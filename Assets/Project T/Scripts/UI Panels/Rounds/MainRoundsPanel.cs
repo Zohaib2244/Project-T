@@ -1,0 +1,161 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Scripts.Resources;
+using TMPro;
+
+namespace Scripts.UIPanels
+{
+    public class MainRoundsPanel : MonoBehaviour
+    {
+        #region Singleton
+        private static MainRoundsPanel _instance;
+
+        public static MainRoundsPanel Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    Debug.LogError("FirestoreManager instance is not initialized.");
+                }
+                return _instance;
+            }
+        }
+        void Awake()
+        {
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        #endregion
+        public Rounds selectedRound;
+        public Transform SelectedRoundPanel;
+
+        [Header("Round Panels")]
+        [SerializeField] private Transform MotionsPanel;
+        // [SerializeField] private ButtonPanel MotionsButtonPanel;
+        [SerializeField] private Transform AttendancePanel;
+        [SerializeField] private Transform DrawsPanel;
+        [SerializeField] private Transform BallotsPanel;
+
+        [Header("Round Side Panel")]
+        [SerializeField] private AdvancedDropdown preLimDropdown;
+        [SerializeField] private AdvancedDropdown noviceBreakDropdown;
+        [SerializeField] private AdvancedDropdown openBreakDropdown;
+
+        [Header("Round Info Panel")]
+        [SerializeField] private TMP_Text preLimRoundName;
+        [SerializeField] private Toggle speakerCategoryToggle;
+
+
+        #region Essentails
+        void OnEnable()
+        {
+           selectedRound = AppConstants.instance.GetCurrentRound();
+
+
+            ConfigureRoudnDropDown();
+            ConfigureScreen();
+            // speakerCategoryToggle.DeActivate();
+            // DisableAllPanels();
+        }
+        private void OnDisable()
+        {
+            selectedRound = null;
+        }
+        #endregion
+
+        #region Panel Switcher
+        public void OpenMotionsPanel()
+        {
+            MotionsPanel.gameObject.SetActive(true);
+            AttendancePanel.gameObject.SetActive(false);
+            DrawsPanel.gameObject.SetActive(false);
+            BallotsPanel.gameObject.SetActive(false);
+        }
+        public void OpenAttendancePanel()
+        {
+            MotionsPanel.gameObject.SetActive(false);
+            AttendancePanel.gameObject.SetActive(true);
+            DrawsPanel.gameObject.SetActive(false);
+            BallotsPanel.gameObject.SetActive(false);
+        }
+        public void OpenDrawsPanel()
+        {
+            MotionsPanel.gameObject.SetActive(false);
+            AttendancePanel.gameObject.SetActive(false);
+            DrawsPanel.gameObject.SetActive(true);
+            BallotsPanel.gameObject.SetActive(false);
+        }
+        public void OpenBallotsPanel()
+        {
+            MotionsPanel.gameObject.SetActive(false);
+            AttendancePanel.gameObject.SetActive(false);
+            DrawsPanel.gameObject.SetActive(false);
+            BallotsPanel.gameObject.SetActive(true);
+        }
+        public void DisableAllPanels()
+        {
+            MotionsPanel.gameObject.SetActive(false);
+            AttendancePanel.gameObject.SetActive(false);
+            DrawsPanel.gameObject.SetActive(false);
+            BallotsPanel.gameObject.SetActive(false);
+        }
+        #endregion
+
+
+
+
+        private void ConfigureRoudnDropDown()
+        {
+            preLimDropdown.DeleteAllOptions();
+            noviceBreakDropdown.DeleteAllOptions();
+            openBreakDropdown.DeleteAllOptions();
+
+            for (int i = 0; i < AppConstants.instance.selectedTouranment.preLimsInTourney.Count; i++)
+            {
+                preLimDropdown.AddOptions($"Round {i + 1}");
+            }
+            for (int i = 0; i < AppConstants.instance.selectedTouranment.noviceBreaksInTourney.Count; i++)
+            {
+                noviceBreakDropdown.AddOptions(AppConstants.instance.selectedTouranment.noviceBreaksInTourney[i].roundType.ToString());
+            }
+            for (int i = 0; i < AppConstants.instance.selectedTouranment.openBreaksInTourney.Count; i++)
+            {
+                openBreakDropdown.AddOptions(AppConstants.instance.selectedTouranment.openBreaksInTourney[i].roundType.ToString());
+            }
+        }
+        private void ConfigureScreen()
+        {
+            //Update Round Name Display Text
+            switch (selectedRound.roundType)
+            {
+                case RoundTypes.PreLim:
+                    int roundIndex = AppConstants.instance.selectedTouranment.preLimsInTourney.IndexOf(selectedRound) + 1;
+                    preLimRoundName.text = $"Round {roundIndex}";
+                    break;
+                case RoundTypes.QF:
+                    preLimRoundName.text = "Quarter Finals";
+                    break;
+                case RoundTypes.SF:
+                    preLimRoundName.text = "Semi Finals";
+                    break;
+                case RoundTypes.F:
+                    preLimRoundName.text = "Finals";
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+    }
+}
