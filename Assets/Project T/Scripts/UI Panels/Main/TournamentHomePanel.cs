@@ -115,5 +115,9 @@ public class TournamentHomePanel : MonoBehaviour
     {
         MainUIManager.Instance.SwitchPanel(Panels.RoundsPanel);
     }
+    public void OpenRankingsPanel()
+    {
+        MainUIManager.Instance.SwitchPanel(Panels.RankingsPanel);
+    }
 }
 }

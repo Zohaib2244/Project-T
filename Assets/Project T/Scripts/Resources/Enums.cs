@@ -12,6 +12,7 @@ namespace Scripts.Resources
         CRUInstitutionPanel,
         TicketRequestPanel,
         RoundsPanel,
+        RankingsPanel
     }
     public enum TournamentType
     {
