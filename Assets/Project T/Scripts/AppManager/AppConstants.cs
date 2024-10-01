@@ -161,23 +161,33 @@ public class Rounds : TournamentInfo
 {
     public string roundId;
     public RoundTypes roundType;
+    public RoundCategory roundCategory;
     public Dictionary<string, string> motions;
     public List<Team> availableTeams;
     public List<Adjudicator> availableAdjudicators;
     public RoundStates roundState;
     public List<TeamRoundData> swings;
     public List<Match> matches;
+        public bool motionAdded = false;
+        public bool teamAttendanceAdded = false;
+        public bool AdjudicatorAttendanceAdded = false;
+        public bool drawGenerated = false;
+        public bool ballotsAdded = false;
+        public bool isSilent = false;
+        public bool isPublic = false;
+
     // FOR DRAWS : be like the number of matches ibn this round, based upon the draw and the data in matches will be set by the generate draw function
     public Rounds()
     {
         roundId = "";
         roundType = RoundTypes.PreLim;
+        roundCategory = RoundCategory.PreLim;
         motions = new Dictionary<string, string>();
         availableTeams = new List<Team>();
         availableAdjudicators = new List<Adjudicator>();
         swings = new List<TeamRoundData>();
         matches = new List<Match>();
-        
+
     }
 }
 public class Match : Rounds
@@ -197,7 +207,7 @@ public class Match : Rounds
 public class TeamRoundData : Team
 {
     public string teamRoundDataID;
-    public _RoundTypes roundType;
+    public RoundCategory roundType;
     public int roundNumber;
     public TeamPositionsAsian teamPositionAsian;
     public TeamPositionsBritish teamPositionBritish;
@@ -280,7 +290,7 @@ public class AppConstants : MonoBehaviour
         await Task.Delay(1500);
         await SaveAllRound(tournament);
     }
-   
+
     public void RemoveTournament(TournamentInfo tournament)
     {
         tournaments.Remove(tournament);
@@ -406,7 +416,7 @@ public class AppConstants : MonoBehaviour
         return null;
     }
 
-   
+
     public string GenerateRoundID(string roundType)
     {
         string selectedTournamentID = selectedTouranment.tournamentId.ToString();
@@ -430,23 +440,23 @@ public class AppConstants : MonoBehaviour
         foreach (Rounds round in selectedTouranment.preLimsInTourney)
         {
             Debug.Log("Saving Prelim Rounds");
-            await FirestoreManager.FireInstance.SaveRoundAsync(_RoundTypes.PreLim.ToString(), round);
+            await FirestoreManager.FireInstance.SaveRoundAsync(RoundCategory.PreLim.ToString(), round);
         }
         foreach (Rounds round in selectedTouranment.noviceBreaksInTourney)
         {
-            await FirestoreManager.FireInstance.SaveRoundAsync(_RoundTypes.NoviceBreak.ToString(), round);
+            await FirestoreManager.FireInstance.SaveRoundAsync(RoundCategory.NoviceBreak.ToString(), round);
         }
         foreach (Rounds round in selectedTouranment.openBreaksInTourney)
         {
-            await FirestoreManager.FireInstance.SaveRoundAsync(_RoundTypes.OpenBreak.ToString(), round);
+            await FirestoreManager.FireInstance.SaveRoundAsync(RoundCategory.OpenBreak.ToString(), round);
         }
         return;
     }
     public async void GetAllRounds()
     {
-        selectedTouranment.preLimsInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(_RoundTypes.PreLim.ToString());
-        selectedTouranment.noviceBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(_RoundTypes.NoviceBreak.ToString());
-        selectedTouranment.openBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(_RoundTypes.OpenBreak.ToString());
+        selectedTouranment.preLimsInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(RoundCategory.PreLim.ToString());
+        selectedTouranment.noviceBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(RoundCategory.NoviceBreak.ToString());
+        selectedTouranment.openBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(RoundCategory.OpenBreak.ToString());
         Debug.Log("Prelims in Tournament: " + selectedTouranment.preLimsInTourney.Count);
         Debug.Log("Novice Breaks in Tournament: " + selectedTouranment.noviceBreaksInTourney.Count);
         Debug.Log("Open Breaks in Tournament: " + selectedTouranment.openBreaksInTourney.Count);

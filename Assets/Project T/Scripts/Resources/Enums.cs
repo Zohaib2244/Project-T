@@ -63,7 +63,7 @@ namespace Scripts.Resources
         SF,
         F,
     }
-    public enum _RoundTypes
+    public enum RoundCategory
     {
         PreLim,
         NoviceBreak,

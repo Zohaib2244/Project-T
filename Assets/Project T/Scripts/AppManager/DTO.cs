@@ -14,6 +14,7 @@ namespace Scripts.FirebaseConfig
             {
                 { "roundId", roundDTO.roundId },
                 { "roundType", roundDTO.roundType },
+                { "roundCategory", roundDTO.roundCategory },
                 { "motions", roundDTO.motions },
                 { "availableTeamsIds", roundDTO.availableTeamsIds },
                 { "availableAdjudicatorsIds", roundDTO.availableAdjudicatorsIds },
@@ -21,7 +22,7 @@ namespace Scripts.FirebaseConfig
                 { "swings", roundDTO.swings },
             };
         }
-    
+
         public static Dictionary<string, object> ToDictionary(this Match_DTO matchDTO)
         {
             return new Dictionary<string, object>
@@ -32,7 +33,7 @@ namespace Scripts.FirebaseConfig
                 { "teamsinMatchIds", matchDTO.teamsinMatchIds }
             };
         }
-    
+
         public static Dictionary<string, object> ToDictionary(this TeamRoundData_DTO teamRoundDataDTO)
         {
             return new Dictionary<string, object>
@@ -45,7 +46,7 @@ namespace Scripts.FirebaseConfig
                 { "teamMatchRanking", teamRoundDataDTO.teamMatchRanking }
             };
         }
-    
+
         public static Dictionary<string, object> ToDictionary(this SpeakerRoundData_DTO speakerRoundDataDTO)
         {
             return new Dictionary<string, object>
@@ -174,18 +175,6 @@ namespace Scripts.FirebaseConfig
             return (RoundStates)Enum.Parse(typeof(RoundStates), value.ToString());
         }
     }
-    public class _RoundTypesConverter : IFirestoreConverter<_RoundTypes>
-    {
-        public object ToFirestore(_RoundTypes value)
-        {
-            return value.ToString();
-        }
-
-        public _RoundTypes FromFirestore(object value)
-        {
-            return (_RoundTypes)Enum.Parse(typeof(_RoundTypes), value.ToString());
-        }
-    }
     #endregion
 
     #region Admin Info
@@ -269,6 +258,9 @@ namespace Scripts.FirebaseConfig
         public RoundTypes roundType { get; set; }
 
         [FirestoreProperty]
+        public int roundCategory { get; set; }
+
+        [FirestoreProperty]
         public Dictionary<string, string> motions { get; set; }
 
         [FirestoreProperty]
@@ -285,6 +277,21 @@ namespace Scripts.FirebaseConfig
 
         [FirestoreProperty]
         public List<Match> matches { get; set; }
+          [FirestoreProperty]
+                public bool motionAdded { get; set; }
+                  [FirestoreProperty]
+        public bool teamAttendanceAdded { get; set; }
+          [FirestoreProperty]
+        public bool AdjudicatorAttendanceAdded{ get; set; }
+          [FirestoreProperty]
+        public bool drawGenerated { get; set; }
+          [FirestoreProperty]
+        public bool ballotsAdded { get; set; }
+        [FirestoreProperty]
+        public bool isPublic { get; set; }
+        [FirestoreProperty]
+        public bool isSilent { get; set; }
+
     }
 
     [FirestoreData]
@@ -305,8 +312,8 @@ namespace Scripts.FirebaseConfig
     {
         [FirestoreDocumentId]
         public string teamRoundDataID { get; set; }
-        [FirestoreProperty(ConverterType = typeof(_RoundTypesConverter))]
-        public _RoundTypes roundType { get; set; }
+        [FirestoreProperty]
+        public int roundCategory { get; set; }
         public int roundNumber { get; set; }
         [FirestoreProperty]
         public string teamId { get; set; }
@@ -529,11 +536,19 @@ namespace Scripts.FirebaseConfig
             {
                 roundId = rounds.roundId,
                 roundType = rounds.roundType,
+                roundCategory = (int)rounds.roundCategory,
                 motions = rounds.motions,
                 availableTeamsIds = rounds.availableTeams.ConvertAll(team => team.teamId),
                 availableAdjudicatorsIds = rounds.availableAdjudicators.ConvertAll(adj => adj.adjudicatorID),
                 roundState = rounds.roundState,
-                swings = rounds.swings.Count
+                swings = rounds.swings.Count,
+                motionAdded = rounds.motionAdded,
+                teamAttendanceAdded = rounds.teamAttendanceAdded,
+                AdjudicatorAttendanceAdded = rounds.AdjudicatorAttendanceAdded,
+                drawGenerated = rounds.drawGenerated,
+                ballotsAdded = rounds.ballotsAdded,
+                isPublic = rounds.isPublic,
+                isSilent = rounds.isSilent
             };
         }
 
@@ -543,6 +558,7 @@ namespace Scripts.FirebaseConfig
             {
                 roundId = rounds.roundId,
                 roundType = rounds.roundType,
+                roundCategory = (RoundCategory)rounds.roundCategory,
                 motions = rounds.motions,
                 availableTeams = AppConstants.instance.selectedTouranment.teamsInTourney
                     .Where(team => rounds.availableTeamsIds.Contains(team.teamId))
@@ -552,8 +568,15 @@ namespace Scripts.FirebaseConfig
                     .Where(adjudicator => rounds.availableAdjudicatorsIds.Contains(adjudicator.adjudicatorID))
                     .ToList(),
                 roundState = rounds.roundState,
-                swings = new List<TeamRoundData>() // Populate this list as needed
-            };
+                swings = new List<TeamRoundData>(),
+                motionAdded = rounds.motionAdded,
+                teamAttendanceAdded = rounds.teamAttendanceAdded,
+                AdjudicatorAttendanceAdded = rounds.AdjudicatorAttendanceAdded,
+                drawGenerated = rounds.drawGenerated,
+                ballotsAdded = rounds.ballotsAdded,
+                isPublic = rounds.isPublic,
+                isSilent = rounds.isSilent
+                            };
         }
 
         // Match DTO Converter
@@ -593,7 +616,7 @@ namespace Scripts.FirebaseConfig
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
                 roundNumber = teamRoundData.roundNumber,
-                roundType = teamRoundData.roundType,
+                roundCategory = (int)teamRoundData.roundType,
                 teamId = teamRoundData.teamId,
                 teamPositionAsian = teamRoundData.teamPositionAsian,
                 teamPositionBritish = teamRoundData.teamPositionBritish,
@@ -608,7 +631,7 @@ namespace Scripts.FirebaseConfig
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
                 roundNumber = teamRoundData.roundNumber,
-                roundType = teamRoundData.roundType,
+                roundType = (RoundCategory)teamRoundData.roundCategory,
                 teamId = teamRoundData.teamId,
                 teamPositionAsian = teamRoundData.teamPositionAsian,
                 teamPositionBritish = teamRoundData.teamPositionBritish,

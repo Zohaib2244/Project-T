@@ -39,6 +39,7 @@ namespace Scripts.UIPanels
         }
 
         #endregion
+        #region  Variables
         public Rounds selectedRound;
         public RoundPanelTypes SelectedRoundPanel;
 
@@ -63,7 +64,7 @@ namespace Scripts.UIPanels
         [SerializeField] private Toggle speakerCategoryToggle;
         [SerializeField] public Button goPublicButton;
         [SerializeField] private TMP_Text roundTypeText;
-
+        #endregion
 
         #region Essentails
         void OnEnable()
@@ -128,6 +129,8 @@ namespace Scripts.UIPanels
             SelectedRoundPanel = RoundPanelTypes.None;
         }
         #endregion
+
+        #region Round Configuration
         private void UpdateSelectedRound(Rounds rounds)
         {
             selectedRound = rounds;
@@ -158,7 +161,7 @@ namespace Scripts.UIPanels
             roundFunctionButton.DeselectAll();
             goPublicButton.interactable = false;
             //Update Round Name Display Text
-            Debug.Log($"Selected round: {selectedRound.roundType}");
+            // Debug.Log($"Selected round: {selectedRound.roundType}");
             switch (selectedRound.roundType)
             {
                 case RoundTypes.PreLim:
@@ -193,18 +196,17 @@ namespace Scripts.UIPanels
             string selectedValue = preLimDropdown.optionsList[index].ToString();
 
             // Find the round it states
-            var allRounds = AppConstants.instance.selectedTouranment.preLimsInTourney
-                .Concat(AppConstants.instance.selectedTouranment.noviceBreaksInTourney)
-                .Concat(AppConstants.instance.selectedTouranment.openBreaksInTourney)
-                .ToList();
+            var allRounds = AppConstants.instance.selectedTouranment.preLimsInTourney.ToList();
 
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-
+            Debug.Log($"Selected round: {selectedRound.roundType}");
+                // Add that round to the selected round
               UpdateSelectedRound(foundRound);
                 noviceBreakDropdown.SetDefaultText();
                 openBreakDropdown.SetDefaultText();
+                roundTypeText.text = "- PreLim";
            DialogueBox.Instance.ShowDialogueBox("Round found!", Color.green);
             
             }
@@ -219,20 +221,17 @@ namespace Scripts.UIPanels
             string selectedValue = noviceBreakDropdown.optionsList[index].ToString();
 
             // Find the round it states
-            var allRounds = AppConstants.instance.selectedTouranment.preLimsInTourney
-                .Concat(AppConstants.instance.selectedTouranment.noviceBreaksInTourney)
-                .Concat(AppConstants.instance.selectedTouranment.openBreaksInTourney)
-                .ToList();
+            var allRounds = AppConstants.instance.selectedTouranment.noviceBreaksInTourney.ToList();
 
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-
+Debug.Log($"Selected round: {selectedRound.roundType}");
                 // Add that round to the selected round
                  UpdateSelectedRound(foundRound);
                 preLimDropdown.SetDefaultText();
                 openBreakDropdown.SetDefaultText();
-                roundTypeText.text = "(NOVICE)";
+                roundTypeText.text = "- NOVICE";
                 Debug.Log($"Selected round: {selectedRound.roundType}");
             }
             else
@@ -246,18 +245,15 @@ namespace Scripts.UIPanels
             string selectedValue = openBreakDropdown.optionsList[index].ToString();
 
             // Find the round it states
-            var allRounds = AppConstants.instance.selectedTouranment.preLimsInTourney
-                .Concat(AppConstants.instance.selectedTouranment.noviceBreaksInTourney)
-                .Concat(AppConstants.instance.selectedTouranment.openBreaksInTourney)
-                .ToList();
+            var allRounds = AppConstants.instance.selectedTouranment.openBreaksInTourney.ToList();
 
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-
+Debug.Log($"Selected round: {selectedRound.roundType}");
                 // Add that round to the selected round
                  UpdateSelectedRound(foundRound);
-                 roundTypeText.text = "(OPEN)";
+                 roundTypeText.text = "- OPEN";
                 preLimDropdown.SetDefaultText();
                 noviceBreakDropdown.SetDefaultText();
                 Debug.Log($"Selected round: {selectedRound.roundType}");
@@ -267,6 +263,24 @@ namespace Scripts.UIPanels
                DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
             }
         }
+        
+
+        private void UpdatePanelSwitcherButtonsStates()
+        {
+            if(!selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded&& !selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                goPublicButton.interactable = false;
+            }
+            else
+            {
+                goPublicButton.interactable = true;
+            }
+        }
+
+
+        #endregion
+        #region Round Functions
         public void SaveRound()
         {
             switch (selectedRound.roundType)
@@ -317,5 +331,6 @@ namespace Scripts.UIPanels
                     break;
             }
         }
+        #endregion
     }
 }

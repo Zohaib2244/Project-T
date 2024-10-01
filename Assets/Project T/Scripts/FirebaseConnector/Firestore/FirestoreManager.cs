@@ -693,8 +693,8 @@ namespace Scripts.FirebaseConfig
 
         public async Task SaveRoundAsync(string roundType, Rounds round, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
-            try
-            {
+            // try
+            // {
                 Debug.Log("<color=yellow>Starting SaveRoundAsync...</color>");
 
                 // Convert the round to DTO
@@ -721,12 +721,12 @@ namespace Scripts.FirebaseConfig
 
                 Debug.Log("<color=green>All matches saved successfully.</color>");
                 onSuccess?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error saving round: {ex.Message}");
-                onFailure?.Invoke();
-            }
+            // }
+            // catch (Exception ex)
+            // {
+            //     Debug.LogError($"Error saving round: {ex.Message}");
+            //     onFailure?.Invoke();
+            // }
         }
         public async Task<List<Rounds>> GetAllRoundsFromFirestore(string roundType)
         {

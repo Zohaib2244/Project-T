@@ -109,4 +109,26 @@ public class ButtonSelect : MonoBehaviour
         Button button = buttons[id];
         OnButtonClick(button);
     }
+    public void DisableInteractability(int id)
+    {
+        if (id < 0 || id >= buttons.Length)
+        {
+            Debug.LogError("Invalid button ID");
+            return;
+        }
+
+        Button button = buttons[id];
+        button.interactable = false;
+    }
+    public void EnableInteractability(int id)
+    {
+        if (id < 0 || id >= buttons.Length)
+        {
+            Debug.LogError("Invalid button ID");
+            return;
+        }
+
+        Button button = buttons[id];
+        button.interactable = true;
+    }
 }
