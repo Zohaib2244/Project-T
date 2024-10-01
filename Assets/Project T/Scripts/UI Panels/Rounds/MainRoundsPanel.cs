@@ -42,6 +42,12 @@ namespace Scripts.UIPanels
         #region  Variables
         public Rounds selectedRound;
         public RoundPanelTypes SelectedRoundPanel;
+        [SerializeField] private GameObject TopPanel;
+        [SerializeField] private Sprite DefaultImage;
+        [SerializeField] private Sprite MotionsPanelImage;
+        [SerializeField] private Sprite AttendancePanelImage;
+        [SerializeField] private Sprite DrawsPanelImage;
+        [SerializeField] private Sprite BallotsPanelImage;
 
         [Header("Round Panels")]
         [SerializeField] private Transform MotionsPanel;
@@ -88,6 +94,52 @@ namespace Scripts.UIPanels
         #endregion
 
         #region Panel Switcher
+        public void UpdatePanelSwitcherButtonsStates()
+        {
+            if (!selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(0);
+                goPublicButton.interactable = false;
+            }
+            else if (selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(1);
+                goPublicButton.interactable = false;
+            }
+            else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(1);
+                goPublicButton.interactable = false;
+            }
+            else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(2);
+                goPublicButton.interactable = false;
+            }
+            else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && selectedRound.ballotsAdded && !selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(3);
+                goPublicButton.interactable = false;
+            }
+            else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && selectedRound.ballotsAdded && selectedRound.drawGenerated)
+            {
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.EnableAllInteractability();
+                goPublicButton.interactable = true;
+            }
+        }
+
+
         public void OpenMotionsPanel()
         {
             MotionsPanel.gameObject.SetActive(true);
@@ -180,7 +232,7 @@ namespace Scripts.UIPanels
                 default:
                     break;
             }
-            if(AppConstants.instance.selectedTouranment.speakerCategories.Count > 1)
+            if (AppConstants.instance.selectedTouranment.speakerCategories.Count > 1)
             {
                 noviceBreakDropdownButton.interactable = true;
             }
@@ -188,6 +240,7 @@ namespace Scripts.UIPanels
             {
                 noviceBreakDropdownButton.interactable = false;
             }
+            UpdatePanelSwitcherButtonsStates();
         }
 
         private void ChangePrelimRound(int index)
@@ -201,18 +254,18 @@ namespace Scripts.UIPanels
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-            Debug.Log($"Selected round: {selectedRound.roundType}");
+                Debug.Log($"Selected round: {selectedRound.roundType}");
                 // Add that round to the selected round
-              UpdateSelectedRound(foundRound);
+                UpdateSelectedRound(foundRound);
                 noviceBreakDropdown.SetDefaultText();
                 openBreakDropdown.SetDefaultText();
                 roundTypeText.text = "- PreLim";
-           DialogueBox.Instance.ShowDialogueBox("Round found!", Color.green);
-            
+                DialogueBox.Instance.ShowDialogueBox("Round found!", Color.green);
+
             }
             else
             {
-               DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
+                DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
             }
         }
         private void ChangeNoviceBreakRound(int index)
@@ -226,9 +279,9 @@ namespace Scripts.UIPanels
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-Debug.Log($"Selected round: {selectedRound.roundType}");
+                Debug.Log($"Selected round: {selectedRound.roundType}");
                 // Add that round to the selected round
-                 UpdateSelectedRound(foundRound);
+                UpdateSelectedRound(foundRound);
                 preLimDropdown.SetDefaultText();
                 openBreakDropdown.SetDefaultText();
                 roundTypeText.text = "- NOVICE";
@@ -236,7 +289,7 @@ Debug.Log($"Selected round: {selectedRound.roundType}");
             }
             else
             {
-              DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
+                DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
             }
         }
         private void ChangeOpenBreakRound(int index)
@@ -250,33 +303,20 @@ Debug.Log($"Selected round: {selectedRound.roundType}");
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-Debug.Log($"Selected round: {selectedRound.roundType}");
+                Debug.Log($"Selected round: {selectedRound.roundType}");
                 // Add that round to the selected round
-                 UpdateSelectedRound(foundRound);
-                 roundTypeText.text = "- OPEN";
+                UpdateSelectedRound(foundRound);
+                roundTypeText.text = "- OPEN";
                 preLimDropdown.SetDefaultText();
                 noviceBreakDropdown.SetDefaultText();
                 Debug.Log($"Selected round: {selectedRound.roundType}");
             }
             else
             {
-               DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
+                DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
             }
         }
-        
 
-        private void UpdatePanelSwitcherButtonsStates()
-        {
-            if(!selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded&& !selectedRound.drawGenerated)
-            {
-                roundFunctionButton.DeselectAll();
-                goPublicButton.interactable = false;
-            }
-            else
-            {
-                goPublicButton.interactable = true;
-            }
-        }
 
 
         #endregion
@@ -330,6 +370,10 @@ Debug.Log($"Selected round: {selectedRound.roundType}");
                     // OpenMotionsPanel();
                     break;
             }
+        }
+        public void SetRoundSilent()
+        {
+            selectedRound.isSilent = true;
         }
         #endregion
     }

@@ -131,4 +131,18 @@ public class ButtonSelect : MonoBehaviour
         Button button = buttons[id];
         button.interactable = true;
     }
+    public void DisableAllInteractability()
+    {
+        foreach (var button in buttons)
+        {
+            button.interactable = false;
+        }
+    }
+    public void EnableAllInteractability()
+    {
+        foreach (var button in buttons)
+        {
+            button.interactable = true;
+        }
+    }
 }
