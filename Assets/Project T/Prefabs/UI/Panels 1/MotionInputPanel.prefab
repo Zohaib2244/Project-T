@@ -1468,7 +1468,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   motionText_IF: {fileID: 6713023677010754744}
   motionInfoSlide_IF: {fileID: 4729126914184372700}
-  infoSLideToggle: {fileID: 0}
+  infoSLideToggle: {fileID: 2353797303421161169}
 --- !u!1 &7315843664589179839
 GameObject:
   m_ObjectHideFlags: 0
@@ -2016,6 +2016,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 757d5f0e8c5055b42a7ab3784fad7a15, type: 3}
+--- !u!114 &2353797303421161169 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7877768718496155276, guid: 757d5f0e8c5055b42a7ab3784fad7a15, type: 3}
+  m_PrefabInstance: {fileID: 5618569033152792669}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24cef3ea2ae643a4f82b88b8e90b3d5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &3389627722668664432 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7130124755057667629, guid: 757d5f0e8c5055b42a7ab3784fad7a15, type: 3}

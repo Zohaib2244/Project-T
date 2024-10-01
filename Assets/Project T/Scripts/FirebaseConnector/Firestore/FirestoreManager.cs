@@ -768,8 +768,44 @@ namespace Scripts.FirebaseConfig
             }
 
             return roundsList;
+        }        
+        public async Task UpdateRoundAsync(string roundType, Rounds round, UnityAction onSuccess = null, UnityAction onFailure = null)
+        {
+            try
+            {
+                Debug.Log("<color=yellow>Starting UpdateRoundAsync...</color>");
+        
+                // Convert the round to DTO
+                Rounds_DTO roundDTO = DTOConverter.Instance.RoundsToDTO(round);
+                Debug.Log($"<color=yellow>Round converted to DTO: {roundDTO.roundId}</color>");
+        
+                // Save the round DTO using UpdateAsync
+                DocumentReference roundRef = GetRoundDocumentReference(roundType, roundDTO.roundId);
+                await roundRef.UpdateAsync(roundDTO.ToDictionary());
+                Debug.Log($"<color=green>Round {roundDTO.roundId} updated successfully.</color>");
+        
+                // Extract matches from the round
+                List<Match> matches = round.matches ?? new List<Match>();
+                List<Match_DTO> matchDTOs = matches.ConvertAll(match => DTOConverter.Instance.MatchToDTO(match));
+                Debug.Log($"<color=yellow>Extracted {matches.Count} matches from the round.</color>");
+        
+                // Save matches as subcollection using UpdateAsync
+                foreach (var matchDTO in matchDTOs)
+                {
+                    DocumentReference matchRef = GetMatchDocumentReference(roundType, roundDTO.roundId, matchDTO.matchId);
+                    await matchRef.UpdateAsync(matchDTO.ToDictionary());
+                    Debug.Log($"<color=green>Match {matchDTO.matchId} updated successfully.</color>");
+                }
+        
+                Debug.Log("<color=green>All matches updated successfully.</color>");
+                onSuccess?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error updating round: {ex.Message}");
+                onFailure?.Invoke();
+            }
         }
-
         #endregion
         #region TeamRoundData Functions
         public async Task AddTeamRoundData(string teamId, TeamRoundData teamRoundData, UnityAction onSuccess = null, UnityAction onFailure = null)

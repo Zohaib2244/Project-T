@@ -7,6 +7,7 @@ using System.Linq;
 using System;
 using System.Threading.Tasks;
 using DG.Tweening;
+using Unity.VisualScripting;
 
 #region Data Classes
 #region Admin Info
@@ -196,6 +197,8 @@ public class Match : Rounds
 public class TeamRoundData : Team
 {
     public string teamRoundDataID;
+    public _RoundTypes roundType;
+    public int roundNumber;
     public TeamPositionsAsian teamPositionAsian;
     public TeamPositionsBritish teamPositionBritish;
     public float teamScore;
@@ -439,7 +442,7 @@ public class AppConstants : MonoBehaviour
         }
         return;
     }
-    public async Task GetAllRounds()
+    public async void GetAllRounds()
     {
         selectedTouranment.preLimsInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(_RoundTypes.PreLim.ToString());
         selectedTouranment.noviceBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(_RoundTypes.NoviceBreak.ToString());

@@ -19,6 +19,12 @@ public class MotionsEntry : MonoBehaviour
     {
         infoSLideToggle.onSelectOption1 += InfoSlideOn;
         infoSLideToggle.onSelectOption2 += InfoSlideOff;
+        motionInfoSlide_IF.interactable = false;
+    }
+    private void OnDestroy()
+    {
+        infoSLideToggle.onSelectOption1 -= InfoSlideOn;
+        infoSLideToggle.onSelectOption2 -= InfoSlideOff;
     }
 
     public Dictionary<string, string> GetMotion()
@@ -54,6 +60,6 @@ public class MotionsEntry : MonoBehaviour
     }
     public void SaveMotion()
     {
-      Round_MotionsPanel.Instance.SaveMotion(GetMotion());
+        Round_MotionsPanel.Instance.SaveMotion(GetMotion());
     }
 }

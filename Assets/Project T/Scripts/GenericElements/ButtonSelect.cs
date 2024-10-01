@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class ButtonSelect : MonoBehaviour
 {
-    private Button[] buttons; // Array to hold all child buttons
+    [SerializeField] private Button[] buttons; // Array to hold all child buttons
     private Button selectedButton; // Reference to the currently selected button
     public List<UnityEvent> buttonSelectEvents; // List to hold select events for each button
     public List<UnityEvent> buttonDeselectEvents; // List to hold deselect events for each button
@@ -89,7 +89,6 @@ public class ButtonSelect : MonoBehaviour
             }
         }
     }
-
     public void DeselectAll()
     {
         foreach (var button in buttons)

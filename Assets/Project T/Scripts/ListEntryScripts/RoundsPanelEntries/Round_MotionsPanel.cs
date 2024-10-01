@@ -90,7 +90,8 @@ namespace Scripts.UIPanels.RoundPanels
         public void SaveMotion(Dictionary<string, string> motion)
         {
             MainRoundsPanel.Instance.selectedRound.motions = motion;
-            Debug.Log("Motion Saved: " + MainRoundsPanel.Instance.selectedRound.motions);
+            DialogueBox.Instance.ShowDialogueBox("Motion Saved Successfully.", Color.green);
+            MainRoundsPanel.Instance.goPublicButton.interactable = true;
         }
     }
 }

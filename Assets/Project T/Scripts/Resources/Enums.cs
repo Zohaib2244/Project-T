@@ -75,4 +75,12 @@ namespace Scripts.Resources
         InProgress,
         Completed
     }
+    public enum RoundPanelTypes
+    {
+        MotionsPanel,
+        AttendancePanel,
+        DrawsPanel,
+        BallotsPanel,
+        None,
+    }
 }

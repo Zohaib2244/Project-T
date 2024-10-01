@@ -6,6 +6,58 @@ using System.Linq;
 
 namespace Scripts.FirebaseConfig
 {
+    public static class DTOExtensions
+    {
+        public static Dictionary<string, object> ToDictionary(this Rounds_DTO roundDTO)
+        {
+            return new Dictionary<string, object>
+            {
+                { "roundId", roundDTO.roundId },
+                { "roundType", roundDTO.roundType },
+                { "motions", roundDTO.motions },
+                { "availableTeamsIds", roundDTO.availableTeamsIds },
+                { "availableAdjudicatorsIds", roundDTO.availableAdjudicatorsIds },
+                { "roundState", roundDTO.roundState },
+                { "swings", roundDTO.swings },
+            };
+        }
+    
+        public static Dictionary<string, object> ToDictionary(this Match_DTO matchDTO)
+        {
+            return new Dictionary<string, object>
+            {
+                { "matchId", matchDTO.matchId },
+                { "adjudicatorsIds", matchDTO.adjudicatorsIds },
+                { "selectedMotion", matchDTO.selectedMotion },
+                { "teamsinMatchIds", matchDTO.teamsinMatchIds }
+            };
+        }
+    
+        public static Dictionary<string, object> ToDictionary(this TeamRoundData_DTO teamRoundDataDTO)
+        {
+            return new Dictionary<string, object>
+            {
+                { "teamRoundDataID", teamRoundDataDTO.teamRoundDataID },
+                { "teamId", teamRoundDataDTO.teamId },
+                { "teamPositionAsian", teamRoundDataDTO.teamPositionAsian },
+                { "teamPositionBritish", teamRoundDataDTO.teamPositionBritish },
+                { "teamScore", teamRoundDataDTO.teamScore },
+                { "teamMatchRanking", teamRoundDataDTO.teamMatchRanking }
+            };
+        }
+    
+        public static Dictionary<string, object> ToDictionary(this SpeakerRoundData_DTO speakerRoundDataDTO)
+        {
+            return new Dictionary<string, object>
+            {
+                { "speakerRoundDataID", speakerRoundDataDTO.speakerRoundDataID },
+                { "speakerId", speakerRoundDataDTO.speakerId },
+                { "speakerSpeakingPosition", speakerRoundDataDTO.speakerSpeakingPosition }
+            };
+        }
+    }
+
+
     #region Converters
     public interface IFirestoreConverter<T>
     {
@@ -120,6 +172,18 @@ namespace Scripts.FirebaseConfig
         public RoundStates FromFirestore(object value)
         {
             return (RoundStates)Enum.Parse(typeof(RoundStates), value.ToString());
+        }
+    }
+    public class _RoundTypesConverter : IFirestoreConverter<_RoundTypes>
+    {
+        public object ToFirestore(_RoundTypes value)
+        {
+            return value.ToString();
+        }
+
+        public _RoundTypes FromFirestore(object value)
+        {
+            return (_RoundTypes)Enum.Parse(typeof(_RoundTypes), value.ToString());
         }
     }
     #endregion
@@ -241,6 +305,9 @@ namespace Scripts.FirebaseConfig
     {
         [FirestoreDocumentId]
         public string teamRoundDataID { get; set; }
+        [FirestoreProperty(ConverterType = typeof(_RoundTypesConverter))]
+        public _RoundTypes roundType { get; set; }
+        public int roundNumber { get; set; }
         [FirestoreProperty]
         public string teamId { get; set; }
         [FirestoreProperty(ConverterType = typeof(TeamPositionsAsianConverter))]
@@ -525,6 +592,8 @@ namespace Scripts.FirebaseConfig
             return new TeamRoundData_DTO
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
+                roundNumber = teamRoundData.roundNumber,
+                roundType = teamRoundData.roundType,
                 teamId = teamRoundData.teamId,
                 teamPositionAsian = teamRoundData.teamPositionAsian,
                 teamPositionBritish = teamRoundData.teamPositionBritish,
@@ -538,6 +607,8 @@ namespace Scripts.FirebaseConfig
             return new TeamRoundData
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
+                roundNumber = teamRoundData.roundNumber,
+                roundType = teamRoundData.roundType,
                 teamId = teamRoundData.teamId,
                 teamPositionAsian = teamRoundData.teamPositionAsian,
                 teamPositionBritish = teamRoundData.teamPositionBritish,
