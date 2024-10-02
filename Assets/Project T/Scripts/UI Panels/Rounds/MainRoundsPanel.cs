@@ -43,6 +43,7 @@ namespace Scripts.UIPanels
         public Rounds selectedRound;
         public RoundPanelTypes SelectedRoundPanel;
         [SerializeField] private GameObject TopPanel;
+        [SerializeField] private Image RoundPanelImage;
         [SerializeField] private Sprite DefaultImage;
         [SerializeField] private Sprite MotionsPanelImage;
         [SerializeField] private Sprite AttendancePanelImage;
@@ -69,6 +70,8 @@ namespace Scripts.UIPanels
         [SerializeField] private TMP_Text preLimRoundName;
         [SerializeField] private Toggle speakerCategoryToggle;
         [SerializeField] public Button goPublicButton;
+        [SerializeField] private Button silentRoundButton;
+        [SerializeField] private Color defaultColorSRBtn;
         [SerializeField] private TMP_Text roundTypeText;
         #endregion
 
@@ -107,6 +110,7 @@ namespace Scripts.UIPanels
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(0);
                 roundFunctionButton.EnableInteractability(1);
                 goPublicButton.interactable = false;
             }
@@ -114,6 +118,7 @@ namespace Scripts.UIPanels
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(0);
                 roundFunctionButton.EnableInteractability(1);
                 goPublicButton.interactable = false;
             }
@@ -121,6 +126,8 @@ namespace Scripts.UIPanels
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(0);
+                roundFunctionButton.EnableInteractability(1);
                 roundFunctionButton.EnableInteractability(2);
                 goPublicButton.interactable = false;
             }
@@ -128,6 +135,9 @@ namespace Scripts.UIPanels
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.DisableAllInteractability();
+                roundFunctionButton.EnableInteractability(0);
+                roundFunctionButton.EnableInteractability(1);
+                roundFunctionButton.EnableInteractability(2);
                 roundFunctionButton.EnableInteractability(3);
                 goPublicButton.interactable = false;
             }
@@ -142,43 +152,53 @@ namespace Scripts.UIPanels
 
         public void OpenMotionsPanel()
         {
+            RoundPanelImage.sprite = MotionsPanelImage;
             MotionsPanel.gameObject.SetActive(true);
             AttendancePanel.gameObject.SetActive(false);
             DrawsPanel.gameObject.SetActive(false);
             BallotsPanel.gameObject.SetActive(false);
             SelectedRoundPanel = RoundPanelTypes.MotionsPanel;
+            goPublicButton.interactable = false;
         }
         public void OpenAttendancePanel()
         {
+            RoundPanelImage.sprite = AttendancePanelImage;
             MotionsPanel.gameObject.SetActive(false);
             AttendancePanel.gameObject.SetActive(true);
             DrawsPanel.gameObject.SetActive(false);
             BallotsPanel.gameObject.SetActive(false);
             SelectedRoundPanel = RoundPanelTypes.AttendancePanel;
+            goPublicButton.interactable = false;
         }
         public void OpenDrawsPanel()
         {
+            RoundPanelImage.sprite = DrawsPanelImage;
             MotionsPanel.gameObject.SetActive(false);
             AttendancePanel.gameObject.SetActive(false);
             DrawsPanel.gameObject.SetActive(true);
             BallotsPanel.gameObject.SetActive(false);
             SelectedRoundPanel = RoundPanelTypes.DrawsPanel;
+            goPublicButton.interactable = false;
         }
         public void OpenBallotsPanel()
         {
+            RoundPanelImage.sprite = BallotsPanelImage;
             MotionsPanel.gameObject.SetActive(false);
             AttendancePanel.gameObject.SetActive(false);
             DrawsPanel.gameObject.SetActive(false);
             BallotsPanel.gameObject.SetActive(true);
             SelectedRoundPanel = RoundPanelTypes.BallotsPanel;
+            goPublicButton.interactable = false;
         }
         public void DisableAllPanels()
         {
+            RoundPanelImage.sprite = DefaultImage;
             MotionsPanel.gameObject.SetActive(false);
             AttendancePanel.gameObject.SetActive(false);
             DrawsPanel.gameObject.SetActive(false);
             BallotsPanel.gameObject.SetActive(false);
             SelectedRoundPanel = RoundPanelTypes.None;
+            goPublicButton.interactable = false;
         }
         #endregion
 
@@ -212,6 +232,15 @@ namespace Scripts.UIPanels
         {
             roundFunctionButton.DeselectAll();
             goPublicButton.interactable = false;
+            if(selectedRound.isSilent)
+            {
+                silentRoundButton.GetComponent<Image>().color = Color.red;
+            }
+            else
+            {
+                silentRoundButton.GetComponent<Image>().color = defaultColorSRBtn;
+            }
+
             //Update Round Name Display Text
             // Debug.Log($"Selected round: {selectedRound.roundType}");
             switch (selectedRound.roundType)
@@ -371,10 +400,21 @@ namespace Scripts.UIPanels
                     break;
             }
         }
-        public void SetRoundSilent()
+  public void SetRoundSilent()
+    {
+        // Toggle the isSilent state
+        selectedRound.isSilent = !selectedRound.isSilent;
+
+        // Change the button color based on the isSilent state
+        if (selectedRound.isSilent)
         {
-            selectedRound.isSilent = true;
+            silentRoundButton.GetComponent<Image>().color = Color.red;
         }
+        else
+        {
+            silentRoundButton.GetComponent<Image>().color = defaultColorSRBtn;
+        }
+    }
         #endregion
     }
 }

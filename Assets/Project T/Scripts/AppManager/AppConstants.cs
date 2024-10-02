@@ -96,7 +96,7 @@ public class Adjudicator : TournamentInfo
     public string adjudicatorName;
     public string adjudicatorEmail;
     public string adjudicatorPhone;
-
+    public bool available = false;
     public AdjudicatorTypes adjudicatorType;
     public string instituitionID;
     public Adjudicator()
@@ -123,6 +123,7 @@ public class Team : TournamentInfo
     public string instituition;
     public List<TeamRoundData> teamRoundDatas;
     public List<Speaker> speakers;
+    public bool available = false;
 
     public Team()
     {
