@@ -453,7 +453,7 @@ public class AppConstants : MonoBehaviour
         }
         return;
     }
-    public async void GetAllRounds()
+    public async Task GetAllRounds()
     {
         selectedTouranment.preLimsInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(RoundCategory.PreLim.ToString());
         selectedTouranment.noviceBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(RoundCategory.NoviceBreak.ToString());

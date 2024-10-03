@@ -88,6 +88,7 @@ namespace Scripts.UIPanels
             preLimDropdown.onChangedValue += ChangePrelimRound;
             noviceBreakDropdown.onChangedValue += ChangeNoviceBreakRound;
             openBreakDropdown.onChangedValue += ChangeOpenBreakRound;
+            
         }
 
         private void OnDisable()
@@ -147,8 +148,7 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableAllInteractability();
                 goPublicButton.interactable = true;
             }
-        }
-
+        }                                       
 
         public void OpenMotionsPanel()
         {

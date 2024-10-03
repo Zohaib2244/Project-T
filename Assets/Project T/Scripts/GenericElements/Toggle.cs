@@ -37,9 +37,9 @@ public class Toggle : MonoBehaviour
     {
         Btn_1.gameObject.GetComponent<Button>().interactable = false;
         //set your interactavility to true if it is false
-        if (Btn_1.gameObject.GetComponent<Button>().interactable == false)
+        if (Btn_2.gameObject.GetComponent<Button>().interactable == false)
         {
-            Btn_1.gameObject.GetComponent<Button>().interactable = true;
+            Btn_2.gameObject.GetComponent<Button>().interactable = true;
         }
         Btn_1.DOScale(Vector3.one * 1.1f, 0.1f); // Scale up slightly
         Btn_2.DOScale(Vector3.one * 0.8f, 0.1f).OnComplete(() => Btn_2.gameObject.GetComponent<Button>().interactable = true);
@@ -49,9 +49,9 @@ public class Toggle : MonoBehaviour
     public void SelectOption2()
     {
         Btn_2.gameObject.GetComponent<Button>().interactable = false;
-        if (Btn_2.gameObject.GetComponent<Button>().interactable == false)
+        if (Btn_1.gameObject.GetComponent<Button>().interactable == false)
         {
-            Btn_2.gameObject.GetComponent<Button>().interactable = true;
+            Btn_1.gameObject.GetComponent<Button>().interactable = true;
         }
         Btn_2.DOScale(Vector3.one * 1.1f, 0.1f); // Scale up slightly
         Btn_1.DOScale(Vector3.one * 0.8f, 0.1f).OnComplete(() => Btn_1.gameObject.GetComponent<Button>().interactable = true);

@@ -59,6 +59,8 @@ public class Rounds_AttendancePanel : MonoBehaviour
         {
             SaveAdjudicatorAttendance();
         }
+        teamAtdPanel.gameObject.SetActive(false);
+        adjudicatorAtdPanel.gameObject.SetActive(false);
     }
 #endregion
 
@@ -111,10 +113,10 @@ private void UpdateTeamList()
     {
         Destroy(child.gameObject);
     }
-
+    teamAttendanceButtonSelect.RemoveAllButtons();
     // Get the list of available teams from selectedRound
     var availableTeams = MainRoundsPanel.Instance.selectedRound.availableTeams;
-
+    
     // Instantiate team list entries and check for attendance
     foreach (Team team in AppConstants.instance.selectedTouranment.teamsInTourney)
     {
@@ -129,6 +131,10 @@ private void UpdateTeamList()
             teamAttendanceButtonSelect.SelectOption(teamEntry.GetComponent<Button>());
         }
     }
+    foreach (var team in availableTeams)
+    {
+        Debug.Log("<color=orange>Called From Update Team List Available Team: " + team.teamName + "</color>");
+    }
 }
 private void UpdateAdjudicatorList()
 {
@@ -137,7 +143,7 @@ private void UpdateAdjudicatorList()
     {
         Destroy(child.gameObject);
     }
-
+    adjudicatorAttendanceButtonSelect.RemoveAllButtons();
     // Get the list of available adjudicators from selectedRound
     var availableAdjudicators = MainRoundsPanel.Instance.selectedRound.availableAdjudicators;
 
@@ -213,9 +219,19 @@ private void UpdateAdjudicatorList()
         }
     
         // Assign the filtered list to selectedRound
+        MainRoundsPanel.Instance.selectedRound.availableTeams.Clear();
         MainRoundsPanel.Instance.selectedRound.availableTeams = uniqueTeams;
         MainRoundsPanel.Instance.selectedRound.teamAttendanceAdded = true;
+        foreach (var team in MainRoundsPanel.Instance.selectedRound.availableTeams)
+        {
+            Debug.Log("<color=green>Called From Save Team Attendance Available Team: " + team.teamName + "</color>");
+        }
+        foreach (var team in AvailableTeams_tmp)
+        {
+            Debug.Log("<color=red>Called From Save Team Attendance Available Team TMP: " + team.teamName + "</color>");
+        }
         isTeamAttendance = true;
+        AvailableTeams_tmp.Clear();
     }
     
     public void SaveAdjudicatorAttendance()
@@ -234,9 +250,11 @@ private void UpdateAdjudicatorList()
         }
     
         // Assign the filtered list to selectedRound
+        MainRoundsPanel.Instance.selectedRound.availableAdjudicators.Clear();
         MainRoundsPanel.Instance.selectedRound.availableAdjudicators = uniqueAdjudicators;
         MainRoundsPanel.Instance.selectedRound.AdjudicatorAttendanceAdded = true;
         isAdjudicatorAttendance = true;
+        AvailableAdjudicators_tmp.Clear();
     }
     #endregion
 }

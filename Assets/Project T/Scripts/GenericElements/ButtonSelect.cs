@@ -278,6 +278,27 @@ public class ButtonSelect : MonoBehaviour
             buttonEventDict = new Dictionary<Button, (UnityEvent, UnityEvent)>();
         }
     }
+    public void RemoveAllButtons()
+    {
+        if (buttons != null)
+        {
+            buttons.Clear();
+        }
 
+        if (buttonSelectEvents != null)
+        {
+            buttonSelectEvents.Clear();
+        }
+
+        if (buttonDeselectEvents != null)
+        {
+            buttonDeselectEvents.Clear();
+        }
+
+        if (buttonEventDict != null)
+        {
+            buttonEventDict.Clear();
+        }
+    }
     #endregion
 }

@@ -25,9 +25,9 @@ public class TournamentHomePanel : MonoBehaviour
     {
         ConfigureTournament();
         UpdateAdminInfo();
-        FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
-        FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
-        AppConstants.instance.GetAllRounds();
+        await FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
+        await FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
+        await AppConstants.instance.GetAllRounds();
         await FirestoreManager.FireInstance.GetAllTeamsFromFirestore();
     }
     private void ConfigureTournament()

@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
@@ -8,6 +7,7 @@ using Scripts.Resources;
 using Scripts.FirebaseConfig;
 using UnityEngine.Events;
 using Scripts.ListEntry;
+using System;
 namespace Scripts.UIPanels
 {public class CRUDSpeakerPanel : MonoBehaviour
 {
@@ -184,7 +184,13 @@ namespace Scripts.UIPanels
         }
 
     }
-    public void ReplaceBtnClick()
+
+        private void OnSpeakerReplaceSuccess(Task arg0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReplaceBtnClick()
     {
         isReplaceModeOn = !isReplaceModeOn;
         if (isReplaceModeOn)
@@ -266,10 +272,10 @@ namespace Scripts.UIPanels
     #endregion
 
     #region Success & Fail Events
-    private void OnSpeakerReplaceSuccess()
+    private async Task OnSpeakerReplaceSuccess()
     {
         DeActivateSpeakerPanel();
-        FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnGetAllTeamsSuccess, OnGetAllTeamsFailed);
+        await FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnGetAllTeamsSuccess, OnGetAllTeamsFailed);
     }
     private void OnSpeakerReplaceFailed()
     {

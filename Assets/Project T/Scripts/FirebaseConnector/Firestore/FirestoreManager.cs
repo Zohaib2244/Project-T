@@ -254,7 +254,7 @@ namespace Scripts.FirebaseConfig
                 onFailure?.Invoke();
             }
         }
-        public async void GetAllInstituitionsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
+        public async Task GetAllInstituitionsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
@@ -505,7 +505,9 @@ namespace Scripts.FirebaseConfig
         }
         #endregion
         #region Speaker Functions
-        public async void ReplaceSpeakersInFirestore(Speaker speaker1, Speaker speaker2, string speaker1TeamID, string speaker2TeamID, UnityAction onSuccess = null, UnityAction onFailure = null)
+        #nullable enable
+                public async void ReplaceSpeakersInFirestore(Speaker speaker1, Speaker speaker2, string speaker1TeamID, string speaker2TeamID, UnityAction<Task>? onSuccess = null, UnityAction? onFailure = null)
+        #nullable disable
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
@@ -517,7 +519,7 @@ namespace Scripts.FirebaseConfig
 
                     await UpdateSpeakersAsync(speakerDocRef1, speakerDocRef2, speaker1, speaker2);
                     Debug.Log("<color=green>Speakers replaced successfully.</color>");
-                    onSuccess?.Invoke();
+                    onSuccess?.Invoke(Task.CompletedTask);
                 }
                 catch (Exception ex)
                 {
@@ -587,7 +589,7 @@ namespace Scripts.FirebaseConfig
         }
         #endregion
         #region Adjudicator Functions
-        public async void GetAllAdjudicatorsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
+        public async Task GetAllAdjudicatorsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
