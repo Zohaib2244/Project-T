@@ -314,7 +314,10 @@ namespace Scripts.FirebaseConfig
         public string teamRoundDataID { get; set; }
         [FirestoreProperty]
         public int roundCategory { get; set; }
-        public int roundNumber { get; set; }
+        [FirestoreProperty]
+        public string roundId { get; set; }
+        [FirestoreProperty]
+        public string matchId { get; set; }
         [FirestoreProperty]
         public string teamId { get; set; }
         [FirestoreProperty(ConverterType = typeof(TeamPositionsAsianConverter))]
@@ -615,7 +618,8 @@ namespace Scripts.FirebaseConfig
             return new TeamRoundData_DTO
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
-                roundNumber = teamRoundData.roundNumber,
+                roundId = teamRoundData.roundID,
+                matchId = teamRoundData.matchID,
                 roundCategory = (int)teamRoundData.roundType,
                 teamId = teamRoundData.teamId,
                 teamPositionAsian = teamRoundData.teamPositionAsian,
@@ -630,7 +634,8 @@ namespace Scripts.FirebaseConfig
             return new TeamRoundData
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
-                roundNumber = teamRoundData.roundNumber,
+                roundID = teamRoundData.roundId,
+                matchID = teamRoundData.matchId,
                 roundType = (RoundCategory)teamRoundData.roundCategory,
                 teamId = teamRoundData.teamId,
                 teamPositionAsian = teamRoundData.teamPositionAsian,

@@ -209,7 +209,8 @@ public class TeamRoundData : Team
 {
     public string teamRoundDataID;
     public RoundCategory roundType;
-    public int roundNumber;
+    public string roundID;
+    public string matchID;
     public TeamPositionsAsian teamPositionAsian;
     public TeamPositionsBritish teamPositionBritish;
     public float teamScore;

@@ -42,6 +42,7 @@ namespace Scripts.UIPanels
         #region  Variables
         public Rounds selectedRound;
         public RoundPanelTypes SelectedRoundPanel;
+        public int swingsCount;
         [SerializeField] private GameObject TopPanel;
         [SerializeField] private Image RoundPanelImage;
         [SerializeField] private Sprite DefaultImage;
