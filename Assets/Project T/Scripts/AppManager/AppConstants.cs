@@ -463,6 +463,35 @@ public class AppConstants : MonoBehaviour
         Debug.Log("Novice Breaks in Tournament: " + selectedTouranment.noviceBreaksInTourney.Count);
         Debug.Log("Open Breaks in Tournament: " + selectedTouranment.openBreaksInTourney.Count);
     }
+    public void PrintRankings()
+{
+    List<Rounds> allRounds = new List<Rounds>();
+    allRounds.AddRange(selectedTouranment.preLimsInTourney);
+    allRounds.AddRange(selectedTouranment.noviceBreaksInTourney);
+    allRounds.AddRange(selectedTouranment.openBreaksInTourney);
+
+    foreach (Rounds round in allRounds)
+    {
+        Debug.Log($"Round ID: {round.roundId}, Round Type: {round.roundType}");
+
+        var teamRankings = round.availableTeams
+            .Select(team => new
+            {
+                Team = team,
+                TotalSpeakerPoints = team.teamRoundDatas.Sum(trd => trd.speakersInRound.Sum(srd => srd.speakerScore)),
+                TeamPoints = team.teamRoundDatas.Sum(trd => trd.teamScore)
+            })
+            .OrderByDescending(tr => tr.TeamPoints)
+            .ThenByDescending(tr => tr.TotalSpeakerPoints)
+            .ToList();
+
+        for (int i = 0; i < teamRankings.Count; i++)
+        {
+            var ranking = teamRankings[i];
+            Debug.Log($"Rank: {i + 1}, Team Name: {ranking.Team.teamName}, Institution: {ranking.Team.instituition}, Total Speaker Points: {ranking.TotalSpeakerPoints}, Team Points: {ranking.TeamPoints}");
+        }
+    }
+}
     #endregion
     #endregion
 }
