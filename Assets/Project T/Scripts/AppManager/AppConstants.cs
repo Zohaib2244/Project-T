@@ -124,7 +124,8 @@ public class Team : TournamentInfo
     public List<TeamRoundData> teamRoundDatas;
     public List<Speaker> speakers;
     public bool available = false;
-
+    public float totalTeamScore;
+    public int teamPoints;
     public Team()
     {
         teamId = "";
@@ -232,11 +233,28 @@ public class SpeakerRoundData : TeamRoundData
     public string speakerId;
     public int speakerSpeakingPosition;
     public float speakerScore;
+
     public SpeakerRoundData()
     {
         speakerId = "";
         speakerSpeakingPosition = 0;
         speakerScore = 0;
+    }
+    public SpeakerRoundData(Team team, int speakingPosition)
+    {
+        if (team.speakers != null && team.speakers.Count > speakingPosition)
+        {
+            var speaker = team.speakers[speakingPosition];
+            speakerId = speaker.speakerId;
+            speakerSpeakingPosition = speakingPosition;
+            speakerScore = 0;
+        }
+        else
+        {
+            speakerId = "";
+            speakerSpeakingPosition = speakingPosition;
+            speakerScore = 0;
+        }
     }
 }
 
@@ -463,6 +481,7 @@ public class AppConstants : MonoBehaviour
         Debug.Log("Novice Breaks in Tournament: " + selectedTouranment.noviceBreaksInTourney.Count);
         Debug.Log("Open Breaks in Tournament: " + selectedTouranment.openBreaksInTourney.Count);
     }
+<<<<<<< Updated upstream
     public void PrintRankings()
 {
     List<Rounds> allRounds = new List<Rounds>();
@@ -492,6 +511,28 @@ public class AppConstants : MonoBehaviour
         }
     }
 }
+=======
+    public string GenerateMatchID(string roundID, int matchCount)
+    {
+        string selectedTournamentID = selectedTouranment.tournamentId.ToString();
+        return $"M_{selectedTournamentID}_{roundID}_{matchCount}";
+    }
+    public string GenerateTRDID(string teamID, string roundID)
+    {
+        string selectedTournamentID = selectedTouranment.tournamentId.ToString();
+        int numberOfThisTRD = selectedTouranment.teamsInTourney.Count();
+        return $"TRD_{selectedTournamentID}_{teamID}_{roundID}_{numberOfThisTRD}";
+    }
+    public string GenerateSRDID(string speakerID, string roundID)
+    {
+        string selectedTournamentID = selectedTouranment.tournamentId.ToString();
+        int numberOfThisSRD = selectedTouranment.teamsInTourney.Count();
+        return $"SRD_{selectedTournamentID}_{speakerID}_{roundID}_{numberOfThisSRD}";
+    }
+>>>>>>> Stashed changes
     #endregion
+   
+   
+   
     #endregion
 }
