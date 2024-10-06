@@ -191,7 +191,6 @@ namespace Scripts.FirebaseConfig
     #endregion
 
     #region  Tournament Info
-
     [FirestoreData]
     public class SpeakerCategories_DTO
     {
@@ -215,7 +214,6 @@ namespace Scripts.FirebaseConfig
         [FirestoreProperty]
         public List<SpeakerCategories_DTO> speakerCategories { get; set; }
     }
-
     [FirestoreData]
     public class Instituitions_DTO
     {
@@ -342,8 +340,9 @@ namespace Scripts.FirebaseConfig
         [FirestoreProperty]
         public float speakerScore { get; set; }
     }
-
     #endregion
+
+
 
     #region Team Info
     [FirestoreData]
@@ -359,6 +358,10 @@ namespace Scripts.FirebaseConfig
         public string teamName { get; set; }
         [FirestoreProperty]
         public SpeakerTypes teamCategory { get; set; }
+        [FirestoreProperty]
+        public float totalTeamScore { get; set; }
+        [FirestoreProperty]
+        public int teamPoints { get; set; }
     }
 
     [FirestoreData]
@@ -493,6 +496,8 @@ namespace Scripts.FirebaseConfig
                 instituitionID = team.instituition,
                 teamName = team.teamName,
                 teamCategory = team.teamCategory,
+                totalTeamScore = team.totalTeamScore,
+                teamPoints = team.teamPoints
             };
         }
         public Team DTOToTeam(Team_DTO team)
@@ -504,6 +509,8 @@ namespace Scripts.FirebaseConfig
                 instituition = team.instituitionID,
                 teamName = team.teamName,
                 teamCategory = team.teamCategory,
+                totalTeamScore = team.totalTeamScore,
+                teamPoints = team.teamPoints
             };
         }
 

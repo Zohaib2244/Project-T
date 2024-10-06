@@ -82,7 +82,8 @@ namespace Scripts.UIPanels
             selectedRound = AppConstants.instance.GetCurrentRound();
             // selectedRound.
             DisableAllPanels();
-            ConfigureRoudnDropDown();
+            ConfigureRoundDropDown();
+            UpdateBreaksDropDown();
             ConfigureScreen();
             // speakerCategoryToggle.DeActivate();
             // DisableAllPanels();
@@ -98,7 +99,7 @@ namespace Scripts.UIPanels
         }
         #endregion
 
-        #region Panel Switcher
+        #region Panel Configuration
         public void UpdatePanelSwitcherButtonsStates()
         {
             if (!selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
@@ -201,6 +202,7 @@ namespace Scripts.UIPanels
             SelectedRoundPanel = RoundPanelTypes.None;
             goPublicButton.interactable = false;
         }
+
         #endregion
 
         #region Round Configuration
@@ -210,23 +212,67 @@ namespace Scripts.UIPanels
             ConfigureScreen();
             DisableAllPanels();
         }
-        private void ConfigureRoudnDropDown()
+        private void ConfigureRoundDropDown()
         {
             preLimDropdown.DeleteAllOptions();
             noviceBreakDropdown.DeleteAllOptions();
             openBreakDropdown.DeleteAllOptions();
-
+        
+            // Populate prelims dropdown
             for (int i = 0; i < AppConstants.instance.selectedTouranment.preLimsInTourney.Count; i++)
             {
                 preLimDropdown.AddOptions($"Round {i + 1}");
             }
-            for (int i = 0; i < AppConstants.instance.selectedTouranment.noviceBreaksInTourney.Count; i++)
+        
+            // Deactivate novice and open dropdowns initially
+            noviceBreakDropdown.gameObject.SetActive(false);
+            openBreakDropdown.gameObject.SetActive(false);
+        
+            // Deactivate novice dropdown if the tournament is open
+            if (AppConstants.instance.selectedTouranment.speakerCategories.Count == 1)
             {
-                noviceBreakDropdown.AddOptions(AppConstants.instance.selectedTouranment.noviceBreaksInTourney[i].roundType.ToString());
+                noviceBreakDropdown.gameObject.SetActive(false);
             }
-            for (int i = 0; i < AppConstants.instance.selectedTouranment.openBreaksInTourney.Count; i++)
+        }
+                private void UpdateBreaksDropDown()
+        {
+            var prelims = AppConstants.instance.selectedTouranment.preLimsInTourney;
+            var noviceBreaks = AppConstants.instance.selectedTouranment.noviceBreaksInTourney;
+            var openBreaks = AppConstants.instance.selectedTouranment.openBreaksInTourney;
+        
+            // Check if all prelims rounds are over
+            bool allPrelimsOver = prelims.All(round => round.roundState == RoundStates.Completed);
+        
+            if (allPrelimsOver)
             {
-                openBreakDropdown.AddOptions(AppConstants.instance.selectedTouranment.openBreaksInTourney[i].roundType.ToString());
+                // Activate novice and open dropdowns
+                if (AppConstants.instance.selectedTouranment.speakerCategories.Count <= 1)
+                {
+                    noviceBreakDropdown.gameObject.SetActive(false);
+                }
+                else
+                {
+                    noviceBreakDropdown.gameObject.SetActive(true);
+                }
+                openBreakDropdown.gameObject.SetActive(true);
+        
+                // Update novice breaks dropdown
+                for (int i = 0; i < noviceBreaks.Count; i++)
+                {
+                    if (i == 0 || noviceBreaks[i - 1].roundState == RoundStates.Completed)
+                    {
+                        noviceBreakDropdown.AddOptions(noviceBreaks[i].roundType.ToString());
+                    }
+                }
+        
+                // Update open breaks dropdown
+                for (int i = 0; i < openBreaks.Count; i++)
+                {
+                    if (i == 0 || openBreaks[i - 1].roundState == RoundStates.Completed)
+                    {
+                        openBreakDropdown.AddOptions(openBreaks[i].roundType.ToString());
+                    }
+                }
             }
         }
         private void ConfigureScreen()
@@ -417,5 +463,6 @@ namespace Scripts.UIPanels
         }
     }
         #endregion
+
     }
 }
