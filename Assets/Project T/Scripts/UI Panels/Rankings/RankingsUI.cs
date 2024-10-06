@@ -18,6 +18,7 @@ public class RankingsUI : MonoBehaviour
     }
 
     public async void printToConsole() {
+        Debug.Log("this is a console test.");
         await AppConstants.instance.GetAllRounds();
         AppConstants.instance.PrintRankings();
     }
