@@ -52,18 +52,17 @@ public class DialogueBox : MonoBehaviour
         dialogueText.text = text;
         dialogueText.color = textColor;
         dialogueBox.SetActive(true);
-        dialogueBox.transform.DOMoveY(visiblePosition.y, animationDuration).SetEase(Ease.OutCubic).OnComplete(() =>
+        dialogueBox.transform.DOMoveY(visiblePosition.y, animationDuration).SetEase(Ease.OutCubic).SetRelative(false).OnComplete(() =>
         {
             // Automatically hide the dialogue box after 2 seconds
             DOVirtual.DelayedCall(2f, () => HideDialogueBox());
-        });
-    }
-    
-    public void HideDialogueBox()
-    {
-        dialogueBox.transform.DOMoveY(hiddenPosition.y, animationDuration).SetEase(Ease.InCubic).OnComplete(() =>
+        });}
+        
+        public void HideDialogueBox()
         {
-            dialogueBox.SetActive(false);
-        });
-    }
+            dialogueBox.transform.DOMoveY(hiddenPosition.y, animationDuration).SetEase(Ease.InCubic).SetRelative(false).OnComplete(() =>
+            {
+                dialogueBox.SetActive(false);
+            });
+        }
 }

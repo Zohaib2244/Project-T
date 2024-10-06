@@ -20,7 +20,7 @@ namespace Scripts.UIPanels
             {
                 if (_instance == null)
                 {
-                    Debug.LogError("FirestoreManager instance is not initialized.");
+                    Destroy(_instance);
                 }
                 return _instance;
             }

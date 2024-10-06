@@ -94,6 +94,7 @@ namespace Scripts.UIPanels.RoundPanels
             DialogueBox.Instance.ShowDialogueBox("Motion Saved Successfully.", Color.green);
             MainRoundsPanel.Instance.goPublicButton.interactable = true;
             MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
+            MainRoundsPanel.Instance.SaveRound();
         }
     }
 }

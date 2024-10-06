@@ -51,16 +51,19 @@ public class Rounds_AttendancePanel : MonoBehaviour
         attendanceToggle.onSelectOption2 = OpenTeamAttendancePanel;
     }
     private void OnDisable() {
-        if (isTeamAttendance)
-        {
-            SaveTeamAttendance();
-        }
-        if (isAdjudicatorAttendance)
-        {
-            SaveAdjudicatorAttendance();
-        }
+        // if (isTeamAttendance)
+        // {
+        //     SaveTeamAttendance();
+        // }
+        // if (isAdjudicatorAttendance)
+        // {
+        //     SaveAdjudicatorAttendance();
+        // }
+        MainRoundsPanel.Instance.SaveRound();
         teamAtdPanel.gameObject.SetActive(false);
         adjudicatorAtdPanel.gameObject.SetActive(false);
+                Debug.Log("Count of available adjudicators: " + MainRoundsPanel.Instance.selectedRound.availableAdjudicators.Count);
+        Debug.Log("Count of available teams: " + MainRoundsPanel.Instance.selectedRound.availableTeams.Count);
     }
 #endregion
 
@@ -226,12 +229,13 @@ private void UpdateAdjudicatorList()
         {
             Debug.Log("<color=green>Called From Save Team Attendance Available Team: " + team.teamName + "</color>");
         }
-        foreach (var team in AvailableTeams_tmp)
-        {
-            Debug.Log("<color=red>Called From Save Team Attendance Available Team TMP: " + team.teamName + "</color>");
-        }
+        // foreach (var team in AvailableTeams_tmp)
+        // {
+        //     Debug.Log("<color=red>Called From Save Team Attendance Available Team TMP: " + team.teamName + "</color>");
+        // }
         isTeamAttendance = true;
         AvailableTeams_tmp.Clear();
+        MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
     }
     
     public void SaveAdjudicatorAttendance()
@@ -253,8 +257,17 @@ private void UpdateAdjudicatorList()
         MainRoundsPanel.Instance.selectedRound.availableAdjudicators.Clear();
         MainRoundsPanel.Instance.selectedRound.availableAdjudicators = uniqueAdjudicators;
         MainRoundsPanel.Instance.selectedRound.AdjudicatorAttendanceAdded = true;
+        foreach (var adjudicator in MainRoundsPanel.Instance.selectedRound.availableAdjudicators)
+        {
+            Debug.Log("<color=green>Called From Save Adjudicator Attendance Available Adjudicator: " + adjudicator.adjudicatorName + "</color>");
+        }
+        // foreach (var adjudicator in AvailableAdjudicators_tmp)
+        // {
+        //     Debug.Log("<color=red>Called From Save Adjudicator Attendance Available Adjudicator TMP: " + adjudicator.adjudicatorName + "</color>");
+        // }
         isAdjudicatorAttendance = true;
         AvailableAdjudicators_tmp.Clear();
+        MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
     }
     #endregion
 }

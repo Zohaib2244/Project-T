@@ -84,4 +84,10 @@ namespace Scripts.Resources
         BallotsPanel,
         None,
     }
+    public enum DrawPanelTypes
+    {
+        DrawOptionsPanel,
+        DrawDisplayPanel,
+        DrawEditPanel,
+    }
 }

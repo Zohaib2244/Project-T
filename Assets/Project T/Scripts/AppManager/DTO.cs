@@ -303,6 +303,8 @@ namespace Scripts.FirebaseConfig
         public string selectedMotion { get; set; }
         [FirestoreProperty]
         public Dictionary<string, string> teamsinMatchIds { get; set; }
+        [FirestoreProperty]
+        public bool ballotEntered { get; set; }
     }
 
     [FirestoreData]
@@ -602,7 +604,8 @@ namespace Scripts.FirebaseConfig
                 matchId = match.matchId,
                 adjudicatorsIds = match.adjudicators.Select(adj => adj.adjudicatorID).ToArray(),
                 selectedMotion = match.selectedMotion,
-                teamsinMatchIds = match.teams // Assuming Match class also has Dictionary<string, string>
+                teamsinMatchIds = match.teams, // Assuming Match class also has Dictionary<string, string>
+                ballotEntered = match.ballotEntered
             };
         }
 
@@ -615,7 +618,8 @@ namespace Scripts.FirebaseConfig
             .Where(adjudicator => match.adjudicatorsIds.Contains(adjudicator.adjudicatorID))
             .ToArray(),
                 selectedMotion = match.selectedMotion,
-                teams = match.teamsinMatchIds
+                teams = match.teamsinMatchIds,
+                ballotEntered = match.ballotEntered
             };
         }
 

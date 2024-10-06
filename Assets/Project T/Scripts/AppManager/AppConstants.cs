@@ -197,6 +197,7 @@ public class Match : Rounds
     public string matchId;
     public Dictionary<string, string> teams; // store team id and team round data id
     public Adjudicator[] adjudicators;
+    public bool ballotEntered = false;
     public string selectedMotion;
     public Match()
     {
@@ -361,7 +362,6 @@ public class AppConstants : MonoBehaviour
         Debug.Log("<color = blue>Admin Category: " + selectedAdmin.AdminCategory + "</color>");
     }
 
-
     #endregion
 
     #region Institute Functions
@@ -395,6 +395,10 @@ public class AppConstants : MonoBehaviour
     internal void AddTournament(TournamentInfo_DTO tournament)
     {
         throw new NotImplementedException();
+    }
+    public Team GetTeamFromID(string teamID)
+    {
+        return selectedTouranment.teamsInTourney.Find(t => t.teamId == teamID);
     }
     #endregion
     #region Adjudicator Functions
@@ -481,7 +485,6 @@ public class AppConstants : MonoBehaviour
         Debug.Log("Novice Breaks in Tournament: " + selectedTouranment.noviceBreaksInTourney.Count);
         Debug.Log("Open Breaks in Tournament: " + selectedTouranment.openBreaksInTourney.Count);
     }
-<<<<<<< Updated upstream
     public void PrintRankings()
 {
     List<Rounds> allRounds = new List<Rounds>();
@@ -511,7 +514,6 @@ public class AppConstants : MonoBehaviour
         }
     }
 }
-=======
     public string GenerateMatchID(string roundID, int matchCount)
     {
         string selectedTournamentID = selectedTouranment.tournamentId.ToString();
@@ -529,7 +531,10 @@ public class AppConstants : MonoBehaviour
         int numberOfThisSRD = selectedTouranment.teamsInTourney.Count();
         return $"SRD_{selectedTournamentID}_{speakerID}_{roundID}_{numberOfThisSRD}";
     }
->>>>>>> Stashed changes
+    public TeamRoundData GetTRDFromID(string teamId, string TRDId)
+    {
+        return GetTeamFromID(teamId).teamRoundDatas.Find(trd => trd.teamRoundDataID == TRDId);
+    }
     #endregion
    
    

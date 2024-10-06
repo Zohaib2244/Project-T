@@ -3,6 +3,7 @@ using TMPro;
 using Scripts.ListEntry;
 using System.Collections.Generic;
 using Scripts.Resources;
+using DG.Tweening;
 
 namespace Scripts.UIPanels.RoundPanels
 {
@@ -28,14 +29,19 @@ public class Rounds_DrawOptionsPanel : MonoBehaviour
 [SerializeField] private GameObject adjudicatorPrefab;
 [SerializeField] private Toggle adjudicatorAllocationToggle;
 
-    void OnEnable()
-    {
-        teamAllocationToggle.onSelectOption1 += OnTeamAutoAllocation;
-        teamAllocationToggle.onSelectOption2 += OnTeamManualAllocation;
-        adjudicatorAllocationToggle.onSelectOption1 += OnAdjudicatorAutoAllocation;
-        adjudicatorAllocationToggle.onSelectOption2 += OnAdjudicatorManualAllocation;
-        ConfigureScreen();
-    }
+void OnEnable()
+{
+    // Add the pop animation
+    DrawsOptionsPanel.localScale = Vector3.zero; // Start from zero scale
+    DrawsOptionsPanel.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack); // Animate to full scale with a pop effect
+
+    teamAllocationToggle.onSelectOption1 += OnTeamAutoAllocation;
+    teamAllocationToggle.onSelectOption2 += OnTeamManualAllocation;
+    adjudicatorAllocationToggle.onSelectOption1 += OnAdjudicatorAutoAllocation;
+    adjudicatorAllocationToggle.onSelectOption2 += OnAdjudicatorManualAllocation;
+    Debug.Log("DrawOptionsPanel Enabled");
+    ConfigureScreen();
+}
     void OnDisable()
     {
         teamAllocationToggle.onSelectOption1 -= OnTeamAutoAllocation;
@@ -46,12 +52,16 @@ public class Rounds_DrawOptionsPanel : MonoBehaviour
 
     private void ConfigureScreen()
     {
+        Debug.Log("Configuring Screen");
+        Debug.Log("Count of available adjudicators: " + MainRoundsPanel.Instance.selectedRound.availableAdjudicators.Count);
+        Debug.Log("Count of available teams: " + MainRoundsPanel.Instance.selectedRound.availableTeams.Count);
         UpdateTeamList();
         UpdateAdjudicatorList();
         ConfigureStats();
     }
     private void UpdateTeamList()
     {
+        Debug.Log("Updating Team List");
         foreach (Transform child in teamContainer)
         {
             Destroy(child.gameObject);
@@ -64,6 +74,7 @@ public class Rounds_DrawOptionsPanel : MonoBehaviour
     }
     private void UpdateAdjudicatorList()
     {
+        Debug.Log("Updating Adjudicator List");
         foreach (Transform child in adjudicatorContainer)
         {
             Destroy(child.gameObject);

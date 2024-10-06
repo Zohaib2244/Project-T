@@ -38,18 +38,64 @@ public class DrawGeneration : MonoBehaviour
         teams_TMP = MainRoundsPanel.Instance.selectedRound.availableTeams;
         adjudicators_TMP = MainRoundsPanel.Instance.selectedRound.availableAdjudicators;
     }
+    public void GenerateDraws()
+    {
+        if (isTeamAutoAllocation)
+        {
+            matches = GenerateDrawForPrelims(teams_TMP, adjudicators_TMP, tournamentType);
+        }
+        else
+        {
+            // matches = GenerateDrawForPrelims(teams_TMP, adjudicators_TMP, tournamentType);
+        }
+        DrawsPanel.Instance.matches_TMP = matches;
+        MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
+        Debug.Log("<color=green>Draws Generated Printing Matches</color>");
+        // DebugPrintMatches(MainRoundsPanel.Instance.selectedRound.matches);
+        DrawsPanel.Instance.SwitchDrawPanel(DrawPanelTypes.DrawDisplayPanel);
+    
+    }
     private List<Match> GenerateDrawForPrelims(List<Team> teams, List<Adjudicator> adjudicators, TournamentType tournamentType)
     {
         List<Match> matches = new List<Match>();
         if (tournamentType == TournamentType.British)
         {
-            // matches = GenerateDrawForBP(teams, adjudicators);
+            DrawGenerator drawGenerator = new DrawGenerator(teams.Count);
+            matches = drawGenerator.GenerateDraw(teams, adjudicators, isAdjudicatorAutoAllocation, isTeamAutoAllocation);
         }
         else if (tournamentType == TournamentType.Asian)
         {
             // matches = GenerateDrawForAP(teams, adjudicators);
         }
+
+
         return matches;
+    }
+    public void DebugPrintMatches(List<Match> matches)
+    {
+        foreach (var match in matches)
+        {
+            Debug.Log($"<color=cyan>Match ID: {match.matchId}</color>");
+            foreach (var teamEntry in match.teams)
+            {
+                var team = teams_TMP.FirstOrDefault(t => t.teamId == teamEntry.Key);
+                if (team != null)
+                {
+                    var teamRoundData = team.teamRoundDatas.FirstOrDefault(trd => trd.teamRoundDataID == teamEntry.Value);
+                    if (teamRoundData != null)
+                    {
+                        Debug.Log($"<color=green>Team ID: {team.teamId}</color>, <color=yellow>Team Name: {team.teamName}</color>, <color=orange>Speaking Position: {teamRoundData.teamPositionBritish}</color>");
+                    }
+                }
+            }
+            Debug.Log("<color=magenta>Adjudicators:</color>");
+            foreach (var adjudicator in match.adjudicators)
+            {
+                Debug.Log($"<color=blue>{adjudicator.adjudicatorName.ToString()}</color>");
+                Debug.Log($"<color=blue>{adjudicator.adjudicatorType.ToString()}</color>");
+            }
+            Debug.Log($"<color=red>Selected Motion: {match.selectedMotion}</color>");
+        }
     }
 }
     #region Draw Generation BP
@@ -62,6 +108,8 @@ public class DrawGenerator
     private int numberOfPositions = 4; // OG, OO, CG, CO
     private double beta = 4.0; // Position cost exponent set to 4
     private double alpha = 1.0; // Order of Rényi entropy, default to 1 (Shannon entropy)
+    private bool isAdjudicatorAutoAllocation = true;
+    private bool isTeamAutoAllocation = true;
     private Random random = new Random();
 
     public DrawGenerator(int numberOfTeams, double beta = 4.0, double alpha = 1.0)
@@ -145,7 +193,7 @@ public class DrawGenerator
         return n_h * (2 - H_alpha);
     }
 
-    public List<Match> GenerateDraw(List<Team> teams, List<Adjudicator> adjudicators)
+    public List<Match> GenerateDraw(List<Team> teams, List<Adjudicator> adjudicators, bool isAdjudicatorAutoAllocation = true, bool isTeamAutoAllocation = true)
     {
         List<Team> adjustedTeams = PullUp(teams);
         CalculateCosts(adjustedTeams);
@@ -161,19 +209,23 @@ public class DrawGenerator
         {
             team.totalTeamScore = CalculateWinningPoints(team);
         }
-
+    
         // Group teams by their winning points to form brackets
         var brackets = teams.GroupBy(t => t.totalTeamScore).OrderByDescending(g => g.Key).ToList();
         List<Team> adjustedTeams = new List<Team>();
-
+        Random random = new Random();
+    
         foreach (var bracket in brackets)
         {
-            int bracketSize = bracket.Count();
+            // Shuffle teams within the bracket
+            var shuffledBracket = bracket.OrderBy(x => random.Next()).ToList();
+    
+            int bracketSize = shuffledBracket.Count();
             if (bracketSize % 4 != 0)
             {
                 int pullUpCount = 4 - (bracketSize % 4);
                 var nextBracketGroup = brackets.FirstOrDefault(b => b.Key < bracket.Key);
-
+    
                 if (nextBracketGroup != null)
                 {
                     var nextBracket = nextBracketGroup.ToList();
@@ -183,9 +235,9 @@ public class DrawGenerator
                     brackets[brackets.IndexOf(nextBracketGroup)] = nextBracket.GroupBy(t => t.totalTeamScore).First();
                 }
             }
-            adjustedTeams.AddRange(bracket);
+            adjustedTeams.AddRange(shuffledBracket);
         }
-
+    
         return adjustedTeams;
     }
 
@@ -232,17 +284,17 @@ public class DrawGenerator
     {
         int numberOfRooms = teams.Count / 4;
         List<Match> matches = new List<Match>();
-
+    
         for (int i = 0; i < numberOfRooms; i++)
         {
             Match match = new Match
             {
                 matchId = AppConstants.instance.GenerateMatchID(MainRoundsPanel.Instance.selectedRound.roundId, i),
                 teams = new Dictionary<string, string>(),
-                adjudicators = adjudicators.Skip(i * 3).Take(3).ToArray(), // Assuming 3 adjudicators per match
+                adjudicators = AssignAdjudicators(adjudicators, numberOfRooms, i), // Assign adjudicators based on conditions
                 selectedMotion = "Motion for the debate" // Placeholder for the motion
             };
-
+    
             for (int j = 0; j < 4; j++)
             {
                 int teamIndex = assignment[i * 4 + j];
@@ -262,106 +314,142 @@ public class DrawGenerator
                     teamMatchRanking = 0,
                     speakersInRound = new List<SpeakerRoundData>()
                 };
-
+    
                 for (int k = 0; k < team.speakers.Count; k++)
                 {
                     SpeakerRoundData speakerRoundData = new SpeakerRoundData(team, k);
                     teamRoundData.speakersInRound.Add(speakerRoundData);
                 }
-
+    
                 match.teams.Add(team.teamId, teamRoundData.teamRoundDataID);
                 team.teamRoundDatas.Add(teamRoundData);
             }
-
+    
             matches.Add(match);
         }
-
+    
         return matches;
     }
-}
-
-// Hungarian Algorithm Implementation (Placeholder)
-public static class HungarianAlgorithm
-{
-    public static int[] Solve(int[,] costMatrix)
+    
+    private Adjudicator[] AssignAdjudicators(List<Adjudicator> adjudicators, int totalMatches, int matchIndex)
     {
-        int rows = costMatrix.GetLength(0);
-        int cols = costMatrix.GetLength(1);
-        int dim = Math.Max(rows, cols);
-
-        int[,] cost = new int[dim, dim];
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                cost[i, j] = costMatrix[i, j];
-
-        int[] u = new int[dim];
-        int[] v = new int[dim];
-        int[] p = new int[dim];
-        int[] way = new int[dim];
-
-        for (int i = 1; i < dim; ++i)
+        if (isAdjudicatorAutoAllocation)
         {
-            p[0] = i;
-            int j0 = 0;
-            int[] minv = new int[dim];
-            bool[] used = new bool[dim];
-            for (int j = 0; j < dim; ++j)
-                minv[j] = int.MaxValue;
-
-            do
+            List<Adjudicator> assignedAdjudicators = new List<Adjudicator>();
+    
+            // Separate CAP and Normie adjudicators
+            List<Adjudicator> capAdjudicators = adjudicators.Where(a => a.adjudicatorType == AdjudicatorTypes.CAP).ToList();
+            List<Adjudicator> normieAdjudicators = adjudicators.Where(a => a.adjudicatorType == AdjudicatorTypes.Normie).ToList();
+    
+            // Assign CAP adjudicators to the first matches
+            if (matchIndex < capAdjudicators.Count)
             {
-                used[j0] = true;
-                int i0 = p[j0], delta = int.MaxValue, j1 = 0;
-                for (int j = 1; j < dim; ++j)
-                {
-                    if (!used[j])
-                    {
-                        int cur = cost[i0, j] - u[i0] - v[j];
-                        if (cur < minv[j])
-                        {
-                            minv[j] = cur;
-                            way[j] = j0;
-                        }
-                        if (minv[j] < delta)
-                        {
-                            delta = minv[j];
-                            j1 = j;
-                        }
-                    }
-                }
-                for (int j = 0; j < dim; ++j)
-                {
-                    if (used[j])
-                    {
-                        u[p[j]] += delta;
-                        v[j] -= delta;
-                    }
-                    else
-                    {
-                        minv[j] -= delta;
-                    }
-                }
-                j0 = j1;
-            } while (p[j0] != 0);
-
-            do
-            {
-                int j1 = way[j0];
-                p[j0] = p[j1];
-                j0 = j1;
-            } while (j0 != 0);
-        }
-
-        int[] result = new int[rows];
-        for (int j = 1; j < dim; ++j)
-        {
-            if (p[j] < rows)
-            {
-                result[p[j]] = j;
+                assignedAdjudicators.Add(capAdjudicators[matchIndex]);
             }
+            else if (matchIndex < capAdjudicators.Count + normieAdjudicators.Count)
+            {
+                assignedAdjudicators.Add(normieAdjudicators[matchIndex - capAdjudicators.Count]);
+            }
+    
+            // Assign remaining Normie adjudicators randomly
+            if (matchIndex == totalMatches - 1 && normieAdjudicators.Count > 0)
+            {
+                Random random = new Random();
+                int randomIndex = random.Next(normieAdjudicators.Count);
+                assignedAdjudicators.Add(normieAdjudicators[randomIndex]);
+            }
+    
+            return assignedAdjudicators.ToArray();
         }
+        else
+        {
+            // Manual allocation, return an empty array
+            return new Adjudicator[0];
+        }
+    }
+// Hungarian Algorithm Implementation (Placeholder)
+    public static class HungarianAlgorithm
+    {
+        public static int[] Solve(int[,] costMatrix)
+        {
+            int rows = costMatrix.GetLength(0);
+            int cols = costMatrix.GetLength(1);
+            int dim = Math.Max(rows, cols);
 
-        return result;
+            int[,] cost = new int[dim, dim];
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
+                    cost[i, j] = costMatrix[i, j];
+
+            int[] u = new int[dim];
+            int[] v = new int[dim];
+            int[] p = new int[dim];
+            int[] way = new int[dim];
+
+            for (int i = 1; i < dim; ++i)
+            {
+                p[0] = i;
+                int j0 = 0;
+                int[] minv = new int[dim];
+                bool[] used = new bool[dim];
+                for (int j = 0; j < dim; ++j)
+                    minv[j] = int.MaxValue;
+
+                do
+                {
+                    used[j0] = true;
+                    int i0 = p[j0], delta = int.MaxValue, j1 = 0;
+                    for (int j = 1; j < dim; ++j)
+                    {
+                        if (!used[j])
+                        {
+                            int cur = cost[i0, j] - u[i0] - v[j];
+                            if (cur < minv[j])
+                            {
+                                minv[j] = cur;
+                                way[j] = j0;
+                            }
+                            if (minv[j] < delta)
+                            {
+                                delta = minv[j];
+                                j1 = j;
+                            }
+                        }
+                    }
+                    for (int j = 0; j < dim; ++j)
+                    {
+                        if (used[j])
+                        {
+                            u[p[j]] += delta;
+                            v[j] -= delta;
+                        }
+                        else
+                        {
+                            minv[j] -= delta;
+                        }
+                    }
+                    j0 = j1;
+                } while (p[j0] != 0);
+
+                do
+                {
+                    int j1 = way[j0];
+                    p[j0] = p[j1];
+                    j0 = j1;
+                } while (j0 != 0);
+            }
+
+            int[] result = new int[rows];
+            for (int j = 1; j < dim; ++j)
+            {
+                if (p[j] < rows)
+                {
+                    result[p[j]] = j;
+                }
+            }
+
+            return result;
+        }
     }
 }
 

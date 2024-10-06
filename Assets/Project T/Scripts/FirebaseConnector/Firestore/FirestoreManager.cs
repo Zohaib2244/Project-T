@@ -125,8 +125,6 @@ namespace Scripts.FirebaseConfig
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
                 Debug.Log("<color=yellow>Retrieving admin info...</color>");
-                try
-                {
                     DocumentReference docRef = FirebaseConnector.Instance.Db.Collection("Admin_Categorizer").Document(userId);
                     DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
@@ -143,12 +141,6 @@ namespace Scripts.FirebaseConfig
                         Debug.LogError("No such document!");
                         onFailure?.Invoke();
                     }
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError("GetAdminFromFirestore encountered an error: " + ex);
-                    onFailure?.Invoke();
-                }
             }
             else
             {
