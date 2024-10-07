@@ -7,9 +7,24 @@ using System.Linq;
 
 public class Rounds_BallotsPanel : MonoBehaviour
 {
+    #region Singleton
+    public static Rounds_BallotsPanel Instance;
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
+    #endregion
     [SerializeField] private Transform ballotsPanel;
     [SerializeField] private Transform ballotsContent;
     [SerializeField] private GameObject ballotEntryPrefab;
+    [SerializeField] private Transform ballotInfoPanel;
 
 
     void OnEnable()
@@ -37,11 +52,11 @@ public class Rounds_BallotsPanel : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-
+        Debug.Log("MainRoundsPanel.Instance.selectedRound.matches.Count: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
         // Instantiate new entries and set match data
-        for (int i = 0; i < DrawsPanel.Instance.matches_TMP.Count; i++)
+        for (int i = 0; i < MainRoundsPanel.Instance.selectedRound.matches.Count; i++)
         {
-            var match = DrawsPanel.Instance.matches_TMP[i];
+            var match = MainRoundsPanel.Instance.selectedRound.matches[i];
             var drawEntry = Instantiate(ballotEntryPrefab, ballotsContent);
             drawEntry.GetComponent<MatchListEntry>().SetMatch(match, i + 1); // Pass match object and match number (index + 1)
         }
@@ -63,7 +78,16 @@ public class Rounds_BallotsPanel : MonoBehaviour
             // Save the draw prefabs to the selected round
             selectedRound.matches = allMatches;
     }
-    
+    public void ShowBallotInfo(Match match)
+    {
+        ballotInfoPanel.gameObject.SetActive(true);
+        ballotInfoPanel.GetComponent<Ballot_InfoPanel>().DisplayMatchBallot(match);
+    }
+    public void CloseBallotInfo()
+    {
+        ballotInfoPanel.gameObject.SetActive(false);
+        UpdateBallotsList();
+    }
     // Helper method to retrieve all ballot prefabs
     private List<Match> GetBallotPrefabs()
     {

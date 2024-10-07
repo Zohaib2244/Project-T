@@ -58,9 +58,11 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
     
         // Save the draw prefabs to the selected round
         selectedRound.matches = allMatches;
-    
+        MainRoundsPanel.Instance.selectedRound.matches.Clear();
+        MainRoundsPanel.Instance.selectedRound.matches = allMatches;
+        MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
+        Debug.Log("Draw saved: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
         // Set the draw generated flag to true
-        selectedRound.drawGenerated = true;
         MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
     }
     private List<Match> GetDrawPrefabs()

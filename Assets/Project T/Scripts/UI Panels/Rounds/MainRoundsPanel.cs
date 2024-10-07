@@ -134,7 +134,7 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableInteractability(2);
                 goPublicButton.interactable = false;
             }
-            else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && selectedRound.ballotsAdded && !selectedRound.drawGenerated)
+            else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && selectedRound.drawGenerated)
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.DisableAllInteractability();

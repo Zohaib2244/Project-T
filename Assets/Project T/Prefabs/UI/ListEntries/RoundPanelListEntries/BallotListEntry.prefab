@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3087207961663726778}
   - component: {fileID: 6732762419605021895}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: 1st
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -297,6 +297,7 @@ GameObject:
   - component: {fileID: 25008447977243798}
   - component: {fileID: 4913034384047814200}
   - component: {fileID: 2928758446290427452}
+  - component: {fileID: 8964477340133736313}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -405,6 +406,35 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8964477340133736313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075907915590778590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f64c5b70c38fe42a3b53db6cf318e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actions:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 207175415357876528}
+        m_TargetAssemblyTypeName: BallotListEntry, Assembly-CSharp
+        m_MethodName: AddBallot
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  animationDuration: 0.1
+  scaleFactor: 1.1
 --- !u!1 &3013546933832444841
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,7 +447,7 @@ GameObject:
   - component: {fileID: 1022926505242380784}
   - component: {fileID: 5318117946957627243}
   m_Layer: 5
-  m_Name: Text (TMP) (2)
+  m_Name: 2nd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -551,7 +581,7 @@ GameObject:
   - component: {fileID: 8078221326708568686}
   - component: {fileID: 2284221044502464696}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: matchno
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -685,7 +715,7 @@ GameObject:
   - component: {fileID: 2076137576584335335}
   - component: {fileID: 4606944097596175883}
   m_Layer: 5
-  m_Name: Text (TMP) (4)
+  m_Name: 4th
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -819,7 +849,7 @@ GameObject:
   - component: {fileID: 5668441012723975525}
   - component: {fileID: 8121790940102209776}
   m_Layer: 5
-  m_Name: Text (TMP) (5)
+  m_Name: adjs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -959,7 +989,7 @@ GameObject:
   - component: {fileID: 6018323130471210362}
   - component: {fileID: 804649868025650284}
   m_Layer: 5
-  m_Name: Text (TMP) (3)
+  m_Name: 3rd
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1131,6 +1161,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2152029392109737923}
+  - component: {fileID: 207175415357876528}
   m_Layer: 5
   m_Name: BallotListEntry
   m_TagString: Untagged
@@ -1160,3 +1191,27 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1146.8275, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &207175415357876528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8884528873958438896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7772ac23df46dcc4bbb989e908fb9d0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ballotBtn: {fileID: 4913034384047814200}
+  ballotTextBg: {fileID: 4509548637298822458}
+  enteredBallotBtnSprite: {fileID: 21300000, guid: c8ceca1c73124c24480551f1a18bf585, type: 3}
+  notEnteredBallotBtnSprite: {fileID: 21300000, guid: ffc2f2558ca22cd47a39b048bb84ea94, type: 3}
+  enteredBallotTextBgSprite: {fileID: 21300000, guid: d8d5a2c043071664d9e50c157f33d358, type: 3}
+  notEnteredBallotTextBgSprite: {fileID: 21300000, guid: f63a66b6dc9a0cc49b5d46f587d70c82, type: 3}
+  matchNo: {fileID: 2284221044502464696}
+  teamName1stPos: {fileID: 6732762419605021895}
+  teamName2ndPos: {fileID: 5318117946957627243}
+  teamName3rdPos: {fileID: 804649868025650284}
+  teamName4thPos: {fileID: 4606944097596175883}
+  adjudicatorNames: {fileID: 8121790940102209776}

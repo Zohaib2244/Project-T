@@ -11,6 +11,7 @@ public class BallotListEntry : MonoBehaviour
 {
     [Header("Sprites")]
     [SerializeField] private Image ballotBtn;
+    [SerializeField] private Image ballotTextBg;
     [SerializeField] private Sprite enteredBallotBtnSprite;
     [SerializeField] private Sprite notEnteredBallotBtnSprite;
     [SerializeField] private Sprite enteredBallotTextBgSprite;
@@ -86,7 +87,7 @@ public class BallotListEntry : MonoBehaviour
     {
         UpdateTeamPositions();
         ballotBtn.sprite = enteredBallotBtnSprite;
-        teamName1stPos.transform.parent.GetComponent<Image>().sprite = enteredBallotTextBgSprite;
+        ballotTextBg.sprite = enteredBallotTextBgSprite;
         match.ballotEntered = true;
     }
     public void UpdateTeamPositions()
@@ -126,5 +127,8 @@ public class BallotListEntry : MonoBehaviour
     {
             return match;
     }
-
+    public void AddBallot()
+    {
+        Rounds_BallotsPanel.Instance.ShowBallotInfo(match);
+    }
 }

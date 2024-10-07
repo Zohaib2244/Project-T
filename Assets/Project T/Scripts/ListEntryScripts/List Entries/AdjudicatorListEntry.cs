@@ -28,7 +28,7 @@ public class AdjudicatorListEntry : MonoBehaviour
         myInstitution = AppConstants.instance.GetInstituitionsFromID(myAdjudicator.instituitionID);
         Debug.Log("Setting Adjudicator");
         adjudicatorName.text = adjudicator.adjudicatorName;
-        adjudicatorInstitute.text = myInstitution.instituitionName;
+        adjudicatorInstitute.text = myInstitution.instituitionAbreviation;
     }
 
 
