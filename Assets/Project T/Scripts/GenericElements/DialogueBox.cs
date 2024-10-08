@@ -1,68 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using DG.Tweening;
 using TMPro;
+using DG.Tweening;
 
 public class DialogueBox : MonoBehaviour
 {
+    public static DialogueBox Instance { get; private set; }
 
-    //make singelton
-    private static DialogueBox _instance;
-    public static DialogueBox Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                Debug.LogError("DialogueBox instance is not initialized.");
-            }
-            return _instance;
-        }
-    }
+    [SerializeField] private GameObject dialogueBox;
+    [SerializeField] private TMP_Text dialogueText;
+    [SerializeField] private float visiblePositionY;
+    [SerializeField] private float hiddenPositionY;
+    [SerializeField] private float animationDuration = 0.5f;
 
-    void Awake()
+    private void Awake()
     {
-        if (_instance == null)
+        if (Instance == null)
         {
-            _instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
-        // Set the hidden and visible positions
-
-        // Initialize the dialogue box to be hidden
-        dialogueBox.transform.position = hiddenPosition;
     }
-
-
-     public GameObject dialogueBox;
-    public TMP_Text dialogueText;
-    public float animationDuration = 0.5f;
-    public Vector3 hiddenPosition;
-    public Vector3 visiblePosition;
-
 
     public void ShowDialogueBox(string text, Color textColor)
     {
         dialogueText.text = text;
         dialogueText.color = textColor;
-        dialogueBox.SetActive(true);
-        dialogueBox.transform.DOMoveY(visiblePosition.y, animationDuration).SetEase(Ease.OutCubic).SetRelative(false).OnComplete(() =>
+
+        if (dialogueBox.activeSelf)
         {
-            // Automatically hide the dialogue box after 2 seconds
+            // If the dialogue box is already active, update the text and color without restarting the animation
             DOVirtual.DelayedCall(2f, () => HideDialogueBox());
-        });}
-        
-        public void HideDialogueBox()
+        }
+        else
         {
-            dialogueBox.transform.DOMoveY(hiddenPosition.y, animationDuration).SetEase(Ease.InCubic).SetRelative(false).OnComplete(() =>
+            dialogueBox.SetActive(true);
+            dialogueBox.transform.DOLocalMoveY(visiblePositionY, animationDuration).SetEase(Ease.OutCubic).OnComplete(() =>
             {
-                dialogueBox.SetActive(false);
+                // Automatically hide the dialogue box after 2 seconds
+                DOVirtual.DelayedCall(2f, () => HideDialogueBox());
             });
         }
+    }
+
+    public void HideDialogueBox()
+    {
+        dialogueBox.transform.DOLocalMoveY(hiddenPositionY, animationDuration).SetEase(Ease.InCubic).OnComplete(() =>
+        {
+            dialogueBox.SetActive(false);
+        });
+    }
 }

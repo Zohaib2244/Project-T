@@ -41,6 +41,8 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     [SerializeField] private Transform capListContent;
     [SerializeField] private GameObject adjudicatorListPrefab;
     [SerializeField] private Button addTeamBtn;
+    [SerializeField] private RectTransform noAdjText;
+    [SerializeField] private RectTransform noCapText;
 
 
     [Header("Adjudicator Panel")]
@@ -73,6 +75,18 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     void OnDisable()
     {
         DeactivateAdjudicatorPanel();
+        institutionDropdown.onChangedValue -= OnInstitutionSelected;
+        adjudicatorTypeToggle.onSelectOption1 -= CapAdjTypeSelected;
+        adjudicatorTypeToggle.onSelectOption2 -= NormieAdjTypeSelected;
+        //destroy list entries
+        foreach (Transform child in capListContent)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in adjudicatorListContent)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     public void AddNewAdjudicator()
@@ -91,11 +105,13 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     }
     private void CapAdjTypeSelected()
     {
+        Debug.Log("CAP selected");
         selectedAdjudicator.adjudicatorType = AdjudicatorTypes.CAP;
         adjudicatorTypeSelected = true;
     }
     private void NormieAdjTypeSelected()
     {
+        Debug.Log("Normie selected");
         selectedAdjudicator.adjudicatorType = AdjudicatorTypes.Normie;
         adjudicatorTypeSelected = true;
     }
@@ -115,16 +131,24 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
                 selectedAdjudicator.adjudicatorID = AppConstants.instance.GenerateAdjudicatorID(selectedAdjudicator.adjudicatorName, selectedAdjudicator.instituitionID);
                 if (!ValidateAdjInfo())
                 {
-                    Debug.Log("<color=red>Invalid adjudicator data</color>");
+                    DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator info", Color.red);
                     saveBtn.interactable = true;
                     return;
                 }
                 genearteIDFlag = false;
+                Loading.Instance.ShowLoadingScreen();
                 FirestoreManager.FireInstance.SaveAdjudicatorToFireStore(selectedAdjudicator, OnAddAdjudicatorSuccess, OnAddAdjudicatorFailure);
             }
             else
             {
+                if (!ValidateAdjInfo())
+                {
+                    DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator info", Color.red);
+                    saveBtn.interactable = true;
+                    return;
+                }
                 Debug.Log("Adjudicator Type: " + selectedAdjudicator.adjudicatorType);
+                Loading.Instance.ShowLoadingScreen();
                 FirestoreManager.FireInstance.UpdateAdjudicatorInFireStore(selectedAdjudicator, OnAdjudicatorUpdateSuccess, OnAdjudicatorUpdateFailure);
             }
         }
@@ -136,29 +160,46 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     }
     private bool ValidateAdjInfo()
     {
-        if (selectedAdjudicator.adjudicatorName == "")
+        if (string.IsNullOrEmpty(selectedAdjudicator.adjudicatorName))
         {
             Debug.Log("<color=red>Invalid adjudicator name</color>");
+            DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator name", Color.red);
             return false;
         }
-        else if (selectedAdjudicator.adjudicatorPhone == "")
+        else if (string.IsNullOrEmpty(selectedAdjudicator.adjudicatorPhone))
         {
             Debug.Log("<color=red>Invalid adjudicator phone</color>");
+            DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator phone", Color.red);
             return false;
         }
-        else if (selectedAdjudicator.adjudicatorEmail == "")
+        else if (!selectedAdjudicator.adjudicatorPhone.StartsWith("0"))
+        {
+            Debug.Log("<color=red>Adjudicator phone must start with 0</color>");
+            DialogueBox.Instance.ShowDialogueBox("Adjudicator phone must start with 0", Color.red);
+            return false;
+        }
+        else if (string.IsNullOrEmpty(selectedAdjudicator.adjudicatorEmail))
         {
             Debug.Log("<color=red>Invalid adjudicator email</color>");
+            DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator email", Color.red);
+            return false;
+        }
+        else if (!selectedAdjudicator.adjudicatorEmail.Contains("@"))
+        {
+            Debug.Log("<color=red>Invalid adjudicator email format</color>");
+            DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator email format", Color.red);
             return false;
         }
         else if (!adjudicatorTypeSelected)
         {
             Debug.Log("<color=red>Invalid adjudicator type</color>");
+            DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator type", Color.red);
             return false;
         }
         else if (selectedAdjudicatorInstitution == null)
         {
             Debug.Log("<color=red>Invalid adjudicator institution</color>");
+            DialogueBox.Instance.ShowDialogueBox("Invalid adjudicator institution", Color.red);
             return false;
         }
         else
@@ -172,6 +213,7 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
         selectedAdjudicatorInstitution = inst;
         selectedAdjudicator = null;
         selectedAdjudicator = adj;
+        Debug.Log("Selected Adjudicator Type: " + selectedAdjudicator.adjudicatorType);
         DeactivateAdjudicatorPanel();
         DOVirtual.DelayedCall(0.2f, () =>
         {
@@ -182,11 +224,11 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
                adjudicatorContactInputField.text = selectedAdjudicator.adjudicatorPhone;
                adjudicatorEmailInputField.text = selectedAdjudicator.adjudicatorEmail;
                genearteIDFlag = false;
-               if (selectedAdjudicatorType == AdjudicatorTypes.CAP)
+               if (selectedAdjudicator.adjudicatorType == AdjudicatorTypes.CAP)
                {
                    adjudicatorTypeToggle.SelectOption1();
                }
-               else if (selectedAdjudicatorType == AdjudicatorTypes.Normie)
+               else if (selectedAdjudicator.adjudicatorType == AdjudicatorTypes.Normie)
                {
                    adjudicatorTypeToggle.SelectOption2();
                }
@@ -278,12 +320,14 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
                 GameObject adjudicatorEntry = Instantiate(adjudicatorListPrefab, capListContent);
                 AdjudicatorListEntry entry = adjudicatorEntry.GetComponent<AdjudicatorListEntry>();
                 entry.SetAdjudicator(adjudicator);
+                noCapText.gameObject.SetActive(false);
             }
             else if (adjudicator.adjudicatorType == AdjudicatorTypes.Normie)
             {
                 GameObject adjudicatorEntry = Instantiate(adjudicatorListPrefab, adjudicatorListContent);
                 AdjudicatorListEntry entry = adjudicatorEntry.GetComponent<AdjudicatorListEntry>();
                 entry.SetAdjudicator(adjudicator);
+                noAdjText.gameObject.SetActive(false);
             }
         }
     }
@@ -299,21 +343,29 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     }
     private void OnAddAdjudicatorSuccess()
     {
+        Loading.Instance.HideLoadingScreen();
         DeactivateAdjudicatorPanel();
         FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore(OnGetAllAdjudicatorsSuccess, OnGetAllAdjudicatorsFailure);
     }
     private void OnAddAdjudicatorFailure()
     {
-        Debug.LogError("Error adding adjudicator: ");
+        DialogueBox.Instance.ShowDialogueBox("Failed to save adjudicator", Color.red);
+        Loading.Instance.HideLoadingScreen();
+        saveBtn.interactable = true;
     }
     private void OnAdjudicatorUpdateSuccess()
     {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Adjudicator updated", Color.green);
         FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore(OnGetAllAdjudicatorsSuccess, OnGetAllAdjudicatorsFailure);
   
     }
     private void OnAdjudicatorUpdateFailure()
     {
-        Debug.LogError("Error updating adjudicator: ");
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to update adjudicator", Color.red);
+        saveBtn.interactable = true;
+        // Debug.LogError("Error updating adjudicator: ");
     }
     #endregion
 }

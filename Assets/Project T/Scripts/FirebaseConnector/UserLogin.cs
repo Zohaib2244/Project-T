@@ -25,12 +25,13 @@ public class UserLogin : MonoBehaviour
             signInButton.transform.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), 0.2f, 10, 1).OnComplete(() => {
                 signInButton.transform.localScale = new Vector3(1, 1, 1);
             
-
+            Loading.Instance.ShowLoadingScreen();
             signInButton.interactable = false;
             if (string.IsNullOrEmpty(emailInputField.text) || string.IsNullOrEmpty(passwordInputField.text))
             {
                 loginStatusText.text = "Please enter email and password!";
                 signInButton.interactable = true;
+                Loading.Instance.HideLoadingScreen();
                 return;
             }
             FirebaseConnector.Instance.SignInUser(emailInputField.text, passwordInputField.text, OnSignInSuccess, OnSignInFailed);
@@ -38,24 +39,32 @@ public class UserLogin : MonoBehaviour
          }
         private void OnSignInSuccess()
         {
+                            Loading.Instance.HideLoadingScreen();
+
             loginStatusText.text = "Login Successful!";
             FirestoreManager.FireInstance.GetAdminFromFirestore(FirebaseConnector.Instance.GetUserId(), onAdminInfoRetrievalSuccess, onAdminInfoRetrievalFailed);
         //MainUIManager.Instance.SwitchPanel(Panels.TournamentSelectionPanel);
         }
         private void OnSignInFailed(string errorMessage)
         {
+                            Loading.Instance.HideLoadingScreen();
+
             signInButton.interactable = true;
             loginStatusText.text = "Login Failed! Error: " + errorMessage;
         }
 
         private void onAdminInfoRetrievalSuccess(Admin admin)
         {
+                            Loading.Instance.HideLoadingScreen();
+
            // AppConstants.instance.DebugAdminInfo();
             AppConstants.instance.selectedAdmin = admin;
             MainUIManager.Instance.SwitchPanel(Panels.TournamentSelectionPanel);
         }
         private void onAdminInfoRetrievalFailed()
         {
+                            Loading.Instance.HideLoadingScreen();
+
             loginStatusText.text = "Login Failed! Try Again!";
             signInButton.interactable = true;
         }
@@ -64,6 +73,8 @@ public class UserLogin : MonoBehaviour
             emailInputField.text = "";
             passwordInputField.text = "";
             if(signInButton!=null) signInButton.interactable = true;
+                            Loading.Instance.HideLoadingScreen();
+
         }
     }
 }

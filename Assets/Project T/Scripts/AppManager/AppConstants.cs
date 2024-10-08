@@ -145,14 +145,14 @@ public class Speaker : Team
 
     public string speakerEmail { get; set; }
 
-    public string speakerPhone { get; set; }
+    public string speakerContact { get; set; }
 
     public Speaker()
     {
         speakerId = "";
         speakerName = "Speaker Name";
         speakerEmail = "";
-        speakerPhone = "";
+        speakerContact = "";
     }
 }
 

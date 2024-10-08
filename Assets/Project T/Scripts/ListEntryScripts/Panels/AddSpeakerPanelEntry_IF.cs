@@ -16,7 +16,7 @@ namespace Scripts.ListEntry
         {
             Speaker speaker = new Speaker();
             speaker.speakerName = NameInputField.text;
-            speaker.speakerPhone = ContactInputField.text;
+            speaker.speakerContact = ContactInputField.text;
             speaker.speakerEmail = EmailInputField.text;
             return speaker;
         }
@@ -24,7 +24,7 @@ namespace Scripts.ListEntry
     public void SetSpeakerInfo(Speaker speaker)
     {
         NameInputField.text = speaker.speakerName;
-        ContactInputField.text = speaker.speakerPhone;
+        ContactInputField.text = speaker.speakerContact;
         EmailInputField.text = speaker.speakerEmail;
     }
     public void SetSpeakerNumber(int number)

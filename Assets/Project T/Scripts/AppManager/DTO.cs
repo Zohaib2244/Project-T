@@ -380,7 +380,7 @@ namespace Scripts.FirebaseConfig
         [FirestoreProperty]
         public string speakerEmail { get; set; }
         [FirestoreProperty]
-        public string speakerPhone { get; set; }
+        public string speakerContact { get; set; }
     }
     #endregion
 
@@ -475,7 +475,7 @@ namespace Scripts.FirebaseConfig
                 speakerId = speaker.speakerId,
                 speakerName = speaker.speakerName,
                 speakerEmail = speaker.speakerEmail,
-                speakerPhone = speaker.speakerPhone
+                speakerContact = speaker.speakerContact
             };
         }
         public Speaker DTOToSpeaker(Speaker_DTO speaker)
@@ -485,7 +485,7 @@ namespace Scripts.FirebaseConfig
                 speakerId = speaker.speakerId,
                 speakerName = speaker.speakerName,
                 speakerEmail = speaker.speakerEmail,
-                speakerPhone = speaker.speakerPhone
+                speakerContact = speaker.speakerContact
             };
         }
         //Team DTO Converter -------------------------------------------------------------------------------------------------

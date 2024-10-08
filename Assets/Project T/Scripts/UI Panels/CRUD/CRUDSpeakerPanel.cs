@@ -98,7 +98,7 @@ namespace Scripts.UIPanels
                     selectedSpeaker = team.speakers[selectedSpeakerIndex];
 
                     speakerName.text = selectedSpeaker.speakerName.ToString();
-                    speakerPhone.text = selectedSpeaker.speakerPhone.ToString();
+                    speakerPhone.text = selectedSpeaker.speakerContact.ToString();
                     speakerEmail.text = selectedSpeaker.speakerEmail.ToString();
                     speakerTeamName.text = selectedTeam.teamName.ToString();
 
@@ -169,10 +169,11 @@ namespace Scripts.UIPanels
     {
         saveBtn.interactable = false;
         replaceSpeakerBtn.interactable = false;
+        Loading.Instance.ShowLoadingScreen();
         if (!isReplaceModeOn)
         {
             selectedSpeaker.speakerName = speakerName.text;
-            selectedSpeaker.speakerPhone = speakerPhone.text;
+            selectedSpeaker.speakerContact = speakerPhone.text;
             selectedSpeaker.speakerEmail = speakerEmail.text;
             Debug.Log("Selected Speaker: " + selectedSpeaker.speakerId);
             Debug.Log("Selected Team: " + selectedTeam.teamId);
@@ -274,27 +275,45 @@ namespace Scripts.UIPanels
     #region Success & Fail Events
     private async Task OnSpeakerReplaceSuccess()
     {
+        DialogueBox.Instance.ShowDialogueBox("Speaker Replaced", Color.green);
+        Loading.Instance.HideLoadingScreen();
         DeActivateSpeakerPanel();
         await FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnGetAllTeamsSuccess, OnGetAllTeamsFailed);
     }
     private void OnSpeakerReplaceFailed()
     {
+        DialogueBox.Instance.ShowDialogueBox("Failed to replace speaker", Color.red);
+        Loading.Instance.HideLoadingScreen();
         Debug.Log("<color = red> Failed to replace speaker</color>");
     }
     private void OnGetAllTeamsSuccess()
     {
+        Loading.Instance.HideLoadingScreen();
         UpdateSpeaekrsList();
     }
     private void OnGetAllTeamsFailed()
     {
+        DialogueBox.Instance.ShowDialogueBox("Failed to get all teams", Color.red);
+        Loading.Instance.HideLoadingScreen();
         Debug.Log("<color = red> Failed to get all teams</color>");
     }
     private void OnUpdateSpeakerSuccess()
     {
+        Debug.Log("Speaker Updated");
+        OnSpeakerListEntryDeselect?.Invoke();
+         Debug.Log("Speaker Updated");
         DeActivateSpeakerPanel();
+         Debug.Log("Speaker Updated");
+        DOVirtual.DelayedCall(0.5f, () => UpdateSpeaekrsList());
+         Debug.Log("Speaker Updated");
+        Loading.Instance.HideLoadingScreen();
+         Debug.Log("Speaker Updated");
+                DialogueBox.Instance.ShowDialogueBox("Speaker Updated", Color.green);
     }
     private void OnUpdateSpeakerFailed()
     {
+        DialogueBox.Instance.ShowDialogueBox("Failed to update speaker", Color.red);
+        Loading.Instance.HideLoadingScreen();
         Debug.Log("<color = red> Failed to update speaker</color>");
     }
 

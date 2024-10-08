@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.Events;
 using Scripts.ListEntry;
-
+using System;
 
 namespace Scripts.UIPanels
 {
@@ -48,6 +48,7 @@ public class CRUInstitutePanel : MonoBehaviour
 
     [SerializeField] private Transform instituteListContent;
     [SerializeField] private GameObject instituteListPrefab;
+    [SerializeField] private TMP_Text noAdjudicatortxt;
 
 
     [SerializeField] private Button addNewInstituteButton;
@@ -66,6 +67,10 @@ public class CRUInstitutePanel : MonoBehaviour
     void OnDisable()
     {
         DeactiveInstitutePanel();
+        foreach(Transform child in instituteListContent)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     public void ShowInstituteData(Instituitions institute)
@@ -95,32 +100,84 @@ public class CRUInstitutePanel : MonoBehaviour
             isGenerateIDFlag = true;
         });
     }
-    public void SaveInsitute()
+public void SaveInstitute()
+{
+    Debug.Log("Adding Institute");
+    saveInstituteButton.interactable = false;
+
+    // Input validation
+    if (string.IsNullOrEmpty(instituteNameInputField.text) || string.IsNullOrEmpty(institutitionAbreviationInputField.text))
     {
-        Debug.Log("Adding Institute");
-        if (instituteNameInputField.text != "" && institutitionAbreviationInputField.text != "" && !isUpdateFlag)
+        // Debug.LogError("Institute name or abbreviation is empty.");
+        DialogueBox.Instance.ShowDialogueBox("Institute name or abbreviation cannot be empty.", Color.red);
+        saveInstituteButton.interactable = true;
+        return;
+    }
+
+    if (institutitionAbreviationInputField.text.Length > 5)
+    {
+        // Debug.LogError("Institute abbreviation is too long.");
+        DialogueBox.Instance.ShowDialogueBox("Institute abbreviation cannot be more than 5 characters.", Color.red);
+        saveInstituteButton.interactable = true;
+        return;
+    }
+
+    if (!isUpdateFlag)
+    {
+        if (selectedInstitute == null)
         {
-
-            if (selectedInstitute == null)
-            {
-                Debug.Log("Selected Institute is null");
-                selectedInstitute = new Instituitions();
-            }
-            selectedInstitute.instituitionName = instituteNameInputField.text;
-            selectedInstitute.instituitionAbreviation = institutitionAbreviationInputField.text;
-
-            selectedInstitute.instituitionID = AppConstants.instance.InstituteIDGenerator(selectedInstitute.instituitionAbreviation);
-
-            FirestoreManager.FireInstance.SaveInstituteToFireStore(selectedInstitute, SaveInstituteOnSuccess, SaveInstituteOnFailed);
-            Debug.Log("Institute Added");
+            Debug.Log("Selected Institute is null");
+            selectedInstitute = new Instituitions();
         }
-        else if (isUpdateFlag)
+
+        // Format the abbreviation to uppercase
+        string abbreviation = institutitionAbreviationInputField.text.ToUpper();
+
+        // Format the institution name
+        string institutionName = FormatInstitutionName(instituteNameInputField.text);
+
+        selectedInstitute.instituitionName = institutionName;
+        selectedInstitute.instituitionAbreviation = abbreviation;
+
+        selectedInstitute.instituitionID = AppConstants.instance.InstituteIDGenerator(abbreviation);
+
+        Loading.Instance.ShowLoadingScreen();
+        FirestoreManager.FireInstance.SaveInstituteToFireStore(selectedInstitute, SaveInstituteOnSuccess, SaveInstituteOnFailed);
+        Debug.Log("Institute Added");
+    }
+    else
+    {
+        // Format the abbreviation to uppercase
+        string abbreviation = institutitionAbreviationInputField.text.ToUpper();
+
+        // Format the institution name
+        string institutionName = FormatInstitutionName(instituteNameInputField.text);
+
+        selectedInstitute.instituitionName = institutionName;
+        selectedInstitute.instituitionAbreviation = abbreviation;
+
+        FirestoreManager.FireInstance.UpdateInstitutionInFireStore(selectedInstitute, SaveInstituteOnSuccess, SaveInstituteOnFailed);
+    }
+}
+
+
+private string FormatInstitutionName(string name)
+{
+    string[] words = name.Split(' ');
+    string[] exceptions = { "of", "the", "and" };
+    for (int i = 0; i < words.Length; i++)
+    {
+        if (Array.Exists(exceptions, e => e.Equals(words[i], StringComparison.OrdinalIgnoreCase)))
         {
-            selectedInstitute.instituitionName = instituteNameInputField.text;
-            selectedInstitute.instituitionAbreviation = institutitionAbreviationInputField.text;
-            FirestoreManager.FireInstance.UpdateInstitutionInFireStore(selectedInstitute, SaveInstituteOnSuccess, SaveInstituteOnFailed);
+            words[i] = words[i].ToLower();
+        }
+        else
+        {
+            words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
         }
     }
+    return string.Join(" ", words);
+}
 
 
 
@@ -135,6 +192,8 @@ public class CRUInstitutePanel : MonoBehaviour
 
     private void UpdateInstituteOnSuccess()
     {
+        Loading.Instance.HideLoadingScreen();
+        noAdjudicatortxt.gameObject.SetActive(false);
         foreach (Instituitions institute in AppConstants.instance.selectedTouranment.instituitionsinTourney)
         {
             GameObject instituteListEntry = Instantiate(instituteListPrefab, instituteListContent);
@@ -143,21 +202,28 @@ public class CRUInstitutePanel : MonoBehaviour
             //debug info about the added institute
             Debug.Log("Institute Added: " + institute.instituitionName);
         }
-        Debug.Log("Institute List Updated");
+        DialogueBox.Instance.ShowDialogueBox("Institute List Updated", Color.green);
     }
     private void UpdateInstituteOnFailed()
     {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to update Institute List", Color.red);
         FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore(UpdateInstituteOnSuccess, UpdateInstituteOnFailed);
     }
     private void SaveInstituteOnSuccess()
     {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Institute Saved", Color.green);
         isGenerateIDFlag = false;
         DeactiveInstitutePanel();
         RefreshInstituteList();
-
+        
     }
     private void SaveInstituteOnFailed()
     {
+        Loading.Instance.HideLoadingScreen();
+        saveInstituteButton.interactable = true;
+        DialogueBox.Instance.ShowDialogueBox("Failed to save Institute", Color.red);
         Debug.Log("Failed to save institute");
     }
     public void DeactiveInstitutePanel()
@@ -178,7 +244,7 @@ public class CRUInstitutePanel : MonoBehaviour
         instituteNameInputField.text = "";
         institutitionAbreviationInputField.text = "";
         saveInstituteButton.interactable = true;
-        addNewInstituteButton.interactable = false;
+        // addNewInstituteButton.interactable = false;
         instituteNameInputField.interactable = true;
         institutitionAbreviationInputField.interactable = true;
         // deleteInstituteButton.interactable = true;

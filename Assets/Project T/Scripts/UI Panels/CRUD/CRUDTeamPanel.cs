@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using Scripts.FirebaseConfig;
 using Scripts.ListEntry;
+using UnityEngine.Events;
 namespace Scripts.UIPanels{
 [System.Serializable]
 public class SpeakerPanelData
@@ -69,7 +70,7 @@ public class CRUDTeamPanel : MonoBehaviour
     private string selectedInstituteID;
     private SpeakerTypes selectedTeamType;
     [SerializeField] private Toggle teamTypeToggle;
-    private List<GameObject> speakerPanels = new List<GameObject>();
+    public List<GameObject> speakerPanels = new List<GameObject>();
     [SerializeField] private Button saveTeamButton;
     private bool teamTypeSelectedFlag = false;
 
@@ -78,9 +79,11 @@ public class CRUDTeamPanel : MonoBehaviour
     [SerializeField] private GameObject openTeamEntryPrefab;
     [SerializeField] private Transform noviceTeamsDisplayPanel;
     [SerializeField] private GameObject noviceTeamEntryPrefab;
-    private bool showingTeamInfoFlag = false;
+    [SerializeField] private RectTransform noOpenTeams;
+    [SerializeField] private RectTransform noNoviceTeams;
     private bool genearteIDFlag = false;
     private Team selectedTeam;
+    public UnityEvent DisableAllTeams;
 
     void OnEnable()
     {
@@ -90,10 +93,20 @@ public class CRUDTeamPanel : MonoBehaviour
     void OnDisable()
     {
         DeActivateAddTeamPanel();
+        //destroy all the speaker panels
+        foreach (Transform child in openTeamsDisplayPanel)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in noviceTeamsDisplayPanel)
+        {
+            Destroy(child.gameObject);
+        }
     }
     public void AddTeam()
     {  genearteIDFlag = true;
         DeActivateAddTeamPanel();
+        DisableAllTeams?.Invoke();  
         DOVirtual.DelayedCall(0.1f, () =>
         {
             ActivateAddTeamPanel();
@@ -197,7 +210,11 @@ public class CRUDTeamPanel : MonoBehaviour
                 return;
             }
             genearteIDFlag = false;
-            FirestoreManager.FireInstance.SaveTeamToFireStore(newTeam, OnTeamAddSuccess, OnTeamAddFailure);
+            Loading.Instance.ShowLoadingScreen();
+            if(genearteIDFlag)
+                FirestoreManager.FireInstance.SaveTeamToFireStore(newTeam, OnTeamAddSuccess, OnTeamAddFailure);
+            else
+                FirestoreManager.FireInstance.UpdateTeamInFireStore(newTeam, OnTeamAddSuccess, OnTeamAddFailure);
         }
         catch (System.Exception e)
         {
@@ -234,21 +251,18 @@ public class CRUDTeamPanel : MonoBehaviour
                  if(institutionDropdown.ratioShrinking == 0)
                     institutionDropdown.ratioShrinking = 1;
                 institutionDropdown.SelectOption(index);
-                int speakerCount = 0;
 
                 if (team.teamCategory == SpeakerTypes.Open)
                 {
-                    teamTypeToggle.SelectOption1();
-                    speakerCount = 2;
+                    teamTypeToggle.SelectOption1();;
                 }
                 else if (team.teamCategory == SpeakerTypes.Novice)
                 {
                     teamTypeToggle.SelectOption2();
-                    speakerCount = 3;
                 }
                 Debug.Log("Going To Access Speaker Panel");
                 //add speaker info too
-                for (int i = 0; i < speakerCount; i++)
+                for (int i = 0; i < selectedTeam.speakers.Count; i++)
                 {
                     AddSpeakerPanelEntry_IF entry = speakerPanels[i].GetComponent<AddSpeakerPanelEntry_IF>();
                     entry.SetSpeakerInfo(team.speakers[i]);
@@ -317,7 +331,7 @@ public class CRUDTeamPanel : MonoBehaviour
         {
             return false;
         }
-        if (string.IsNullOrEmpty(speaker.speakerPhone))
+        if (string.IsNullOrEmpty(speaker.speakerContact))
         {
             return false;
         }
@@ -327,8 +341,10 @@ public class CRUDTeamPanel : MonoBehaviour
         }
         return true;
     }
-    private void DeActivateAddTeamPanel()
+    public void DeActivateAddTeamPanel()
     {
+        selectedTeam = null;
+        selectedInstituteID = "";
         addTeamBtn.interactable = true;
         teamNameInputField.text = "";
         teamNameInputField.interactable = false;
@@ -348,23 +364,29 @@ public class CRUDTeamPanel : MonoBehaviour
         //animate addteam panel to be a lil small less scale
         addTeamPanel.DOScale(Vector3.one * 0.8f, 0.1f);
     }
-    private void OnTeamAddSuccess()
+    private async void OnTeamAddSuccess()
     {
+        DialogueBox.Instance.ShowDialogueBox("Team Saved", Color.green);
         DeActivateAddTeamPanel();
-        FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnAllTeamsUpdatedSuccess, OnAllTeamsUpdatedFailure);
+        await FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnAllTeamsUpdatedSuccess, OnAllTeamsUpdatedFailure);
         UpdateTeamsList();
     }
     private void OnTeamAddFailure()
     {
+        DialogueBox.Instance.ShowDialogueBox("Failed to save Team", Color.red);
+        Loading.Instance.HideLoadingScreen();
         saveTeamButton.interactable = true;
     }
 
     private void OnAllTeamsUpdatedSuccess()
     {
+        Loading.Instance.HideLoadingScreen();
         UpdateTeamsList();
     }
-    private void OnAllTeamsUpdatedFailure()
+    private async void OnAllTeamsUpdatedFailure()
     {
+        await FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnAllTeamsUpdatedSuccess, OnAllTeamsUpdatedFailure);
+        Loading.Instance.HideLoadingScreen();
     }
     private void UpdateTeamsList()
     {
@@ -383,6 +405,7 @@ public class CRUDTeamPanel : MonoBehaviour
                 GameObject teamEntry = Instantiate(openTeamEntryPrefab, openTeamsDisplayPanel);
                 TeamListEntry entry = teamEntry.GetComponent<TeamListEntry>();
                 entry.SetTeam(team);
+                noOpenTeams.gameObject.SetActive(false);
             }
             else if (team.teamCategory == SpeakerTypes.Novice)
             {
@@ -390,6 +413,7 @@ public class CRUDTeamPanel : MonoBehaviour
                 GameObject teamEntry = Instantiate(noviceTeamEntryPrefab, noviceTeamsDisplayPanel);
                 TeamListEntry entry = teamEntry.GetComponent<TeamListEntry>();
                 entry.SetTeam(team);
+                noNoviceTeams.gameObject.SetActive(false);
             }
         }
     }

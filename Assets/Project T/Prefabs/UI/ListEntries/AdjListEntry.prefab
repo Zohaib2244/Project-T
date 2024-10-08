@@ -74,8 +74,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 674378290
-  m_fontColor: {r: 0.19607845, g: 0.19607845, b: 0.19607845, a: 0.15686275}
+    rgba: 3039965746
+  m_fontColor: {r: 0.19607845, g: 0.19607845, b: 0.19607845, a: 0.70980394}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -226,7 +226,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.65
+  m_fontSize: 27
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -407,6 +407,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adjudicatorName: {fileID: 3976474543580261154}
   adjudicatorInstitute: {fileID: 1365670875206682012}
+  myColorBlock:
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0
+  myBtn: {fileID: 6600038055656503884}
 --- !u!114 &-4493132263660408964
 MonoBehaviour:
   m_ObjectHideFlags: 0

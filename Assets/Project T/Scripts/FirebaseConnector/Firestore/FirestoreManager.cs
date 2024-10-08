@@ -125,104 +125,133 @@ namespace Scripts.FirebaseConfig
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
                 Debug.Log("<color=yellow>Retrieving admin info...</color>");
-                    DocumentReference docRef = FirebaseConnector.Instance.Db.Collection("Admin_Categorizer").Document(userId);
-                    DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                DialogueBox.Instance.ShowDialogueBox("Retrieving admin info...", Color.yellow);
 
-                    if (snapshot.Exists)
-                    {
-                        Admin_DTO admin_dto = snapshot.ConvertTo<Admin_DTO>();
-                        //create a new Admin object and pass the values from the Admin_DTO object
-                        Admin admin = new Admin(admin_dto.UserID, admin_dto.AdminCategory, admin_dto.Name);
-                        onSuccess?.Invoke(admin);
-                        Debug.Log("<color=green>Admin info retrieved successfully.</color>");
-                    }
-                    else
-                    {
-                        Debug.LogError("No such document!");
-                        onFailure?.Invoke();
-                    }
-            }
-            else
-            {
-                Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
-                onFailure?.Invoke();
-            }
-        }
-        #endregion
-        #region Tournament Functions
-        public async void SaveTournamentToFireStore(TournamentInfo tournament, UnityAction onSuccess = null, UnityAction onFailure = null)
-        {
-            if (FirebaseConnector.Instance.isFirebaseReady)
-            {
-                try
+                DocumentReference docRef = FirebaseConnector.Instance.Db.Collection("Admin_Categorizer").Document(userId);
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+                if (snapshot.Exists)
                 {
-                    Debug.Log("<color=orange>Trying to Save Tournament.</color>");
-                    var tournamentInfoDTO = DTOConverter.Instance.TournamentInfoToDTO(tournament);
-                    DocumentReference docRef = GetTouranmentCollectionReference().Document(tournamentInfoDTO.tournamentId);
-                    await docRef.SetAsync(tournamentInfoDTO);
-                    Debug.Log("<color=green>Tournament saved successfully.</color>");
-
-                    onSuccess?.Invoke();
+                    Admin_DTO admin_dto = snapshot.ConvertTo<Admin_DTO>();
+                    Admin admin = new Admin(admin_dto.UserID, admin_dto.AdminCategory, admin_dto.Name);
+                    onSuccess?.Invoke(admin);
+                    Debug.Log("<color=green>Admin info retrieved successfully.</color>");
+                    DialogueBox.Instance.ShowDialogueBox("Admin info retrieved successfully.", Color.green);
                 }
-                catch (System.Exception ex)
+                else
                 {
-                    Debug.LogError($"SaveTournamentToFireStore encountered an error: {ex}");
+                    Debug.LogError("No such document!");
+                    DialogueBox.Instance.ShowDialogueBox("No such document!", Color.red);
                     onFailure?.Invoke();
                 }
             }
             else
             {
-                Debug.Log("<color=orange>Firebase is not ready. Please wait for Firebase to initialize.</color>");
-                onFailure?.Invoke();
-            }
-        }
-
-        public async void UpdateTournamentsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
-        {
-            if (FirebaseConnector.Instance.isFirebaseReady)
-            {
-                try
-                {
-                    QuerySnapshot snapshot = await GetTouranmentCollectionReference().GetSnapshotAsync();
-                    Debug.Log($"<color=blue>Retrieved {snapshot.Count} tournament documents from Firestore.</color>");
-
-                    //check the count of documents
-                    if (snapshot.Count == 0)
-                    {
-                        Debug.Log("<color=orange>No tournaments found in Firestore.</color>");
-                        onFailure?.Invoke();
-                        return;
-                    }
-                    foreach (DocumentSnapshot document in snapshot.Documents)
-                    {
-                        AppConstants.instance.tournaments.Add(DTOConverter.Instance.DTOToTournamentInfo(document.ConvertTo<TournamentInfo_DTO>()));
-                    }
-                    Debug.Log("<color=green>Tournaments updated successfully.</color>");
-                    onSuccess?.Invoke();
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"UpdateTournamentsFromFirestore encountered an error: {ex}");
-                }
-            }
-            else
-            {
                 Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+                DialogueBox.Instance.ShowDialogueBox("Firebase is not ready. Please wait for Firebase to initialize.", Color.red);
                 onFailure?.Invoke();
             }
         }
         #endregion
+        #region Tournament Functions
+    public async void SaveTournamentToFireStore(TournamentInfo tournament, UnityAction onSuccess = null, UnityAction onFailure = null)
+    {
+        if (FirebaseConnector.Instance.isFirebaseReady)
+        {
+            try
+            {
+                Debug.Log("<color=orange>Trying to Save Tournament.</color>");
+                DialogueBox.Instance.ShowDialogueBox("Trying to Save Tournament.", Color.yellow);
+
+                var tournamentInfoDTO = DTOConverter.Instance.TournamentInfoToDTO(tournament);
+                DocumentReference docRef = GetTouranmentCollectionReference().Document(tournamentInfoDTO.tournamentId);
+                await docRef.SetAsync(tournamentInfoDTO);
+
+                Debug.Log("<color=green>Tournament saved successfully.</color>");
+                DialogueBox.Instance.ShowDialogueBox("Tournament saved successfully.", Color.green);
+
+                onSuccess?.Invoke();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"SaveTournamentToFireStore encountered an error: {ex}");
+                DialogueBox.Instance.ShowDialogueBox("Failed to save tournament.", Color.red);
+
+                onFailure?.Invoke();
+            }
+        }
+        else
+        {
+            Debug.Log("<color=orange>Firebase is not ready. Please wait for Firebase to initialize.</color>");
+            DialogueBox.Instance.ShowDialogueBox("Firebase is not ready. Please wait for Firebase to initialize.", Color.red);
+
+            onFailure?.Invoke();
+        }
+    }
+
+    public async void UpdateTournamentsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
+    {
+        if (FirebaseConnector.Instance.isFirebaseReady)
+        {
+            try
+            {
+                Debug.Log("<color=orange>Retrieving tournaments from Firestore.</color>");
+                // DialogueBox.Instance.ShowDialogueBox("Retrieving tournaments from Firestore.", Color.yellow);
+
+                QuerySnapshot snapshot = await GetTouranmentCollectionReference().GetSnapshotAsync();
+                Debug.Log($"<color=blue>Retrieved {snapshot.Count} tournament documents from Firestore.</color>");
+
+                // Check the count of documents
+                if (snapshot.Count == 0)
+                {
+                    Debug.Log("<color=orange>No tournaments found in Firestore.</color>");
+                    // DialogueBox.Instance.ShowDialogueBox("No tournaments found in Firestore.", Color.red);
+
+                    onFailure?.Invoke();
+                    return;
+                }
+
+                foreach (DocumentSnapshot document in snapshot.Documents)
+                {
+                    AppConstants.instance.tournaments.Add(DTOConverter.Instance.DTOToTournamentInfo(document.ConvertTo<TournamentInfo_DTO>()));
+                }
+
+                Debug.Log("<color=green>Tournaments updated successfully.</color>");
+                // DialogueBox.Instance.ShowDialogueBox("Tournaments updated successfully.", Color.green);
+
+                onSuccess?.Invoke();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"UpdateTournamentsFromFirestore encountered an error: {ex}");
+                // DialogueBox.Instance.ShowDialogueBox("Failed to update tournaments.", Color.red);
+
+                onFailure?.Invoke();
+            }
+        }
+        else
+        {
+            Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+            // DialogueBox.Instance.ShowDialogueBox("Firebase is not ready. Please wait for Firebase to initialize.", Color.red);
+
+            onFailure?.Invoke();
+        }
+    }
+        #endregion
         #region Institution Functions
-        public async void SaveInstituteToFireStore(Instituitions institute, UnityAction onSuccess = null, UnityAction onFailure = null)
+               public async void SaveInstituteToFireStore(Instituitions institute, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
                 try
                 {
                     Debug.Log("<color=orange>Trying to Save Institute.</color>");
+                    // DialogueBox.Instance.ShowDialogueBox("Trying to Save Institute.", Color.yellow);
+        
                     if (AppConstants.instance.selectedTouranment.instituitionsinTourney.Any(i => i.instituitionAbreviation == institute.instituitionAbreviation))
                     {
                         Debug.LogError("Institute with the same name already exists.");
+                        // DialogueBox.Instance.ShowDialogueBox("Institute with the same name already exists.", Color.red);
                         onFailure?.Invoke();
                     }
                     else
@@ -231,34 +260,40 @@ namespace Scripts.FirebaseConfig
                         Debug.Log("<color=lightblue>Trying to Save Institute.</color>");
                         await GetInstitutionDocumentReference(institute.instituitionID).SetAsync(instituition_dto);
                         Debug.Log("<color=green>Institute saved successfully.</color>");
+                        // DialogueBox.Instance.ShowDialogueBox("Institute saved successfully.", Color.green);
                         onSuccess?.Invoke();
                     }
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"SaveInstituteToFireStore encountered an error: {ex}");
+                    // DialogueBox.Instance.ShowDialogueBox("Failed to save institute.", Color.red);
                     onFailure?.Invoke();
                 }
             }
             else
             {
                 Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+                // DialogueBox.Instance.ShowDialogueBox("Firebase is not ready. Please wait for Firebase to initialize.", Color.red);
                 onFailure?.Invoke();
             }
         }
+        
         public async Task GetAllInstituitionsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
                 try
                 {
+                    Debug.Log("<color=orange>Retrieving institutions from Firestore.</color>");
+        
                     QuerySnapshot snapshot = await GetInstituteCollectionReference().GetSnapshotAsync();
-                    Debug.Log($"<color=blue>Retrieved {snapshot.Count} instituition documents from Firestore.</color>");
-                    //remove all entries from AppCOns   
+                    Debug.Log($"<color=blue>Retrieved {snapshot.Count} institution documents from Firestore.</color>");
+        
                     AppConstants.instance.selectedTouranment.instituitionsinTourney.Clear();
                     foreach (DocumentSnapshot document in snapshot.Documents)
                     {
-                        Debug.Log("Instituitions adding to the list");
+                        Debug.Log("Institutions adding to the list");
                         AppConstants.instance.selectedTouranment.instituitionsinTourney.Add(DTOConverter.Instance.DTOToInstituitions(document.ConvertTo<Instituitions_DTO>()));
                     }
                     Debug.Log("<color=green>Institutions updated successfully.</color>");
@@ -266,36 +301,43 @@ namespace Scripts.FirebaseConfig
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError("UpdateInstituitionsFromFirestore encountered an error: " + ex);
+                    Debug.Log("GetAllInstituitionsFromFirestore encountered an error: " + ex);
                     onFailure?.Invoke();
                 }
             }
             else
             {
-                Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+                Debug.Log("Firebase is not ready. Please wait for Firebase to initialize.");
                 onFailure?.Invoke();
             }
         }
+        
         public async void UpdateInstitutionInFireStore(Instituitions institute, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
                 try
                 {
+                    Debug.Log("<color=orange>Trying to Update Institute.</color>");
+                    DialogueBox.Instance.ShowDialogueBox("Trying to Update Institute.", Color.yellow);
+        
                     Instituitions_DTO instituition_dto = DTOConverter.Instance.InstituitionsToDTO(institute);
                     await GetInstitutionDocumentReference(instituition_dto.instituitionID).SetAsync(instituition_dto);
                     Debug.Log("<color=green>Institute updated successfully.</color>");
+                    DialogueBox.Instance.ShowDialogueBox("Institute updated successfully.", Color.green);
                     onSuccess?.Invoke();
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"UpdateInstituteInFireStore encountered an error: {ex}");
+                    DialogueBox.Instance.ShowDialogueBox("Failed to update institute.", Color.red);
                     onFailure?.Invoke();
                 }
             }
             else
             {
                 Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+                DialogueBox.Instance.ShowDialogueBox("Firebase is not ready. Please wait for Firebase to initialize.", Color.red);
                 onFailure?.Invoke();
             }
         }
@@ -534,14 +576,14 @@ namespace Scripts.FirebaseConfig
                     transaction.Update(speakerDocRef1, new Dictionary<string, object>
                     {
                 { "speakerName", speaker2.speakerName },
-                { "speakerContact", speaker2.speakerPhone },
+                { "speakerContact", speaker2.speakerContact },
                 { "speakerEmail", speaker2.speakerEmail }
                     });
 
                     transaction.Update(speakerDocRef2, new Dictionary<string, object>
                 {
             { "speakerName", speaker1.speakerName },
-            { "speakerContact", speaker1.speakerPhone },
+            { "speakerContact", speaker1.speakerContact },
             { "speakerEmail", speaker1.speakerEmail }
                 });
                 }

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Scripts.Resources;
 using Scripts.UI;
 using Scripts.FirebaseConfig;
+using System.Threading.Tasks;
 namespace Scripts.UIPanels
 {
 public class TournamentHomePanel : MonoBehaviour
@@ -25,10 +26,18 @@ public class TournamentHomePanel : MonoBehaviour
     {
         ConfigureTournament();
         UpdateAdminInfo();
-        await FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
-        await FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
-        await AppConstants.instance.GetAllRounds();
-        await FirestoreManager.FireInstance.GetAllTeamsFromFirestore();
+        Loading.Instance.ShowLoadingScreen();
+    
+        // Run Firestore calls in parallel
+        var institutionsTask = FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
+        var adjudicatorsTask = FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
+        var roundsTask = AppConstants.instance.GetAllRounds();
+        var teamsTask = FirestoreManager.FireInstance.GetAllTeamsFromFirestore();
+    
+        // Await all tasks to complete
+        await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
+    
+        Loading.Instance.HideLoadingScreen();
     }
     private void ConfigureTournament()
     {
