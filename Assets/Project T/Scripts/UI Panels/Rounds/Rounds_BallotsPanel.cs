@@ -56,9 +56,10 @@ public class Rounds_BallotsPanel : MonoBehaviour
         // Instantiate new entries and set match data
         for (int i = 0; i < MainRoundsPanel.Instance.selectedRound.matches.Count; i++)
         {
+            Debug.Log("MainRoundsPanel.Instance.selectedRound.matches[i]: " + MainRoundsPanel.Instance.selectedRound.matches[i]);
             var match = MainRoundsPanel.Instance.selectedRound.matches[i];
             var drawEntry = Instantiate(ballotEntryPrefab, ballotsContent);
-            drawEntry.GetComponent<MatchListEntry>().SetMatch(match, i + 1); // Pass match object and match number (index + 1)
+            drawEntry.GetComponent<BallotListEntry>().SetMatch(match, i + 1); // Pass match object and match number (index + 1)
         }
     }
     public void SaveBallots()

@@ -18,6 +18,7 @@ public class MatchListEntry : MonoBehaviour
 
     public void SetMatch(Match match, int _matchNo)
     {
+        Debug.Log("SetMatch called");
         this.match = match;
         matchNo.text = _matchNo.ToString();
 

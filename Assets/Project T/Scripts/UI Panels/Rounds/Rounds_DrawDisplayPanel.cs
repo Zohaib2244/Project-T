@@ -45,7 +45,7 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
     public void SaveDraw()
     {
         // Retrieve all draw prefabs
-        var allMatches = GetDrawPrefabs();
+        // var allMatches = GetDrawPrefabs();
     
         // Get the selected round
         var selectedRound = MainRoundsPanel.Instance.selectedRound;
@@ -57,9 +57,10 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
         }
     
         // Save the draw prefabs to the selected round
-        selectedRound.matches = allMatches;
-        MainRoundsPanel.Instance.selectedRound.matches.Clear();
-        MainRoundsPanel.Instance.selectedRound.matches = allMatches;
+        selectedRound.matches.Clear();
+        selectedRound.matches = DrawsPanel.Instance.matches_TMP;
+        // MainRoundsPanel.Instance.selectedRound.matches.Clear();
+        // MainRoundsPanel.Instance.selectedRound.matches = allMatches;
         MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
         Debug.Log("Draw saved: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
         // Set the draw generated flag to true
