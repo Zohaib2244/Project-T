@@ -43,10 +43,14 @@ namespace Scripts.ListEntry
         }
         public void SpeakerSelected()
         {
+            if(isSelected && !CRUDSpeakerPanel.Instance.isReplaceModeOn || isSelected && isReplaceable && CRUDSpeakerPanel.Instance.isReplaceModeOn)
+            {
+                DeselectedAnim();
+                CRUDSpeakerPanel.Instance.OnSpeakerListEntryDeselect?.Invoke();
+                return;
+            }
             CRUDSpeakerPanel.Instance.OnSpeakerListEntryDeselect?.Invoke();
-            // Debug.Log("Speaker Selected");
             isSelected = true;
-            // Debug.Log("ReplaceMode : " + CRUDSpeakerPanel.Instance.isReplaceModeOn);
             if (CRUDSpeakerPanel.Instance.isReplaceModeOn)
             {
 
@@ -67,12 +71,11 @@ namespace Scripts.ListEntry
         {
             if (CRUDSpeakerPanel.Instance.isReplaceModeOn)
             {
-                speakerSelectBtn.interactable = false;
                 transform.DOScale(Vector3.one * 0.9f, 0.1f);
             }
             else if (!CRUDSpeakerPanel.Instance.isReplaceModeOn)
             {
-                speakerSelectBtn.interactable = false;
+               
                 transform.DOScale(Vector3.one * 0.9f, 0.1f);
             }
         }
@@ -81,13 +84,13 @@ namespace Scripts.ListEntry
             if (isSelected && !CRUDSpeakerPanel.Instance.isReplaceModeOn)
             {
                 transform.DOScale(Vector3.one, 0.1f);
-                speakerSelectBtn.interactable = true;
+             
                 isSelected = false;
             }
             else if (isSelected && CRUDSpeakerPanel.Instance.isReplaceModeOn && isReplaceable)
             {
                 transform.DOScale(Vector3.one, 0.1f);
-                speakerSelectBtn.interactable = true;
+              
                 isSelected = false;
                 isReplaceable = false;
             }
@@ -105,6 +108,7 @@ namespace Scripts.ListEntry
             ColorBlock cb = speakerSelectBtn.colors;
             cb.highlightedColor = new Color32(0xDF, 0xFF, 0xD2, 0xFF); // Hex color DFFFD2
             speakerSelectBtn.colors = cb;
+            DeselectedAnim();
         }
     }
 }

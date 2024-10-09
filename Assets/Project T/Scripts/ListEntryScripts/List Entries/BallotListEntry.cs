@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Scripts.Resources;
-using Unity.VisualScripting.Dependencies.Sqlite;
-using UnityEngine.AI;
 
 public class BallotListEntry : MonoBehaviour
 {

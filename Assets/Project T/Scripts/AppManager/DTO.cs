@@ -210,6 +210,8 @@ namespace Scripts.FirebaseConfig
         [FirestoreProperty]
         public string tournamentName { get; set; }
         [FirestoreProperty]
+        public string tournamentShortHand { get; set; }
+        [FirestoreProperty]
         public int noOfPrelims { get; set; }
         [FirestoreProperty]
         public List<SpeakerCategories_DTO> speakerCategories { get; set; }
@@ -438,6 +440,7 @@ namespace Scripts.FirebaseConfig
                 tournamentId = tournamentInfo.tournamentId,
                 tournamentType = tournamentInfo.tournamentType,
                 tournamentName = tournamentInfo.tournamentName,
+                tournamentShortHand = tournamentInfo.tournamentShortHand,
                 noOfPrelims = tournamentInfo.noOfPrelims,
                 speakerCategories = speakerCategories
             };
@@ -462,6 +465,7 @@ namespace Scripts.FirebaseConfig
                 tournamentId = tournamentInfo.tournamentId,
                 tournamentType = tournamentInfo.tournamentType,
                 tournamentName = tournamentInfo.tournamentName,
+                tournamentShortHand = tournamentInfo.tournamentShortHand,
                 noOfPrelims = tournamentInfo.noOfPrelims,
                 speakerCategories = speakerCategories,
             };

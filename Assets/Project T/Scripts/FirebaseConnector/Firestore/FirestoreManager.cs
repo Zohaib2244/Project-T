@@ -153,6 +153,7 @@ namespace Scripts.FirebaseConfig
             }
         }
         #endregion
+
         #region Tournament Functions
     public async void SaveTournamentToFireStore(TournamentInfo tournament, UnityAction onSuccess = null, UnityAction onFailure = null)
     {
@@ -162,7 +163,7 @@ namespace Scripts.FirebaseConfig
             {
                 Debug.Log("<color=orange>Trying to Save Tournament.</color>");
                 DialogueBox.Instance.ShowDialogueBox("Trying to Save Tournament.", Color.yellow);
-
+                Debug.Log("<color=lightblue>Tournament ID: " + tournament.tournamentId + "</color>");
                 var tournamentInfoDTO = DTOConverter.Instance.TournamentInfoToDTO(tournament);
                 DocumentReference docRef = GetTouranmentCollectionReference().Document(tournamentInfoDTO.tournamentId);
                 await docRef.SetAsync(tournamentInfoDTO);
@@ -238,6 +239,7 @@ namespace Scripts.FirebaseConfig
         }
     }
         #endregion
+
         #region Institution Functions
                public async void SaveInstituteToFireStore(Instituitions institute, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
@@ -342,6 +344,7 @@ namespace Scripts.FirebaseConfig
             }
         }
         #endregion
+
         #region Team Functions
         public async void SaveTeamToFireStore(Team team, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
@@ -538,6 +541,7 @@ namespace Scripts.FirebaseConfig
             }
         }
         #endregion
+
         #region Speaker Functions
         #nullable enable
                 public async void ReplaceSpeakersInFirestore(Speaker speaker1, Speaker speaker2, string speaker1TeamID, string speaker2TeamID, UnityAction<Task>? onSuccess = null, UnityAction? onFailure = null)
@@ -622,6 +626,7 @@ namespace Scripts.FirebaseConfig
             }
         }
         #endregion
+
         #region Adjudicator Functions
         public async Task GetAllAdjudicatorsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
         {
@@ -725,6 +730,7 @@ namespace Scripts.FirebaseConfig
             }
         }
         #endregion
+
         #region Round Functions
 
         public async Task SaveRoundAsync(string roundType, Rounds round, UnityAction onSuccess = null, UnityAction onFailure = null)
@@ -843,6 +849,7 @@ namespace Scripts.FirebaseConfig
             }
         }
         #endregion
+
         #region TeamRoundData Functions
         public async Task AddTeamRoundData(string teamId, TeamRoundData teamRoundData, UnityAction onSuccess = null, UnityAction onFailure = null)
         {

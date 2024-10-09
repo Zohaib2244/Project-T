@@ -17,6 +17,7 @@ namespace Scripts.UIPanels
         [SerializeField] private Transform panel1;
         [SerializeField] private Transform panel2;
         [SerializeField] private TMP_InputField tournamentName;
+        [SerializeField] private TMP_InputField tournamentShortHand;
         [SerializeField] private Toggle tournamentTypeToggle;
 
         [SerializeField] private TMP_Text preLimCount;
@@ -29,11 +30,14 @@ namespace Scripts.UIPanels
         [SerializeField] private Button increasePrelimCountBtn;
         [SerializeField] private Button decreasePrelimCountBtn;
         public bool generateID = false;
+        
         #endregion
-
         void OnEnable()
         {
-            ActivatePanel();
+            tournamentTypeToggle.Activate();
+            generateID = true;
+            tournamentTypeToggle.onSelectOption1 += SelectAsian;
+            tournamentTypeToggle.onSelectOption2 += SelectBritish;
             openBreakDropDown.onChangedValue += OnOpenBreakSelected;
             noviceBreakDropDown.onChangedValue += OnNoviceBreakSelected;
         }
@@ -51,22 +55,10 @@ namespace Scripts.UIPanels
 
             tournamentName.text = "";
             tournamentTypeToggle.Activate();
-
-            if (AppConstants.instance.tournaments.Count == 1)
-            {
-                if (AppConstants.instance.tournaments[0].tournamentType == TournamentType.British)
-                    tournamentTypeToggle.DisableOption(2);
-                else
-                    tournamentTypeToggle.DisableOption(1);
-            }
-            else if (AppConstants.instance.tournaments.Count == 2)
-            {
-                tournamentTypeToggle.DeActivate();
-            }
+            
 
 
             preLimCount.text = "4";
-            // teamCategoriersBtnSelect.DeselectAll();
             openBreakDropDown.SetDefaultText();
             noviceBreakDropDown.SetDefaultText();
             NoviceBreakDropDownBtn.interactable = false;
@@ -89,7 +81,14 @@ namespace Scripts.UIPanels
             saveTournamentBtn.interactable = false;
             generateID = false;
         }
-
+        public void SelectBritish()
+        {
+            tournamentConfiguration.tournamentType = TournamentType.British;
+        }
+        public void SelectAsian()
+        {
+            tournamentConfiguration.tournamentType = TournamentType.Asian;
+        }
         public void ShowTournamentInfo(TournamentInfo tournamentInfo)
         {
             DeActivatePanel();
@@ -161,7 +160,6 @@ namespace Scripts.UIPanels
                 decreasePrelimCountBtn.interactable = true;
             }
         }
-
         public void DecreasePrelimCount()
         {
             Debug.Log("Decrease Prelim Count");
@@ -188,7 +186,6 @@ namespace Scripts.UIPanels
                 increasePrelimCountBtn.interactable = true;
             }
         }
-
         public void SelectOpenOnly()
         {
             NoviceBreakDropDownBtn.interactable = false;
@@ -299,30 +296,29 @@ namespace Scripts.UIPanels
             saveTournamentBtn.interactable = false;
             tournamentConfiguration.tournamentName = tournamentName.text;
             tournamentConfiguration.noOfPrelims = int.Parse(preLimCount.text);
+            tournamentConfiguration.tournamentShortHand = tournamentShortHand.text;
             InitializeRounds();
             Debug.Log("Tournament Name: " + tournamentConfiguration.tournamentName);
             if (generateID)
             {
                 Debug.Log("Generating ID");
-                //add id
-                if (tournamentConfiguration.tournamentType == TournamentType.British)
-                    tournamentConfiguration.tournamentId = "b01";
-                else if (tournamentConfiguration.tournamentType == TournamentType.Asian)
-                    tournamentConfiguration.tournamentId = "a01";
-                Debug.Log("Generating ID");
+                tournamentConfiguration.tournamentId = AppConstants.instance.GenerateTournamentID(tournamentConfiguration.tournamentShortHand);
                 tournamentConfiguration.preLimsInTourney[0].roundState = RoundStates.InProgress;
 
                 await AppConstants.instance.AddTournament(tournamentConfiguration);
             }
 
+
             DOVirtual.DelayedCall(1.5f, () => MainUIManager.Instance.SwitchPanel(Panels.TournamentSelectionPanel));
         }
 
+#region Rounds Initialization
         private void InitializeRounds()
         {
             Debug.Log("Initializing Rounds");
             int noviceBreaks = 0;
-            switch (tournamentConfiguration.speakerCategories[1].breakType)
+            if(tournamentConfiguration.speakerCategories.Count > 1)
+            {switch (tournamentConfiguration.speakerCategories[1].breakType)
             {
                 case BreakTypes.QF:
                     noviceBreaks = 3;
@@ -336,7 +332,7 @@ namespace Scripts.UIPanels
                 default:
                     Debug.Log("Unknown break type selected");
                     break;
-            }
+            }}
 
             int openBreaks = 0;
             switch (tournamentConfiguration.speakerCategories[0].breakType)
@@ -429,5 +425,6 @@ namespace Scripts.UIPanels
                 });
             }
         }
+#endregion
     }
 }

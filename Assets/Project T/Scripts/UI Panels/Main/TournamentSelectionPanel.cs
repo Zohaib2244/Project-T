@@ -33,12 +33,12 @@ public class TournamentSelectionPanel : MonoBehaviour
         TournamentType tournamentType = (TournamentType)tournamentTypeindex;
         if (tournamentType == TournamentType.British)
         {
-            AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments.Find(t => t.tournamentId == "b01");
+            AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments[0];
             MainUIManager.Instance.SwitchPanel(Panels.TournamentHomePanel);
         }
         else if (tournamentType == TournamentType.Asian)
         {
-            AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments.Find(t => t.tournamentId == "a01");
+            AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments[1];
             MainUIManager.Instance.SwitchPanel(Panels.TournamentHomePanel);
         }
     }
@@ -65,26 +65,25 @@ public class TournamentSelectionPanel : MonoBehaviour
             {
                 asianTournamentCard.SetTournamentInfo();
             }
-
-            if (AppConstants.instance.tournaments.Exists(t => t.tournamentId == "b01") && AppConstants.instance.tournaments.Exists(t => t.tournamentId == "a01"))
+            if(AppConstants.instance.tournaments.Count == 0)
             {
-                createTournamentBtn.interactable = false;
-                britishParliamentBtn.interactable = true;
-                asianParliamentBtn.interactable = true;
+                createTournamentBtn.interactable = true;
+                britishParliamentBtn.interactable = false;
+                asianParliamentBtn.interactable = false;
             }
-            else if (AppConstants.instance.tournaments.Exists(t => t.tournamentId == "b01"))
+            else if(AppConstants.instance.tournaments.Count == 1 )
             {
                 createTournamentBtn.interactable = true;
                 britishParliamentBtn.interactable = true;
                 asianParliamentBtn.interactable = false;
             }
-            else if (AppConstants.instance.tournaments.Exists(t => t.tournamentId == "a01"))
+            else if(AppConstants.instance.tournaments.Count == 2)
             {
-                createTournamentBtn.interactable = true;
-                britishParliamentBtn.interactable = false;
+                createTournamentBtn.interactable = false;
+                britishParliamentBtn.interactable = true;
                 asianParliamentBtn.interactable = true;
             }
-        }
+            }
     }
 }
 }

@@ -297,10 +297,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 235181014993519324}
-  - {fileID: 3966146792415239745}
-  - {fileID: 8878446744372149239}
   - {fileID: 976347287872909624}
+  - {fileID: 235181014993519324}
+  - {fileID: 8878446744372149239}
+  - {fileID: 3966146792415239745}
   - {fileID: 87942136614677498}
   - {fileID: 3636953148330417892}
   m_Father: {fileID: 274036638957176086}
@@ -370,10 +370,10 @@ RectTransform:
   - {fileID: 3923888483210715392}
   m_Father: {fileID: 7697487685312178578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1200, y: -157.5}
-  m_SizeDelta: {x: 436, y: 315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4167178122117038833
 CanvasRenderer:
@@ -977,7 +977,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is some info about this app that is very special to us
+  m_text: YES Find out who is going to win this tourney.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
@@ -1333,7 +1333,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &274036638957176086
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1377,7 +1377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tournamentName: {fileID: 3918236886500168856}
-  tournamentCategory: {fileID: 6043478537059304872}
+  tournamentSelection: {fileID: 0}
   adminName: {fileID: 5654200983561598456}
   adminCategory: {fileID: 1836434207042650818}
   roundsPanelBtnl: {fileID: 6004727185963173691}
@@ -1417,10 +1417,10 @@ RectTransform:
   - {fileID: 2666275137323751836}
   m_Father: {fileID: 7697487685312178578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 218, y: -157.5}
-  m_SizeDelta: {x: 436, y: 315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1162700148714807666
 CanvasRenderer:
@@ -1703,10 +1703,10 @@ RectTransform:
   - {fileID: 8397529802278871160}
   m_Father: {fileID: 7697487685312178578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 709, y: -527.5}
-  m_SizeDelta: {x: 436, y: 315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &954797227186485764
 CanvasRenderer:
@@ -2222,7 +2222,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is some info about this app that is very special to us
+  m_text: 'Our Bread and Butter. Make sure to not make any flaws. '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
@@ -2491,7 +2491,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Nigger
+  m_text: My Name
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: db3446ce06ff48e40add41553e4e8ea6, type: 2}
   m_sharedMaterial: {fileID: 7680096857200572986, guid: db3446ce06ff48e40add41553e4e8ea6, type: 2}
@@ -3003,10 +3003,10 @@ RectTransform:
   - {fileID: 6516607464286254825}
   m_Father: {fileID: 7697487685312178578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1200, y: -527.5}
-  m_SizeDelta: {x: 436, y: 315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9147287397267110861
 CanvasRenderer:
@@ -3184,7 +3184,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is some info about this app that is very special to us
+  m_text: Speakers Demand Editing huh.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
@@ -3600,10 +3600,10 @@ RectTransform:
   - {fileID: 4083709578813390299}
   m_Father: {fileID: 7697487685312178578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 709, y: -157.5}
-  m_SizeDelta: {x: 436, y: 315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2368214362716684788
 CanvasRenderer:
@@ -3903,7 +3903,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is some info about this app that is very special to us
+  m_text: Double if not Triple Check This Panel to avoid Boo Boos
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
@@ -4037,7 +4037,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Tournament Name Fuck them Bitches
+  m_text: Tournament Name
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: db3446ce06ff48e40add41553e4e8ea6, type: 2}
   m_sharedMaterial: {fileID: 7680096857200572986, guid: db3446ce06ff48e40add41553e4e8ea6, type: 2}
@@ -4171,7 +4171,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is some info about this app that is very special to us
+  m_text: 'Let them know where they are from. '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
@@ -4276,10 +4276,10 @@ RectTransform:
   - {fileID: 5111752651366404312}
   m_Father: {fileID: 7697487685312178578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 218, y: -527.5}
-  m_SizeDelta: {x: 436, y: 315}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7053514304010355053
 CanvasRenderer:
@@ -4802,7 +4802,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is some info about this app that is very special to us
+  m_text: 'Judge the judges in this panel. '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
@@ -5392,17 +5392,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 757d5f0e8c5055b42a7ab3784fad7a15, type: 3}
---- !u!114 &6043478537059304872 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7877768718496155276, guid: 757d5f0e8c5055b42a7ab3784fad7a15, type: 3}
-  m_PrefabInstance: {fileID: 4507482402254996260}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24cef3ea2ae643a4f82b88b8e90b3d5e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &6664907353274821897 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7130124755057667629, guid: 757d5f0e8c5055b42a7ab3784fad7a15, type: 3}

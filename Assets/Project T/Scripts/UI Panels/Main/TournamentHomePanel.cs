@@ -12,11 +12,10 @@ public class TournamentHomePanel : MonoBehaviour
 
     #region Private Variables
     [SerializeField] private TMP_Text _tournamentName;
-    [SerializeField] private Toggle tournamentCategory;
+    [SerializeField] private Toggle tournamentSelection;
     [SerializeField] private TMP_Text adminName;
     [SerializeField] private TMP_Text adminCategory;
     [SerializeField] private Button roundsPanelBtnl;
-
     #endregion
 
     #region Public Variables
@@ -36,19 +35,37 @@ public class TournamentHomePanel : MonoBehaviour
     
         // Await all tasks to complete
         await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
-    
+        tournamentSelection.onSelectOption1 = ShowTournament1Info;
+        tournamentSelection.onSelectOption2 = ShowTournament2Info;
         Loading.Instance.HideLoadingScreen();
     }
+
+    public void ShowTournament1Info()
+    {
+        AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments[0];
+         _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
+         Debug.Log("Tournament 1 selected");
+        // ConfigureTournament();
+    }
+    public void ShowTournament2Info()
+    {
+        AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments[1];
+        _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
+        Debug.Log("Tournament 2 selected");
+        // ConfigureTournament();
+    }
+
+
     private void ConfigureTournament()
     {
-        _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
-        if (AppConstants.instance.selectedTouranment.tournamentType == TournamentType.British)
+        // _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
+        if(AppConstants.instance.tournaments[0].tournamentId == AppConstants.instance.selectedTouranment.tournamentId)
         {
-            tournamentCategory.SelectOption1();
+            tournamentSelection.SelectOption1();
         }
-        else if (AppConstants.instance.selectedTouranment.tournamentType == TournamentType.Asian)
+        else
         {
-            tournamentCategory.SelectOption2();
+            tournamentSelection.SelectOption2();
         }
     }
 
@@ -82,15 +99,6 @@ public class TournamentHomePanel : MonoBehaviour
             {
                 roundsPanelBtnl.interactable = false;
             }
-       
-       
-       
-       
-       
-       
-       
-       
-       
         }
         catch (System.Exception)
         {
@@ -100,6 +108,7 @@ public class TournamentHomePanel : MonoBehaviour
             }
         }
     }
+    #region Panel Switchers
     public void OpenHomePanel()
     {
         MainUIManager.Instance.SwitchPanel(Panels.TournamentHomePanel);
@@ -128,5 +137,6 @@ public class TournamentHomePanel : MonoBehaviour
     {
         MainUIManager.Instance.SwitchPanel(Panels.RankingsPanel);
     }
+    #endregion
 }
 }

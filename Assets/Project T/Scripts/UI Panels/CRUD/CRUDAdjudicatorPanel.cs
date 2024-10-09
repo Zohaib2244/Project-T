@@ -6,6 +6,8 @@ using Scripts.Resources;
 using UnityEngine.Events;
 using Scripts.FirebaseConfig;
 using Scripts.ListEntry;
+using System.Linq;
+
 namespace Scripts.UIPanels{
 public class CRUDAdjudicatorPanel : MonoBehaviour
 {
@@ -305,6 +307,8 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     private void UpdateTeamsList()
     {
         Debug.Log("Updating adjudicator list");
+    
+        // Clear existing adjudicator list entries
         foreach (Transform child in capListContent)
         {
             Destroy(child.gameObject);
@@ -313,7 +317,14 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        foreach (Adjudicator adjudicator in AppConstants.instance.selectedTouranment.adjudicatorsInTourney)
+    
+        // Sort adjudicators by their names
+        var sortedAdjudicators = AppConstants.instance.selectedTouranment.adjudicatorsInTourney
+            .OrderBy(adjudicator => adjudicator.adjudicatorName)
+            .ToList();
+    
+        // Iterate through sorted adjudicators and instantiate list entries
+        foreach (Adjudicator adjudicator in sortedAdjudicators)
         {
             if (adjudicator.adjudicatorType == AdjudicatorTypes.CAP)
             {
@@ -331,7 +342,6 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
             }
         }
     }
-
     #region Callbacks
     private void OnGetAllAdjudicatorsSuccess()
     {

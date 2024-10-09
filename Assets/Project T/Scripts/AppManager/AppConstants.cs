@@ -50,7 +50,7 @@ public class TournamentInfo
     public TournamentType tournamentType { get; set; }
 
     public string tournamentName { get; set; }
-
+    public string tournamentShortHand { get; set; }
     public int noOfPrelims { get; set; }
     public List<Instituitions> instituitionsinTourney { get; set; }
     public List<Adjudicator> adjudicatorsInTourney { get; set; }
@@ -311,7 +311,11 @@ public class AppConstants : MonoBehaviour
         await Task.Delay(1500);
         await SaveAllRound(tournament);
     }
-
+    public string GenerateTournamentID(string tournamentShortHand)
+    {
+        int numberOfTournaments = tournaments.Count;
+        return $"TOURNEY_{numberOfTournaments}_{tournamentShortHand}";
+    }
     public void RemoveTournament(TournamentInfo tournament)
     {
         tournaments.Remove(tournament);

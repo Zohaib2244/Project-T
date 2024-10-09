@@ -7,7 +7,7 @@ using Scripts.Resources;
 using Scripts.FirebaseConfig;
 using UnityEngine.Events;
 using Scripts.ListEntry;
-using System;
+using System.Linq;
 namespace Scripts.UIPanels
 {public class CRUDSpeakerPanel : MonoBehaviour
 {
@@ -53,6 +53,8 @@ namespace Scripts.UIPanels
     [SerializeField] private Transform openSpeakerListContent;
     [SerializeField] private Transform noviceSpeakerListContent;
     [SerializeField] private GameObject speakerListEntryPrefab;
+    [SerializeField] private Transform noOpenText;
+    [SerializeField] private Transform noNoviceText;
 
     [Header("Speaker Panel")]
     [SerializeField] private Transform speakerPanel;
@@ -75,6 +77,8 @@ namespace Scripts.UIPanels
     #endregion
     private void OnEnable()
     {
+        noOpenText.gameObject.SetActive(true);
+        noNoviceText.gameObject.SetActive(true);
         UpdateSpeaekrsList();
         DeActivateSpeakerPanel();
     }
@@ -136,6 +140,7 @@ namespace Scripts.UIPanels
     }
     private void UpdateSpeaekrsList()
     {
+        // Clear existing speaker list entries
         foreach (Transform child in openSpeakerListContent)
         {
             Destroy(child.gameObject);
@@ -144,7 +149,14 @@ namespace Scripts.UIPanels
         {
             Destroy(child.gameObject);
         }
-        AppConstants.instance.selectedTouranment.teamsInTourney.ForEach(team =>
+    
+        // Sort teams by team name
+        var sortedTeams = AppConstants.instance.selectedTouranment.teamsInTourney
+            .OrderBy(team => team.teamName)
+            .ToList();
+    
+        // Iterate through sorted teams and instantiate speaker list entries
+        sortedTeams.ForEach(team =>
         {
             for (int i = 0; i < team.speakers.Count; i++)
             {
@@ -153,11 +165,19 @@ namespace Scripts.UIPanels
                 {
                     GameObject speakerObj = Instantiate(speakerListEntryPrefab, noviceSpeakerListContent);
                     speakerObj.GetComponent<SpeakerPanelSpeakerListEntry>().SetSpeakerListEntry(team, i);
+                    if(noNoviceText.gameObject.activeSelf)
+                    {
+                        noNoviceText.gameObject.SetActive(false);
+                    }
                 }
                 else if (team.teamCategory == SpeakerTypes.Open)
                 {
                     GameObject speakerObj = Instantiate(speakerListEntryPrefab, openSpeakerListContent);
                     speakerObj.GetComponent<SpeakerPanelSpeakerListEntry>().SetSpeakerListEntry(team, i);
+                    if (noOpenText.gameObject.activeSelf)
+                    {
+                        noOpenText.gameObject.SetActive(false);
+                    }
                 }
             }
         });
@@ -186,10 +206,6 @@ namespace Scripts.UIPanels
 
     }
 
-        private void OnSpeakerReplaceSuccess(Task arg0)
-        {
-            throw new NotImplementedException();
-        }
 
         public void ReplaceBtnClick()
     {
@@ -273,7 +289,8 @@ namespace Scripts.UIPanels
     #endregion
 
     #region Success & Fail Events
-    private async Task OnSpeakerReplaceSuccess()
+
+    private async void OnSpeakerReplaceSuccess(Task arg0)
     {
         DialogueBox.Instance.ShowDialogueBox("Speaker Replaced", Color.green);
         Loading.Instance.HideLoadingScreen();
@@ -299,16 +316,11 @@ namespace Scripts.UIPanels
     }
     private void OnUpdateSpeakerSuccess()
     {
-        Debug.Log("Speaker Updated");
         OnSpeakerListEntryDeselect?.Invoke();
-         Debug.Log("Speaker Updated");
         DeActivateSpeakerPanel();
-         Debug.Log("Speaker Updated");
         DOVirtual.DelayedCall(0.5f, () => UpdateSpeaekrsList());
-         Debug.Log("Speaker Updated");
         Loading.Instance.HideLoadingScreen();
-         Debug.Log("Speaker Updated");
-                DialogueBox.Instance.ShowDialogueBox("Speaker Updated", Color.green);
+        DialogueBox.Instance.ShowDialogueBox("Speaker Updated", Color.green);
     }
     private void OnUpdateSpeakerFailed()
     {

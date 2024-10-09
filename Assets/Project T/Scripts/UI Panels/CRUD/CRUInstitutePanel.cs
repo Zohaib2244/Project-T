@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.Events;
 using Scripts.ListEntry;
+using System.Linq;
 using System;
 
 namespace Scripts.UIPanels
@@ -194,14 +195,24 @@ private string FormatInstitutionName(string name)
     {
         Loading.Instance.HideLoadingScreen();
         noAdjudicatortxt.gameObject.SetActive(false);
-        foreach (Instituitions institute in AppConstants.instance.selectedTouranment.instituitionsinTourney)
+    
+        // Sort institutes by their names
+        var sortedInstitutes = AppConstants.instance.selectedTouranment.instituitionsinTourney
+            .OrderBy(institute => institute.instituitionName)
+            .ToList();
+    
+        // Iterate through sorted institutes and instantiate list entries
+        foreach (Instituitions institute in sortedInstitutes)
         {
             GameObject instituteListEntry = Instantiate(instituteListPrefab, instituteListContent);
             if (instituteListEntry.TryGetComponent<InstituteListEntry>(out var instituteListEntryComponent))
+            {
                 instituteListEntryComponent.SetInstituteData(institute);
-            //debug info about the added institute
+            }
+            // Debug info about the added institute
             Debug.Log("Institute Added: " + institute.instituitionName);
         }
+    
         DialogueBox.Instance.ShowDialogueBox("Institute List Updated", Color.green);
     }
     private void UpdateInstituteOnFailed()

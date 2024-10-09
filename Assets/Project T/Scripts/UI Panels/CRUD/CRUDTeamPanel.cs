@@ -7,6 +7,7 @@ using DG.Tweening;
 using Scripts.FirebaseConfig;
 using Scripts.ListEntry;
 using UnityEngine.Events;
+using System.Linq;
 namespace Scripts.UIPanels{
 [System.Serializable]
 public class SpeakerPanelData
@@ -390,6 +391,7 @@ public class CRUDTeamPanel : MonoBehaviour
     }
     private void UpdateTeamsList()
     {
+        // Clear existing team list entries
         foreach (Transform child in openTeamsDisplayPanel)
         {
             Destroy(child.gameObject);
@@ -398,7 +400,14 @@ public class CRUDTeamPanel : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        foreach (Team team in AppConstants.instance.selectedTouranment.teamsInTourney)
+    
+        // Sort teams by their names
+        var sortedTeams = AppConstants.instance.selectedTouranment.teamsInTourney
+            .OrderBy(team => team.teamName)
+            .ToList();
+    
+        // Iterate through sorted teams and instantiate list entries
+        foreach (Team team in sortedTeams)
         {
             if (team.teamCategory == SpeakerTypes.Open)
             {
