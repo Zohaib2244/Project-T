@@ -82,13 +82,16 @@ public class BallotListEntry : MonoBehaviour
     }
     public void BallotEntered()
     {
+        Debug.Log("Ballot Entered");
+        match.ballotEntered = true;
         UpdateTeamPositions();
         ballotBtn.sprite = enteredBallotBtnSprite;
         ballotTextBg.sprite = enteredBallotTextBgSprite;
-        match.ballotEntered = true;
+      
     }
     public void UpdateTeamPositions()
     {
+        Debug.Log("UpdateTeamPositions");
         // Iterate through each team in the match
         foreach (var teamEntry in match.teams)
         {
@@ -104,21 +107,41 @@ public class BallotListEntry : MonoBehaviour
                     switch (teamRoundData.teamMatchRanking)
                     {
                         case 1:
-                            teamName1stPos.text = team.teamName;
+                        Debug.Log("team.teamName: " + team.teamName);
+                            teamName1stPos.text = team.teamName.ToString();
                             break;
                         case 2:
-                            teamName2ndPos.text = team.teamName;
+                        Debug.Log("team.teamName: " + team.teamName);
+                            teamName2ndPos.text = team.teamName.ToString();
                             break;
                         case 3:
-                            teamName3rdPos.text = team.teamName;
+                        Debug.Log("team.teamName: " + team.teamName);
+                            teamName3rdPos.text = team.teamName.ToString();
                             break;
                         case 4:
-                            teamName4thPos.text = team.teamName;
+                        Debug.Log("team.teamName: " + team.teamName);
+                            teamName4thPos.text = team.teamName.ToString();
                             break;
                     }
                 }
             }
         }
+           List<string> capAdjudicatorNamesList = new List<string>();
+            List<string> normieAdjudicatorNamesList = new List<string>();
+
+            foreach (var adjudicator in match.adjudicators)
+            {
+                if (adjudicator.adjudicatorType == AdjudicatorTypes.CAP)
+                {
+                    capAdjudicatorNamesList.Add(adjudicator.adjudicatorName);
+                }
+                else if (adjudicator.adjudicatorType == AdjudicatorTypes.Normie)
+                {
+                    normieAdjudicatorNamesList.Add(adjudicator.adjudicatorName);
+                }
+            }
+
+            adjudicatorNames.text = "CAP: " + string.Join(", ", capAdjudicatorNamesList.ToArray()) + "\n" + "Adjudicators: " + string.Join(", ", normieAdjudicatorNamesList.ToArray());
     }
     public Match GetSavedBallot()
     {

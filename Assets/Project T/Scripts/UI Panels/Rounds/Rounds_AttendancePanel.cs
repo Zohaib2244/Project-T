@@ -4,7 +4,7 @@ using Scripts.UIPanels;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
-
+using Scripts.FirebaseConfig;
 public class Rounds_AttendancePanel : MonoBehaviour
 {
     #region Singleton
@@ -206,8 +206,9 @@ private void UpdateAdjudicatorList()
         AvailableAdjudicators_tmp.Remove(adjudicator);
         adjudicator.available = false;
     }
-    public void SaveTeamAttendance()
+    public async void SaveTeamAttendance()
     {
+        Loading.Instance.ShowLoadingScreen();
         // Create a HashSet to track unique team IDs (as strings)
         HashSet<string> uniqueTeamIds = new HashSet<string>();
         List<Team> uniqueTeams = new List<Team>();
@@ -220,8 +221,35 @@ private void UpdateAdjudicatorList()
                 uniqueTeams.Add(team);
             }
         }
+        List<string> uniqueTeamIdsList = uniqueTeamIds.ToList();
+        await FirestoreManager.FireInstance.SaveTeamAttendanceToFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, uniqueTeamIdsList,uniqueTeams, OnTeamAttendanceAddedSuccess, OnTeamAttendanceAddedFailure);
+    }
     
-        // Assign the filtered list to selectedRound
+    public async void SaveAdjudicatorAttendance()
+    {
+        // Create a HashSet to track unique adjudicator IDs (as strings)
+        HashSet<string> uniqueAdjudicatorIds = new HashSet<string>();
+        List<Adjudicator> uniqueAdjudicators = new List<Adjudicator>();
+    
+        // Filter the list to remove duplicates
+        foreach (var adjudicator in AvailableAdjudicators_tmp)
+        {
+            if (uniqueAdjudicatorIds.Add(adjudicator.adjudicatorID))
+            {
+                uniqueAdjudicators.Add(adjudicator);
+            }
+        }
+    
+    await FirestoreManager.FireInstance.SaveAdjudicatorAttendanceToFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, uniqueAdjudicatorIds.ToList(), uniqueAdjudicators, OnAdjudicatorAttendanceAddedSuccess, OnAdjudicatorAttendanceAddedFailure);
+       
+    }
+    #endregion
+#region Firestore Callbacks
+    public void OnTeamAttendanceAddedSuccess(List<Team> uniqueTeams)
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Team Attendance Added Successfully.", Color.green);
+                // Assign the filtered list to selectedRound
         MainRoundsPanel.Instance.selectedRound.availableTeams.Clear();
         MainRoundsPanel.Instance.selectedRound.availableTeams = uniqueTeams;
         MainRoundsPanel.Instance.selectedRound.teamAttendanceAdded = true;
@@ -237,23 +265,16 @@ private void UpdateAdjudicatorList()
         AvailableTeams_tmp.Clear();
         MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
     }
-    
-    public void SaveAdjudicatorAttendance()
+    public void OnTeamAttendanceAddedFailure()
     {
-        // Create a HashSet to track unique adjudicator IDs (as strings)
-        HashSet<string> uniqueAdjudicatorIds = new HashSet<string>();
-        List<Adjudicator> uniqueAdjudicators = new List<Adjudicator>();
-    
-        // Filter the list to remove duplicates
-        foreach (var adjudicator in AvailableAdjudicators_tmp)
-        {
-            if (uniqueAdjudicatorIds.Add(adjudicator.adjudicatorID))
-            {
-                uniqueAdjudicators.Add(adjudicator);
-            }
-        }
-    
-        // Assign the filtered list to selectedRound
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to add team attendance.", Color.red);
+    }
+    public void OnAdjudicatorAttendanceAddedSuccess(List<Adjudicator> uniqueAdjudicators)
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Adjudicator Attendance Added Successfully.", Color.green);
+         // Assign the filtered list to selectedRound
         MainRoundsPanel.Instance.selectedRound.availableAdjudicators.Clear();
         MainRoundsPanel.Instance.selectedRound.availableAdjudicators = uniqueAdjudicators;
         MainRoundsPanel.Instance.selectedRound.AdjudicatorAttendanceAdded = true;
@@ -269,5 +290,11 @@ private void UpdateAdjudicatorList()
         AvailableAdjudicators_tmp.Clear();
         MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
     }
-    #endregion
+    public void OnAdjudicatorAttendanceAddedFailure()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to add adjudicator attendance.", Color.red);
+    }
+
+#endregion
 }

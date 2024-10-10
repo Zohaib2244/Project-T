@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using Scripts.ListEntry;
 using System.Linq;
 using System;
+using Unity.VisualScripting;
 
 namespace Scripts.UIPanels
 {
@@ -127,7 +128,6 @@ public void SaveInstitute()
     {
         if (selectedInstitute == null)
         {
-            Debug.Log("Selected Institute is null");
             selectedInstitute = new Instituitions();
         }
 
@@ -136,10 +136,20 @@ public void SaveInstitute()
 
         // Format the institution name
         string institutionName = FormatInstitutionName(instituteNameInputField.text);
-
+        if (string.IsNullOrEmpty(institutionName))
+        {
+            DialogueBox.Instance.ShowDialogueBox("Institute name cannot be empty.", Color.red);
+            saveInstituteButton.interactable = true;
+            return;
+        }
         selectedInstitute.instituitionName = institutionName;
         selectedInstitute.instituitionAbreviation = abbreviation;
-
+        if (DuplicateExists())
+        {
+            DialogueBox.Instance.ShowDialogueBox("Institute already exists.", Color.red);
+            saveInstituteButton.interactable = true;
+                return;
+        }
         selectedInstitute.instituitionID = AppConstants.instance.InstituteIDGenerator(abbreviation);
 
         Loading.Instance.ShowLoadingScreen();
@@ -161,11 +171,35 @@ public void SaveInstitute()
     }
 }
 
-
+private bool DuplicateExists()
+{
+    foreach (Instituitions institute in AppConstants.instance.selectedTouranment.instituitionsinTourney)
+    {
+        if (institute.instituitionName.Equals(selectedInstitute.instituitionName, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        else if (institute.instituitionAbreviation.Equals(selectedInstitute.instituitionAbreviation, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 private string FormatInstitutionName(string name)
 {
-    string[] words = name.Split(' ');
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        return string.Empty;
+    }
+
+    // Trim the input string to remove leading and trailing whitespace
+    name = name.Trim();
+
+    // Split the input string into words and filter out empty strings
+    string[] words = name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
     string[] exceptions = { "of", "the", "and" };
+
     for (int i = 0; i < words.Length; i++)
     {
         if (Array.Exists(exceptions, e => e.Equals(words[i], StringComparison.OrdinalIgnoreCase)))
@@ -179,16 +213,13 @@ private string FormatInstitutionName(string name)
     }
     return string.Join(" ", words);
 }
-
-
-
-    public void RefreshInstituteList()
+    public async void RefreshInstituteList()
     {
         foreach (Transform child in instituteListContent)
         {
             Destroy(child.gameObject);
         }
-        FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore(UpdateInstituteOnSuccess, UpdateInstituteOnFailed);
+       await FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore(UpdateInstituteOnSuccess, UpdateInstituteOnFailed);
     }
 
     private void UpdateInstituteOnSuccess()

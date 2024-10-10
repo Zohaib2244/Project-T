@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Scripts.Resources;
+using Scripts.FirebaseConfig;
 
 
 namespace Scripts.UIPanels.RoundPanels
@@ -87,14 +88,26 @@ namespace Scripts.UIPanels.RoundPanels
                 }
             }
         }
-        public void SaveMotion(Dictionary<string, string> motion)
+        public async void SaveMotion(Dictionary<string, string> motion)
         {
-            MainRoundsPanel.Instance.selectedRound.motionAdded = true;
-            MainRoundsPanel.Instance.selectedRound.motions = motion;
+            Loading.Instance.ShowLoadingScreen();
+           await FirestoreManager.FireInstance.SaveRoundMotionToFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(),MainRoundsPanel.Instance.selectedRound.roundId, motion, OnMotionSavedSuccess);
+        }
+        
+        private void OnMotionSavedSuccess(Dictionary<string, string> motion)
+        {
+            Loading.Instance.HideLoadingScreen();
             DialogueBox.Instance.ShowDialogueBox("Motion Saved Successfully.", Color.green);
+           MainRoundsPanel.Instance.selectedRound.motionAdded = true;
+            MainRoundsPanel.Instance.selectedRound.motions = motion;
             MainRoundsPanel.Instance.goPublicButton.interactable = true;
             MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
             MainRoundsPanel.Instance.SaveRound();
+        }
+        private void OnMotionSavedFailure()
+        {
+            Loading.Instance.HideLoadingScreen();
+            DialogueBox.Instance.ShowDialogueBox("Failed to save motion.", Color.red);
         }
     }
 }

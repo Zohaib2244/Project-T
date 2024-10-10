@@ -43,11 +43,14 @@ public class MotionsEntry : MonoBehaviour
 
         motionText_IF.text = motionText;
         motionInfoSlide_IF.text = motionInfoSlide;
-
         // Check if the text in the input field is null or empty
         if (string.IsNullOrEmpty(motionInfoSlide))
         {
             infoSLideToggle.SelectOption2();
+        }
+        else if (!string.IsNullOrEmpty(motionInfoSlide))
+        {
+            infoSLideToggle.SelectOption1();
         }
     }
     private void InfoSlideOn()

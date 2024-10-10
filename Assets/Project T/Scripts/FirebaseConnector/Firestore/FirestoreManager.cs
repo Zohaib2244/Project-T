@@ -848,6 +848,90 @@ namespace Scripts.FirebaseConfig
                 onFailure?.Invoke();
             }
         }
+        #region Round SI Functions
+        public async Task SaveRoundMotionToFirestore(string roundType, string roundId, Dictionary<string, string> motion, UnityAction< Dictionary<string, string>> onSuccess = null, UnityAction onFailure = null)
+        {
+            try
+            {
+                // Get the document reference for the specified round
+                DocumentReference roundRef = GetRoundDocumentReference(roundType, roundId);
+        
+                // Create an update object with the motion data and motionAdded set to true
+                var updateData = new Dictionary<string, object>
+                {
+                    { "motions", motion },
+                    { "motionAdded", true }
+                };
+        
+                // Save the motion data and update motionAdded to Firestore
+                await roundRef.SetAsync(updateData, SetOptions.MergeAll);
+        
+                Debug.Log($"<color=green>Motion for round {roundId} saved successfully.</color>");
+                onSuccess?.Invoke(motion);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"<color=red>Error saving motion for round {roundId}: {ex.Message}</color>");
+                onFailure?.Invoke();
+            }
+        }
+        public async Task SaveTeamAttendanceToFirestore(string roundType, string roundId, List<string> teamAttendance,List<Team> teamsList, UnityAction<List<Team>> onSuccess = null, UnityAction onFailure = null)
+        {
+            try
+            {
+                // Get the document reference for the specified round
+                DocumentReference roundRef = GetRoundDocumentReference(roundType, roundId);
+        
+                // Create an update object with the team attendance data and teamAttendanceAdded set to true
+                var updateData = new Dictionary<string, object>
+                {
+                    { "availableTeamsIds", teamAttendance },
+                    { "teamAttendanceAdded", true }
+                };
+        
+                // Save the team attendance data and update teamAttendanceAdded to Firestore
+                await roundRef.SetAsync(updateData, SetOptions.MergeAll);
+        
+                Debug.Log($"<color=green>Team attendance for round {roundId} saved successfully.</color>");
+                onSuccess?.Invoke(teamsList);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"<color=red>Error saving team attendance for round {roundId}: {ex.Message}</color>");
+                onFailure?.Invoke();
+            }
+        } 
+        public async Task SaveAdjudicatorAttendanceToFirestore(string roundType, string roundId, List<string> adjudicatorAttendance,List<Adjudicator> adjudicators, UnityAction<List<Adjudicator>> onSuccess = null, UnityAction onFailure = null)
+        {
+            try
+            {
+                // Get the document reference for the specified round
+                DocumentReference roundRef = GetRoundDocumentReference(roundType, roundId);
+        
+                // Create an update object with the adjudicator attendance data and AdjudicatorAttendanceAdded set to true
+                var updateData = new Dictionary<string, object>
+                {
+                    { "availableAdjudicatorsIds", adjudicatorAttendance },
+                    { "AdjudicatorAttendanceAdded", true }
+                };
+        
+                // Save the adjudicator attendance data and update AdjudicatorAttendanceAdded to Firestore
+                await roundRef.SetAsync(updateData, SetOptions.MergeAll);
+        
+                Debug.Log($"<color=green>Adjudicator attendance for round {roundId} saved successfully.</color>");
+                onSuccess?.Invoke(adjudicators);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"<color=red>Error saving adjudicator attendance for round {roundId}: {ex.Message}</color>");
+                onFailure?.Invoke();
+            }
+        }
+        
+    
+        
+        #endregion
+
         #endregion
 
         #region TeamRoundData Functions
