@@ -25,6 +25,8 @@ public class Ballot_InfoPanel : MonoBehaviour
     #endregion
     //OG Variables----------------------------------------------------
     // [SerializeField] private TMP_Text matchNotxt;
+
+    #region Variables
     [Header("OG Variables")]
     [SerializeField] private TMP_Text OG_posText;
     [SerializeField] private TMP_Text OG_teamNameText;
@@ -67,6 +69,7 @@ public class Ballot_InfoPanel : MonoBehaviour
     private TeamRoundData OO_trd;
     private TeamRoundData CG_trd;
     private TeamRoundData CO_trd;
+    #endregion
     void OnEnable()
     {
         OG_speakerScore_1.onValueChanged.AddListener(delegate { UpdateScoresAndPositions(); });
@@ -83,104 +86,50 @@ public class Ballot_InfoPanel : MonoBehaviour
     void OnDisable()
     {
         ClearScreen();
+        OG_speakerScore_1.onValueChanged.RemoveAllListeners();
+        OG_speakerScore_2.onValueChanged.RemoveAllListeners();
+        OO_speakerScore_1.onValueChanged.RemoveAllListeners();
+        OO_speakerScore_2.onValueChanged.RemoveAllListeners();
+        CG_speakerScore_1.onValueChanged.RemoveAllListeners();
+        CG_speakerScore_2.onValueChanged.RemoveAllListeners();
+        CO_speakerScore_1.onValueChanged.RemoveAllListeners();
+        CO_speakerScore_2.onValueChanged.RemoveAllListeners();
+        
+        OG_speakerNameDropdown_1.onChangedValue -= OnOGSpeakerSelected;
+        OO_speakerNameDropdown_1.onChangedValue -= OnOOSpeakerSelected;
+        CG_speakerNameDropdown_1.onChangedValue -= OnCGSpeakerSelected;
+        CO_speakerNameDropdown_1.onChangedValue -= OnCOSpeakerSelected;
+
+        OG_trd = null;
+        OO_trd = null;
+        CG_trd = null;
+        CO_trd = null;
     }
-    
-   public void UpdateSpeakerScores()
-{
-    // Retrieve TeamRoundData for each team using enum
-    OG_trd = GetTeamRoundData(myMatch, TeamPositionsBritish.OG);
-    OO_trd = GetTeamRoundData(myMatch, TeamPositionsBritish.OO);
-    CG_trd = GetTeamRoundData(myMatch, TeamPositionsBritish.CG);
-    CO_trd = GetTeamRoundData(myMatch, TeamPositionsBritish.CO);
 
-    // Update speaker scores for each team
-    UpdateTeamSpeakerScores(OG_trd, OG_speakerScore_1, OG_speakerScore_2);
-    UpdateTeamSpeakerScores(OO_trd, OO_speakerScore_1, OO_speakerScore_2);
-    UpdateTeamSpeakerScores(CG_trd, CG_speakerScore_1, CG_speakerScore_2);
-    UpdateTeamSpeakerScores(CO_trd, CO_speakerScore_1, CO_speakerScore_2);
-}
-
-private TeamRoundData GetTeamRoundData(Match match, TeamPositionsBritish teamPosition)
-{
-    string teamRoundDataID;
-    if (match.teams.TryGetValue(teamPosition.ToString(), out teamRoundDataID))
-    {
-        // Assuming you have a method to get TeamRoundData by ID
-        return GetTeamRoundDataByID(teamRoundDataID);
-    }
-    return null;
-}
-    
-private void UpdateTeamSpeakerScores(TeamRoundData trd, TMP_InputField score1, TMP_InputField score2)
-{
-    if (trd != null && trd.speakersInRound != null)
-    {
-        score1.text = trd.speakersInRound.Count > 0 ? trd.speakersInRound[0].speakerScore.ToString() : "0";
-        score2.text = trd.speakersInRound.Count > 1 ? trd.speakersInRound[1].speakerScore.ToString() : "0";
-    }
-    else
-    {
-        score1.text = "0";
-        score2.text = "0";
-    }
-}
-    
-    // Placeholder for the method to get TeamRoundData by ID
-    private TeamRoundData GetTeamRoundDataByID(string teamRoundDataID)
-    {
-        // Implement this method based on your data retrieval logic
-        return new TeamRoundData();
-    }    
-    private void ClearScreen()
-    {
-        OG_posText.text = "-";
-        OG_teamNameText.text = "";
-        OG_speakerNameText_2.text = "";
-        OG_speakerScore_1.text = "";
-        OG_speakerScore_2.text = "";
-        OG_totalScore.text = "";
-
-        OO_posText.text = "-";
-        OO_teamNameText.text = "";
-        OO_speakerNameText_2.text = "";
-        OO_speakerScore_1.text = "";
-        OO_speakerScore_2.text = "";
-        OO_totalScore.text = "";
-
-        CG_posText.text = "-";
-        CG_teamNameText.text = "";
-        CG_speakerNameText_2.text = "";
-        CG_speakerScore_1.text = "";
-        CG_speakerScore_2.text = "";
-        CG_totalScore.text = "";
-
-        CO_posText.text = "-";
-        CO_teamNameText.text = "";
-        CO_speakerNameText_2.text = "";
-        CO_speakerScore_1.text = "";
-        CO_speakerScore_2.text = "";
-        CO_totalScore.text = "";
-
-    }
+    #region Essentials
     public void DisplayMatchBallot(Match match)
     {
         myMatch = match;
         AssignTeamRoundData();
+        ClearScreen();
+        ConfigureScreen();
         PopulateDropdowns();
-        if(myMatch.ballotEntered)
+      
+        if (myMatch.ballotEntered)
         {
-            UpdateSpeakerScores();
+            Debug.Log("<color=yellow>Ballot already entered</color>");
+            // UpdateSpeakerScores();
         }
     }
     public async void SaveBallot()
     {
         myMatch.ballotEntered = true;
 
-         // Save data from input fields to TeamRoundData objects
-    SaveTeamRoundDataFromInput(OG_trd, OG_speakerScore_1, OG_speakerScore_2);
-    SaveTeamRoundDataFromInput(OO_trd, OO_speakerScore_1, OO_speakerScore_2);
-    SaveTeamRoundDataFromInput(CG_trd, CG_speakerScore_1, CG_speakerScore_2);
-    SaveTeamRoundDataFromInput(CO_trd, CO_speakerScore_1, CO_speakerScore_2);
+        // Save data from input fields to TeamRoundData objects
+        SaveTeamRoundDataFromInput(OG_trd, OG_speakerScore_1, OG_speakerScore_2);
+        SaveTeamRoundDataFromInput(OO_trd, OO_speakerScore_1, OO_speakerScore_2);
+        SaveTeamRoundDataFromInput(CG_trd, CG_speakerScore_1, CG_speakerScore_2);
+        SaveTeamRoundDataFromInput(CO_trd, CO_speakerScore_1, CO_speakerScore_2);
 
         SaveTeamRoundData(OG_trd);
         SaveTeamRoundData(OO_trd);
@@ -191,58 +140,129 @@ private void UpdateTeamSpeakerScores(TeamRoundData trd, TMP_InputField score1, T
         DebugTeamRoundData(OO_trd, "OO");
         DebugTeamRoundData(CG_trd, "CG");
         DebugTeamRoundData(CO_trd, "CO");
-    
-        // Loading.Instance.ShowLoadingScreen();
-        Rounds_BallotsPanel.Instance.CloseBallotInfo();
-        // await FirestoreManager.FireInstance.UpdateMatchAtFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, myMatch);
-        
+
+        Loading.Instance.ShowLoadingScreen();
+        // Rounds_BallotsPanel.Instance.CloseBallotInfo();
+        await FirestoreManager.FireInstance.UpdateMatchAtFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, myMatch, OnUpdateMatchesSuccess, OnUpdateMatchesFail);
     }
-    private void OnUpdateMatchesSuccess(){
-        Loading.Instance.HideLoadingScreen();
-        DialogueBox.Instance.ShowDialogueBox("Ballot saved successfully", Color.green);
-Rounds_BallotsPanel.Instance.CloseBallotInfo();
-    
-    }
-    private void OnUpdateMatchesFail(){
-        Loading.Instance.HideLoadingScreen();
-        DialogueBox.Instance.ShowDialogueBox("Failed to save ballot", Color.red);
-    }
-    
-private void SaveTeamRoundDataFromInput(TeamRoundData trd, TMP_InputField score1, TMP_InputField score2)
-{
-    if (trd != null)
+    private void ConfigureScreen()
     {
-        trd.speakersInRound[0].speakerScore = float.TryParse(score1.text, out float score1Value) ? score1Value : 0;
-        trd.speakersInRound[1].speakerScore = float.TryParse(score2.text, out float score2Value) ? score2Value : 0;
-        trd.teamScore = trd.speakersInRound[0].speakerScore + trd.speakersInRound[1].speakerScore;
+        // Set the team names
+        OG_teamNameText.text = OG_trd != null ? AppConstants.instance.GetTeamFromID(OG_trd.teamId.ToString()).teamName : "";
+        OO_teamNameText.text = OO_trd != null ? AppConstants.instance.GetTeamFromID(OO_trd.teamId.ToString()).teamName : "";
+        CG_teamNameText.text = CG_trd != null ? AppConstants.instance.GetTeamFromID(CG_trd.teamId.ToString()).teamName : "";
+        CO_teamNameText.text = CO_trd != null ? AppConstants.instance.GetTeamFromID(CO_trd.teamId.ToString()).teamName : "";
     }
-}
-    private void DebugTeamRoundData(TeamRoundData trd, string teamPosition)
-{
-    if (trd != null)
+    private void ClearScreen()
     {
-        Debug.Log($"{teamPosition} TeamRoundData:");
-        Debug.Log($"teamRoundDataID: {trd.teamRoundDataID}");
-        Debug.Log($"teamId: {trd.teamId}");
-        Debug.Log($"teamPositionAsian: {trd.teamPositionAsian}");
-        Debug.Log($"teamPositionBritish: {trd.teamPositionBritish}");
-        Debug.Log($"teamScore: {trd.teamScore}");
-        Debug.Log($"teamMatchRanking: {trd.teamMatchRanking}");
-        Debug.Log($"speakersInRound Count: {trd.speakersInRound.Count}");
-        for (int i = 0; i < trd.speakersInRound.Count; i++)
+        OG_posText.text = "-";
+        OG_teamNameText.text = "";
+        OG_speakerNameText_2.text = "";
+        OG_speakerScore_1.text = "0";
+        OG_speakerScore_2.text = "0";
+        OG_totalScore.text = "0";
+
+        OO_posText.text = "-";
+        OO_teamNameText.text = "";
+        OO_speakerNameText_2.text = "";
+        OO_speakerScore_1.text = "0";
+        OO_speakerScore_2.text = "0";
+        OO_totalScore.text = "0";
+
+        CG_posText.text = "-";
+        CG_teamNameText.text = "";
+        CG_speakerNameText_2.text = "";
+        CG_speakerScore_1.text = "0";
+        CG_speakerScore_2.text = "0";
+        CG_totalScore.text = "0";
+
+        CO_posText.text = "-";
+        CO_teamNameText.text = "";
+        CO_speakerNameText_2.text = "0";
+        CO_speakerScore_1.text = "0";
+        CO_speakerScore_2.text = "0";
+        CO_totalScore.text = "0";
+
+    }
+
+   #endregion
+
+    #region TRD Configuration
+    public void UpdateSpeakerScores()
+    {
+        // Update speaker scores for each team
+        UpdateTeamSpeakerScores(OG_trd, OG_speakerScore_1, OG_speakerScore_2);
+        UpdateTeamSpeakerScores(OO_trd, OO_speakerScore_1, OO_speakerScore_2);
+        UpdateTeamSpeakerScores(CG_trd, CG_speakerScore_1, CG_speakerScore_2);
+        UpdateTeamSpeakerScores(CO_trd, CO_speakerScore_1, CO_speakerScore_2);
+    }
+
+    private TeamRoundData GetTeamRoundData(Match match, TeamPositionsBritish teamPosition)
+    {
+        string teamRoundDataID;
+        if (match.teams.TryGetValue(teamPosition.ToString(), out teamRoundDataID))
         {
-            var speaker = trd.speakersInRound[i];
-            Debug.Log($"Speaker {i + 1}:");
-            Debug.Log($"  speakerId: {speaker.speakerId}");
-            Debug.Log($"  speakerSpeakingPosition: {speaker.speakerSpeakingPosition}");
-            Debug.Log($"  speakerScore: {speaker.speakerScore}");
+            // Assuming you have a method to get TeamRoundData by ID
+            return GetTeamRoundDataByID(teamRoundDataID);
+        }
+        return null;
+    }
+
+    private void UpdateTeamSpeakerScores(TeamRoundData trd, TMP_InputField score1, TMP_InputField score2)
+    {
+        if (trd != null && trd.speakersInRound != null)
+        {
+            score1.text = trd.speakersInRound.Count > 0 ? trd.speakersInRound[0].speakerScore.ToString() : "0";
+            score2.text = trd.speakersInRound.Count > 1 ? trd.speakersInRound[1].speakerScore.ToString() : "0";
+        }
+        else
+        {
+            score1.text = "0";
+            score2.text = "0";
         }
     }
-    else
+
+    private TeamRoundData GetTeamRoundDataByID(string teamRoundDataID)
     {
-        Debug.Log($"{teamPosition} TeamRoundData is null");
+        // Implement this method based on your data retrieval logic
+        return new TeamRoundData();
     }
-}
+
+    private void SaveTeamRoundDataFromInput(TeamRoundData trd, TMP_InputField score1, TMP_InputField score2)
+    {
+        if (trd != null)
+        {
+            trd.speakersInRound[0].speakerScore = float.TryParse(score1.text, out float score1Value) ? score1Value : 0;
+            trd.speakersInRound[1].speakerScore = float.TryParse(score2.text, out float score2Value) ? score2Value : 0;
+            trd.teamScore = trd.speakersInRound[0].speakerScore + trd.speakersInRound[1].speakerScore;
+        }
+    }
+    private void DebugTeamRoundData(TeamRoundData trd, string teamPosition)
+    {
+        if (trd != null)
+        {
+            Debug.Log($"{teamPosition} TeamRoundData:");
+            Debug.Log($"teamRoundDataID: {trd.teamRoundDataID}");
+            Debug.Log($"teamId: {trd.teamId}");
+            Debug.Log($"teamPositionAsian: {trd.teamPositionAsian}");
+            Debug.Log($"teamPositionBritish: {trd.teamPositionBritish}");
+            Debug.Log($"teamScore: {trd.teamScore}");
+            Debug.Log($"teamMatchRanking: {trd.teamMatchRanking}");
+            Debug.Log($"speakersInRound Count: {trd.speakersInRound.Count}");
+            for (int i = 0; i < trd.speakersInRound.Count; i++)
+            {
+                var speaker = trd.speakersInRound[i];
+                Debug.Log($"Speaker {i + 1}:");
+                Debug.Log($"  speakerId: {speaker.speakerId}");
+                Debug.Log($"  speakerSpeakingPosition: {speaker.speakerSpeakingPosition}");
+                Debug.Log($"  speakerScore: {speaker.speakerScore}");
+            }
+        }
+        else
+        {
+            Debug.Log($"{teamPosition} TeamRoundData is null");
+        }
+    }
     private void SaveTeamRoundData(TeamRoundData trd)
     {
         var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == trd.teamId);
@@ -294,16 +314,18 @@ private void SaveTeamRoundDataFromInput(TeamRoundData trd, TMP_InputField score1
             }
         }
     }
+    #endregion
 
+    #region Dropdown Configuration
     void PopulateDropdowns()
     {
-        PopulateDropdown(OG_trd, OG_speakerNameDropdown_1, OG_speakerNameText_2);
-        PopulateDropdown(OO_trd, OO_speakerNameDropdown_1, OO_speakerNameText_2);
-        PopulateDropdown(CG_trd, CG_speakerNameDropdown_1, CG_speakerNameText_2);
-        PopulateDropdown(CO_trd, CO_speakerNameDropdown_1, CO_speakerNameText_2);
+        PopulateDropdown(OG_trd, OG_speakerNameDropdown_1, OG_speakerNameText_2, OG_speakerScore_1, OG_speakerScore_2);
+        PopulateDropdown(OO_trd, OO_speakerNameDropdown_1, OO_speakerNameText_2, OO_speakerScore_1, OO_speakerScore_2);
+        PopulateDropdown(CG_trd, CG_speakerNameDropdown_1, CG_speakerNameText_2, CG_speakerScore_1, CG_speakerScore_2);
+        PopulateDropdown(CO_trd, CO_speakerNameDropdown_1, CO_speakerNameText_2, CO_speakerScore_1, CO_speakerScore_2);
     }
 
-    void PopulateDropdown(TeamRoundData trd, AdvancedDropdown dropdown, TMP_Text speakerNameText_2)
+    void PopulateDropdown(TeamRoundData trd, AdvancedDropdown dropdown, TMP_Text speakerNameText_2, TMP_InputField speaker1ScoreText, TMP_InputField speaker2ScoreText)
     {
         if (trd != null)
         {
@@ -316,23 +338,31 @@ private void SaveTeamRoundDataFromInput(TeamRoundData trd, TMP_InputField score1
                 {
                     options[i] = team.speakers[i].speakerName;
                 }
-
+    
                 dropdown.AddOptions(options);
-
+    
                 if (trd.speakersInRound[0].speakerId == "0")
                 {
                     dropdown.SetDefaultText();
                     speakerNameText_2.text = "";
+                    speaker1ScoreText.text = "";
+                    speaker2ScoreText.text = "";
                 }
                 else
                 {
                     var speaker1 = team.speakers.Find(s => s.speakerId == trd.speakersInRound[0].speakerId);
                     var speaker2 = team.speakers.Find(s => s.speakerId == trd.speakersInRound[1].speakerId);
-
+    
                     if (speaker1 != null)
                     {
                         dropdown.ratioShrinking = 1;
                         dropdown.SelectOption(0);
+                        speaker1ScoreText.text = trd.speakersInRound[0].speakerScore.ToString();
+                    }
+    
+                    if (speaker2 != null)
+                    {
+                        speaker2ScoreText.text = trd.speakersInRound[1].speakerScore.ToString();
                     }
                 }
             }
@@ -345,75 +375,81 @@ private void SaveTeamRoundDataFromInput(TeamRoundData trd, TMP_InputField score1
         CG_speakerNameDropdown_1.onChangedValue += OnCGSpeakerSelected;
         CO_speakerNameDropdown_1.onChangedValue += OnCOSpeakerSelected;
     }
-void OnOGSpeakerSelected(int index)
-{
-    var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == OG_trd.teamId);
-    if (team != null)
-    {
-        var selectedSpeaker = team.speakers[index];
-        OG_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
+    #endregion
 
-        // Find the other speaker
-        var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
-        if (otherSpeaker != null)
+    #region Speaker Selected Callbacks
+    void OnOGSpeakerSelected(int index)
+    {
+        var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == OG_trd.teamId);
+        if (team != null)
         {
-            OG_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
-            OG_speakerNameText_2.text = otherSpeaker.speakerName;
+            var selectedSpeaker = team.speakers[index];
+            OG_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
+
+            // Find the other speaker
+            var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
+            if (otherSpeaker != null)
+            {
+                OG_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
+                OG_speakerNameText_2.text = otherSpeaker.speakerName;
+            }
         }
     }
-}
-void OnOOSpeakerSelected(int index)
-{
-    var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == OO_trd.teamId);
-    if (team != null)
+    void OnOOSpeakerSelected(int index)
     {
-        var selectedSpeaker = team.speakers[index];
-        OO_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
-
-        // Find the other speaker
-        var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
-        if (otherSpeaker != null)
+        var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == OO_trd.teamId);
+        if (team != null)
         {
-            OO_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
-            OO_speakerNameText_2.text = otherSpeaker.speakerName;
+            var selectedSpeaker = team.speakers[index];
+            OO_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
+
+            // Find the other speaker
+            var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
+            if (otherSpeaker != null)
+            {
+                OO_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
+                OO_speakerNameText_2.text = otherSpeaker.speakerName;
+            }
         }
     }
-}
 
-void OnCGSpeakerSelected(int index)
-{
-    var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == CG_trd.teamId);
-    if (team != null)
+    void OnCGSpeakerSelected(int index)
     {
-        var selectedSpeaker = team.speakers[index];
-        CG_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
-
-        // Find the other speaker
-        var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
-        if (otherSpeaker != null)
+        var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == CG_trd.teamId);
+        if (team != null)
         {
-            CG_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
-            CG_speakerNameText_2.text = otherSpeaker.speakerName;
+            var selectedSpeaker = team.speakers[index];
+            CG_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
+
+            // Find the other speaker
+            var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
+            if (otherSpeaker != null)
+            {
+                CG_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
+                CG_speakerNameText_2.text = otherSpeaker.speakerName;
+            }
         }
     }
-}
-void OnCOSpeakerSelected(int index)
-{
-    var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == CO_trd.teamId);
-    if (team != null)
+    void OnCOSpeakerSelected(int index)
     {
-        var selectedSpeaker = team.speakers[index];
-        CO_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
-
-        // Find the other speaker
-        var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
-        if (otherSpeaker != null)
+        var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == CO_trd.teamId);
+        if (team != null)
         {
-            CO_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
-            CO_speakerNameText_2.text = otherSpeaker.speakerName;
+            var selectedSpeaker = team.speakers[index];
+            CO_trd.speakersInRound[0].speakerId = selectedSpeaker.speakerId;
+
+            // Find the other speaker
+            var otherSpeaker = team.speakers.Find(s => s.speakerId != selectedSpeaker.speakerId);
+            if (otherSpeaker != null)
+            {
+                CO_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
+                CO_speakerNameText_2.text = otherSpeaker.speakerName;
+            }
         }
     }
-}
+    #endregion
+
+    #region Update Scores and Positions
     void UpdateScoresAndPositions()
     {
         UpdateTotalScore(OG_trd, OG_speakerScore_1, OG_speakerScore_2, OG_totalScore);
@@ -435,39 +471,63 @@ void OnCOSpeakerSelected(int index)
             trd.teamScore = totalScore;
         }
     }
-void UpdatePositions()
-{
-    List<(TeamRoundData trd, TMP_Text posText)> teams = new List<(TeamRoundData, TMP_Text)>
+    void UpdatePositions()
     {
-        (OG_trd, OG_posText),
-        (OO_trd, OO_posText),
-        (CG_trd, CG_posText),
-        (CO_trd, CO_posText)
-    };
-
-    // Filter out any null TeamRoundData or TMP_Text entries
-    teams = teams.Where(t => t.trd != null && t.posText != null).ToList();
-
-    // Sort the teams by teamScore, handling potential null values
-    teams.Sort((a, b) =>
-    {
-        if (a.trd == null || b.trd == null)
+        List<(TeamRoundData trd, TMP_Text posText)> teams = new List<(TeamRoundData, TMP_Text)>
         {
-            throw new InvalidOperationException("TeamRoundData cannot be null.");
+            (OG_trd, OG_posText),
+            (OO_trd, OO_posText),
+            (CG_trd, CG_posText),
+            (CO_trd, CO_posText)
+        };
+    
+        // Filter out any null TeamRoundData or TMP_Text entries
+        teams = teams.Where(t => t.trd != null && t.posText != null).ToList();
+    
+        // Sort the teams by teamScore, handling potential null values
+        teams.Sort((a, b) =>
+        {
+            if (a.trd == null || b.trd == null)
+            {
+                throw new InvalidOperationException("TeamRoundData cannot be null.");
+            }
+    
+            if (float.IsNaN(a.trd.teamScore) && float.IsNaN(b.trd.teamScore)) return 0;
+            if (float.IsNaN(a.trd.teamScore)) return 1;
+            if (float.IsNaN(b.trd.teamScore)) return -1;
+            return b.trd.teamScore.CompareTo(a.trd.teamScore);
+        });
+    
+        string[] positions = { "1st", "2nd", "3rd", "4th" };
+        for (int i = 0; i < teams.Count; i++)
+        {
+            // Check for ties
+            if (i > 0 && teams[i].trd.teamScore == teams[i - 1].trd.teamScore)
+            {
+                teams[i].posText.text = "-";
+                teams[i - 1].posText.text = "-"; // Ensure the previous team also shows "-"
+            }
+            else
+            {
+                teams[i].posText.text = positions[i];
+            }
+            teams[i].trd.teamMatchRanking = i + 1;
         }
-
-        if (float.IsNaN(a.trd.teamScore) && float.IsNaN(b.trd.teamScore)) return 0;
-        if (float.IsNaN(a.trd.teamScore)) return 1;
-        if (float.IsNaN(b.trd.teamScore)) return -1;
-        return b.trd.teamScore.CompareTo(a.trd.teamScore);
-    });
-
-    string[] positions = { "1st", "2nd", "3rd", "4th" };
-    for (int i = 0; i < teams.Count; i++)
-    {
-        teams[i].posText.text = positions[i];
-        teams[i].trd.teamMatchRanking = i + 1;
     }
-}
+    #endregion
 
+    #region CallBacks
+    private void OnUpdateMatchesSuccess()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Ballot saved successfully", Color.green);
+        Rounds_BallotsPanel.Instance.CloseBallotInfo();
+    }
+    private void OnUpdateMatchesFail()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to save ballot", Color.red);
+    }
+
+    #endregion
 }

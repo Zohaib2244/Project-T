@@ -128,7 +128,7 @@ private void UpdateTeamList()
     teamAttendanceButtonSelect.RemoveAllButtons();
     // Get the list of available teams from selectedRound
     var availableTeams = MainRoundsPanel.Instance.selectedRound.availableTeams;
-    
+    Debug.Log("Available Teams Count: " + availableTeams.Count);
     // Instantiate team list entries and check for attendance
     foreach (Team team in AppConstants.instance.selectedTouranment.teamsInTourney)
     {
@@ -158,7 +158,7 @@ private void UpdateAdjudicatorList()
     adjudicatorAttendanceButtonSelect.RemoveAllButtons();
     // Get the list of available adjudicators from selectedRound
     var availableAdjudicators = MainRoundsPanel.Instance.selectedRound.availableAdjudicators;
-
+    Debug.Log("Available Adjudicators Count: " + availableAdjudicators.Count);
 
     // First, add all GameObjects
     foreach (Adjudicator adjudicator in AppConstants.instance.selectedTouranment.adjudicatorsInTourney)

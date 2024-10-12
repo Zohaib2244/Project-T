@@ -43,6 +43,7 @@ public class DrawGeneration : MonoBehaviour
         MainRoundsPanel.Instance.selectedRound.availableTeams.Count();
         if (isTeamAutoAllocation)
         {
+            Debug.Log("Available Teams: " + teams_TMP.Count);   
             matches = GenerateDrawForPrelims(teams_TMP, adjudicators_TMP, tournamentType);
         }
         else
@@ -203,7 +204,7 @@ public class DrawGenerator
         List<Match> matches = MapAssignmentToMatches(assignment, adjustedTeams, adjudicators);
         return matches;
     }
-    private List<Team> PullUp(List<Team> teams)
+      private List<Team> PullUp(List<Team> teams)
     {
         // Calculate winning points for each team
         foreach (var team in teams)
@@ -212,9 +213,12 @@ public class DrawGenerator
         }
     
         // Group teams by their winning points to form brackets
-        var brackets = teams.GroupBy(t => t.totalTeamScore).OrderByDescending(g => g.Key).ToList();
+        var brackets = teams.GroupBy(t => (int)t.totalTeamScore).OrderByDescending(g => g.Key).ToList();
         List<Team> adjustedTeams = new List<Team>();
         Random random = new Random();
+    
+        // Create a new list to store the modified brackets
+        var updatedBrackets = new List<IGrouping<int, Team>>(brackets);
     
         foreach (var bracket in brackets)
         {
@@ -225,15 +229,27 @@ public class DrawGenerator
             if (bracketSize % 4 != 0)
             {
                 int pullUpCount = 4 - (bracketSize % 4);
-                var nextBracketGroup = brackets.FirstOrDefault(b => b.Key < bracket.Key);
+                var nextBracketGroup = updatedBrackets.FirstOrDefault(b => b.Key < bracket.Key);
     
                 if (nextBracketGroup != null)
                 {
                     var nextBracket = nextBracketGroup.ToList();
-                    var pullUpTeams = nextBracket.Take(pullUpCount).ToList();
-                    adjustedTeams.AddRange(pullUpTeams);
-                    nextBracket = nextBracket.Skip(pullUpCount).ToList();
-                    brackets[brackets.IndexOf(nextBracketGroup)] = nextBracket.GroupBy(t => t.totalTeamScore).First();
+                    if (nextBracket.Any())
+                    {
+                        var pullUpTeams = nextBracket.Take(pullUpCount).ToList();
+                        adjustedTeams.AddRange(pullUpTeams);
+                        nextBracket = nextBracket.Skip(pullUpCount).ToList();
+    
+                        // Update the updatedBrackets list with the remaining teams in the next bracket
+                        if (nextBracket.Any())
+                        {
+                            updatedBrackets[updatedBrackets.IndexOf(nextBracketGroup)] = nextBracket.GroupBy(t => (int)t.totalTeamScore).First();
+                        }
+                        else
+                        {
+                            updatedBrackets.Remove(nextBracketGroup);
+                        }
+                    }
                 }
             }
             adjustedTeams.AddRange(shuffledBracket);
@@ -281,7 +297,7 @@ public class DrawGenerator
 
             return shuffledMatrix;
         }
-    private List<Match> MapAssignmentToMatches(int[] assignment, List<Team> teams, List<Adjudicator> adjudicators)
+      private List<Match> MapAssignmentToMatches(int[] assignment, List<Team> teams, List<Adjudicator> adjudicators)
     {
         int numberOfRooms = teams.Count / 4;
         List<Match> matches = new List<Match>();
@@ -300,30 +316,57 @@ public class DrawGenerator
             {
                 int teamIndex = assignment[i * 4 + j];
                 Team team = teams[teamIndex];
-                TeamRoundData teamRoundData = new TeamRoundData
-                {
-                    teamId = team.teamId,
-                    teamName = team.teamName,
-                    teamCategory = team.teamCategory,
-                    speakers = team.speakers,
-                    teamRoundDataID = AppConstants.instance.GenerateTRDID(MainRoundsPanel.Instance.selectedRound.roundId, team.teamId),
-                    roundType = MainRoundsPanel.Instance.selectedRound.roundCategory,
-                    roundID = match.matchId,
-                    matchID = match.matchId,
-                    teamPositionBritish = (TeamPositionsBritish)j,
-                    teamScore = 0,
-                    teamMatchRanking = 0,
-                    speakersInRound = new List<SpeakerRoundData>()
-                };
     
-                for (int k = 0; k < team.speakers.Count; k++)
+                // Check if a TRD already exists for the current round
+                TeamRoundData teamRoundData = team.teamRoundDatas.FirstOrDefault(trd => trd.roundID == MainRoundsPanel.Instance.selectedRound.roundId);
+    
+                if (teamRoundData == null)
                 {
-                    SpeakerRoundData speakerRoundData = new SpeakerRoundData(team, k);
-                    teamRoundData.speakersInRound.Add(speakerRoundData);
+                    // Create a new TRD if it doesn't exist
+                    teamRoundData = new TeamRoundData
+                    {
+                        teamId = team.teamId,
+                        teamName = team.teamName,
+                        teamCategory = team.teamCategory,
+                        speakers = team.speakers,
+                        teamRoundDataID = AppConstants.instance.GenerateTRDID(MainRoundsPanel.Instance.selectedRound.roundId, team.teamId),
+                        roundType = MainRoundsPanel.Instance.selectedRound.roundCategory,
+                        roundID = MainRoundsPanel.Instance.selectedRound.roundId,
+                        matchID = match.matchId,
+                        teamPositionBritish = (TeamPositionsBritish)j,
+                        teamScore = 0,
+                        teamMatchRanking = 0,
+                        speakersInRound = new List<SpeakerRoundData>()
+                    };
+    
+                    for (int k = 0; k < team.speakers.Count; k++)
+                    {
+                        SpeakerRoundData speakerRoundData = new SpeakerRoundData(team, k);
+                        teamRoundData.speakersInRound.Add(speakerRoundData);
+                    }
+    
+                    team.teamRoundDatas.Add(teamRoundData);
                 }
+                else
+                {
+                    // Update the existing TRD, preserving additional information
+                    teamRoundData.matchID = match.matchId;
+                    teamRoundData.teamPositionBritish = (TeamPositionsBritish)j;
     
-                match.teams.Add(team.teamId, teamRoundData.teamRoundDataID);
-                team.teamRoundDatas.Add(teamRoundData);
+                    // Preserve existing scores and rankings
+                    // teamRoundData.teamScore = teamRoundData.teamScore;
+                    teamRoundData.teamMatchRanking = 0;
+                    teamRoundData.teamScore = 0;
+                    teamRoundData.speakersInRound.Clear();
+                    teamRoundData.speakersInRound = new List<SpeakerRoundData>();
+
+                    for (int k = 0; k < team.speakers.Count; k++)
+                    {
+                        SpeakerRoundData speakerRoundData = new SpeakerRoundData(team, k);
+                        teamRoundData.speakersInRound.Add(speakerRoundData);
+                    }
+                }
+                match.teams[team.teamId] = teamRoundData.teamRoundDataID;
             }
     
             matches.Add(match);

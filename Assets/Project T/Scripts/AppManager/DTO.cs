@@ -628,7 +628,7 @@ namespace Scripts.FirebaseConfig
         // TeamRoundData DTO Converter
         public TeamRoundData_DTO TeamRoundDataToDTO(TeamRoundData teamRoundData)
         {
-            return new TeamRoundData_DTO
+            var teamRoundDataDTO = new TeamRoundData_DTO
             {
                 teamRoundDataID = teamRoundData.teamRoundDataID,
                 roundId = teamRoundData.roundID,
@@ -640,25 +640,43 @@ namespace Scripts.FirebaseConfig
                 teamScore = teamRoundData.teamScore,
                 teamMatchRanking = teamRoundData.teamMatchRanking
             };
-        }
 
-        public TeamRoundData DTOToTeamRoundData(TeamRoundData_DTO teamRoundData)
-        {
-            return new TeamRoundData
+            if (teamRoundData.speakersInRound != null)
             {
-                teamRoundDataID = teamRoundData.teamRoundDataID,
-                roundID = teamRoundData.roundId,
-                matchID = teamRoundData.matchId,
-                roundType = (RoundCategory)teamRoundData.roundCategory,
-                teamId = teamRoundData.teamId,
-                teamPositionAsian = teamRoundData.teamPositionAsian,
-                teamPositionBritish = teamRoundData.teamPositionBritish,
-                teamScore = teamRoundData.teamScore,
-                teamMatchRanking = teamRoundData.teamMatchRanking
-            };
+                teamRoundDataDTO.speakersInRound = teamRoundData.speakersInRound
+                    .Select(speakerRoundData => SpeakerRoundDataToDTO(speakerRoundData))
+                    .ToList();
+            }
+
+            return teamRoundDataDTO;
         }
 
-        // SpeakerRoundData DTO Converter
+public TeamRoundData DTOToTeamRoundData(TeamRoundData_DTO teamRoundData)
+{
+    var teamRoundDataEntity = new TeamRoundData
+    {
+        teamRoundDataID = teamRoundData.teamRoundDataID,
+        roundID = teamRoundData.roundId,
+        matchID = teamRoundData.matchId,
+        roundType = (RoundCategory)teamRoundData.roundCategory,
+        teamId = teamRoundData.teamId,
+        teamPositionAsian = teamRoundData.teamPositionAsian,
+        teamPositionBritish = teamRoundData.teamPositionBritish,
+        teamScore = teamRoundData.teamScore,
+        teamMatchRanking = teamRoundData.teamMatchRanking
+    };
+
+    if (teamRoundData.speakersInRound != null)
+    {
+        teamRoundDataEntity.speakersInRound = teamRoundData.speakersInRound
+            .Select(speakerRoundDataDTO => DTOToSpeakerRoundData(speakerRoundDataDTO))
+            .ToList();
+    }
+
+    return teamRoundDataEntity;
+}
+
+        // SpeakerRoundData DTO Converter 
         public SpeakerRoundData_DTO SpeakerRoundDataToDTO(SpeakerRoundData speakerRoundData)
         {
             return new SpeakerRoundData_DTO

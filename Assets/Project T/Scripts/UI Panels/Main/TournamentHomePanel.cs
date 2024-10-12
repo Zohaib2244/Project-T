@@ -16,6 +16,8 @@ public class TournamentHomePanel : MonoBehaviour
     [SerializeField] private TMP_Text adminName;
     [SerializeField] private TMP_Text adminCategory;
     [SerializeField] private Button roundsPanelBtnl;
+    [SerializeField] private TMP_Text tournament1Shorthand;
+    [SerializeField] private TMP_Text tournament2Shorthand;
     #endregion
 
     #region Public Variables
@@ -30,8 +32,9 @@ public class TournamentHomePanel : MonoBehaviour
         // Run Firestore calls in parallel
     await   FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
       await FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
-      await AppConstants.instance.GetAllRounds();
       await FirestoreManager.FireInstance.GetAllTeamsFromFirestore();
+      await AppConstants.instance.GetAllRounds();
+     
     
         // Await all tasks to complete
         // await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
@@ -61,10 +64,12 @@ public class TournamentHomePanel : MonoBehaviour
         // _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
         if(AppConstants.instance.tournaments[0].tournamentId == AppConstants.instance.selectedTouranment.tournamentId)
         {
+            tournament1Shorthand.text = AppConstants.instance.selectedTouranment.tournamentShortHand;
             tournamentSelection.SelectOption1();
         }
         else
         {
+            tournament2Shorthand.text = AppConstants.instance.selectedTouranment.tournamentShortHand;
             tournamentSelection.SelectOption2();
         }
     }

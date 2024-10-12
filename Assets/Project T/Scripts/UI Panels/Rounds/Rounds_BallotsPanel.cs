@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Scripts.UIPanels;
 using Scripts.FirebaseConfig;
+using System.Threading.Tasks;
 public class Rounds_BallotsPanel : MonoBehaviour
 {
     #region Singleton
@@ -24,7 +25,7 @@ public class Rounds_BallotsPanel : MonoBehaviour
     [SerializeField] private Transform ballotsContent;
     [SerializeField] private GameObject ballotEntryPrefab;
     [SerializeField] private Transform ballotInfoPanel;
-
+    [SerializeField] private Transform overlayPanel;
 
     void OnEnable()
     {
@@ -78,24 +79,32 @@ public class Rounds_BallotsPanel : MonoBehaviour
             // Save the draw prefabs to the selected round
             selectedRound.matches = allMatches;
     }
+
     public void ShowBallotInfo(Match match)
     {
         ballotInfoPanel.gameObject.SetActive(true);
+            // Display the match ballot
         ballotInfoPanel.GetComponent<Ballot_InfoPanel>().DisplayMatchBallot(match);
     }
+    
     public async void CloseBallotInfo()
     {
+    
+        // Deactivate the ballotInfoPanel
         ballotInfoPanel.gameObject.SetActive(false);
-        UpdateBallotsList();
-        // Loading.Instance.ShowLoadingScreen();
-        // await FirestoreManager.FireInstance.GetAllMatchesFromFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId);
-
-       
+    
+        // Update the ballots list
+        // UpdateBallotsList();
+    
+        // Optionally, load matches from Firestore
+        Loading.Instance.ShowLoadingScreen();
+        await FirestoreManager.FireInstance.GetAllMatchesFromFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, GetAllMatchesSuccess, GetAllMatchesFail);
     }
-    private void GetAllMatchesSuccess()
+       private void GetAllMatchesSuccess(List<Match> matches)
     {
-        Loading.Instance.HideLoadingScreen();
+        MainRoundsPanel.Instance.selectedRound.matches = matches;
         UpdateBallotsList();
+        Loading.Instance.HideLoadingScreen();
     }
     private void GetAllMatchesFail()
     {

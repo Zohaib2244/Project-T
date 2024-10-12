@@ -7,11 +7,13 @@ using Scripts.FirebaseConfig;
 
 public class Rounds_DrawDisplayPanel : MonoBehaviour
 {
+    #region Variables
     [SerializeField] private Transform drawDisplayPanel;
     [SerializeField] private Transform drawContent;
     [SerializeField] private GameObject drawEntryPrefab;
+    #endregion
 
-
+    #region Essentials
     void OnEnable()
     {
         drawDisplayPanel.localScale = Vector3.zero; // Start from zero scale
@@ -26,7 +28,9 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+    #endregion
 
+    #region Methods
     private void UpdateMatchesList()
     {
         // Clear existing entries
@@ -52,29 +56,19 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
             Debug.LogWarning("No selected round found.");
             return;
         }
-    MainRoundsPanel.Instance.selectedRound.matches.Clear();
-         MainRoundsPanel.Instance.selectedRound.matches = DrawsPanel.Instance.matches_TMP;
-        // MainRoundsPanel.Instance.selectedRound.matches.Clear();
-        // MainRoundsPanel.Instance.selectedRound.matches = allMatches;
-        MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
-        Debug.Log("Draw saved: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
+    // MainRoundsPanel.Instance.selectedRound.matches.Clear();
+    //      MainRoundsPanel.Instance.selectedRound.matches = DrawsPanel.Instance.matches_TMP;
+    //     // MainRoundsPanel.Instance.selectedRound.matches.Clear();
+    //     // MainRoundsPanel.Instance.selectedRound.matches = allMatches;
+    //     MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
+    //     Debug.Log("Draw saved: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
         // Set the draw generated flag to true
-        MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
-    //   await FirestoreManager.FireInstance.SaveAllMatchesToFirestore( MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, DrawsPanel.Instance.matches_TMP, OnMatchesSaveSuccess, OnMatchesSaveFail);
+        // MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
+      await FirestoreManager.FireInstance.SaveAllMatchesToFirestore( MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, DrawsPanel.Instance.matches_TMP, OnMatchesSaveSuccess, OnMatchesSaveFail);
     }
-    private List<Match> GetDrawPrefabs()
-    {
-        List<Match> drawPrefabs = new List<Match>();
-    
-        foreach (Transform child in drawContent)
-        {
-            var drawEntry = child.GetComponent<MatchListEntry>();
-            drawPrefabs.Add(drawEntry.GetMatch());
-        }
-    
-        return drawPrefabs;
-    }
-    
+    #endregion
+
+   #region Callbacks
     private void OnMatchesSaveSuccess(List<Match> matches)
     {
         Loading.Instance.HideLoadingScreen();
@@ -94,4 +88,5 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
         Loading.Instance.HideLoadingScreen();
         DialogueBox.Instance.ShowDialogueBox("Failed to save draw.", Color.red);
     }
+    #endregion
 }

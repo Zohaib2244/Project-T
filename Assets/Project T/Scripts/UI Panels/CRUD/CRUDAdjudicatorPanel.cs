@@ -351,11 +351,11 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
     {
         Debug.LogError("Error getting adjudicators: ");
     }
-    private void OnAddAdjudicatorSuccess()
+    private async void OnAddAdjudicatorSuccess()
     {
         Loading.Instance.HideLoadingScreen();
         DeactivateAdjudicatorPanel();
-        FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore(OnGetAllAdjudicatorsSuccess, OnGetAllAdjudicatorsFailure);
+        await FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore(OnGetAllAdjudicatorsSuccess, OnGetAllAdjudicatorsFailure);
     }
     private void OnAddAdjudicatorFailure()
     {
@@ -363,11 +363,11 @@ public class CRUDAdjudicatorPanel : MonoBehaviour
         Loading.Instance.HideLoadingScreen();
         saveBtn.interactable = true;
     }
-    private void OnAdjudicatorUpdateSuccess()
+    private async void OnAdjudicatorUpdateSuccess()
     {
         Loading.Instance.HideLoadingScreen();
         DialogueBox.Instance.ShowDialogueBox("Adjudicator updated", Color.green);
-        FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore(OnGetAllAdjudicatorsSuccess, OnGetAllAdjudicatorsFailure);
+        await FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore(OnGetAllAdjudicatorsSuccess, OnGetAllAdjudicatorsFailure);
   
     }
     private void OnAdjudicatorUpdateFailure()

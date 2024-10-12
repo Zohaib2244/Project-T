@@ -28,7 +28,8 @@ public class DrawsPanel : MonoBehaviour
         }
     }
     #endregion
-    public List<Match> matches_TMP;
+    #region Essentials
+    public List<Match> matches_TMP = new List<Match>();
     [SerializeField] private List<DrawPanels> drawPanels;
     void OnEnable()
     {
@@ -36,12 +37,22 @@ public class DrawsPanel : MonoBehaviour
         {
             SwitchDrawPanel(DrawPanelTypes.DrawOptionsPanel);
         }
-        else
+        else if(MainRoundsPanel.Instance.selectedRound.drawGenerated == true)
         {
+            matches_TMP = MainRoundsPanel.Instance.selectedRound.matches;
             SwitchDrawPanel(DrawPanelTypes.DrawDisplayPanel);
         }
-    }
 
+    }
+    #endregion
+
+    public void RegenerateDraw()
+    {
+        MainRoundsPanel.Instance.selectedRound.drawGenerated = false;
+        MainRoundsPanel.Instance.selectedRound.ballotsAdded = false;
+        SwitchDrawPanel(DrawPanelTypes.DrawOptionsPanel);
+        matches_TMP.Clear();
+    }
     public void SwitchDrawPanel(DrawPanelTypes panel)
     {
         foreach (var drawPanel in drawPanels)

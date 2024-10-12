@@ -279,9 +279,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'ATOMIC
-
-    MAGNESIUM'
+  m_text: Nutty Tabs
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0eb1e5072c5b07b45b56ddb32ee44efb, type: 2}
   m_sharedMaterial: {fileID: 3158234549900575908, guid: 0eb1e5072c5b07b45b56ddb32ee44efb, type: 2}
@@ -1654,7 +1652,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -40.9, y: 82.3}
+  m_AnchoredPosition: {x: -32.1, y: 55.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2124256096259951413
@@ -2048,8 +2046,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -40.9, y: -58.8}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 22.3, y: -41.4}
+  m_SizeDelta: {x: 354.3163, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4038752204578959465
 CanvasRenderer:
@@ -2079,7 +2077,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: some info about this ap you may find helpful
+  m_text: A Tab App By Some very Nutty People...hence the name *wink wink*
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}
   m_sharedMaterial: {fileID: 2300738518590625997, guid: 4af9f5b5e545c7c42aaa08f4b589de94, type: 2}

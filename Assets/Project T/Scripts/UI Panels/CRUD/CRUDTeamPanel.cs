@@ -389,44 +389,77 @@ public class CRUDTeamPanel : MonoBehaviour
         await FirestoreManager.FireInstance.GetAllTeamsFromFirestore(OnAllTeamsUpdatedSuccess, OnAllTeamsUpdatedFailure);
         Loading.Instance.HideLoadingScreen();
     }
-    private void UpdateTeamsList()
-    {
-        // Clear existing team list entries
-        foreach (Transform child in openTeamsDisplayPanel)
+        private void UpdateTeamsList()
         {
-            Destroy(child.gameObject);
-        }
-        foreach (Transform child in noviceTeamsDisplayPanel)
-        {
-            Destroy(child.gameObject);
-        }
-    
-        // Sort teams by their names
-        var sortedTeams = AppConstants.instance.selectedTouranment.teamsInTourney
-            .OrderBy(team => team.teamName)
-            .ToList();
-    
-        // Iterate through sorted teams and instantiate list entries
-        foreach (Team team in sortedTeams)
-        {
-            if (team.teamCategory == SpeakerTypes.Open)
+            // Clear existing team list entries
+            foreach (Transform child in openTeamsDisplayPanel)
             {
-                GameObject teamEntry = Instantiate(openTeamEntryPrefab, openTeamsDisplayPanel);
-                TeamListEntry entry = teamEntry.GetComponent<TeamListEntry>();
-                entry.SetTeam(team);
-                noOpenTeams.gameObject.SetActive(false);
+                Destroy(child.gameObject);
             }
-            else if (team.teamCategory == SpeakerTypes.Novice)
+            foreach (Transform child in noviceTeamsDisplayPanel)
             {
-                Debug.Log("Novice Team Found");
-                GameObject teamEntry = Instantiate(noviceTeamEntryPrefab, noviceTeamsDisplayPanel);
-                TeamListEntry entry = teamEntry.GetComponent<TeamListEntry>();
-                entry.SetTeam(team);
-                noNoviceTeams.gameObject.SetActive(false);
+                Destroy(child.gameObject);
             }
-        }
-    }
-    #endregion
 
+    if (AppConstants.instance == null)
+    {
+        Debug.Log("AppConstants.instance is null.");
+        return;
+    }
+
+    if (AppConstants.instance.selectedTouranment == null)
+    {
+        Debug.Log("AppConstants.instance.selectedTouranment is null.");
+        return;
+    }
+
+    if (AppConstants.instance.selectedTouranment.teamsInTourney != null)
+    {
+        Debug.Log("AppConstants.instance.selectedTouranment.teamsInTourney count is: "+ AppConstants.instance.selectedTouranment.teamsInTourney.Count);
+    }
+
+    foreach(Team team in AppConstants.instance.selectedTouranment.teamsInTourney)
+    {
+       if (team == null)
+{
+    Debug.Log("Team object is null.");
 }
+else if (team.teamName == null)
+{
+    Debug.Log("Team name is null for team: " + team.ToString());
+}
+else
+{
+    Debug.Log("Team Name: " + team.teamName);
+}
+    }
+
+    // Sort teams by their names
+    var sortedTeams = AppConstants.instance.selectedTouranment.teamsInTourney
+        .OrderBy(team => team.teamName)
+        .ToList();
+
+            // Iterate through sorted teams and instantiate list entries
+            foreach (Team team in sortedTeams)
+            {
+                if (team.teamCategory == SpeakerTypes.Open)
+                {
+                    GameObject teamEntry = Instantiate(openTeamEntryPrefab, openTeamsDisplayPanel);
+                    TeamListEntry entry = teamEntry.GetComponent<TeamListEntry>();
+                    entry.SetTeam(team);
+                    noOpenTeams.gameObject.SetActive(false);
+                }
+                else if (team.teamCategory == SpeakerTypes.Novice)
+                {
+                    Debug.Log("Novice Team Found");
+                    GameObject teamEntry = Instantiate(noviceTeamEntryPrefab, noviceTeamsDisplayPanel);
+                    TeamListEntry entry = teamEntry.GetComponent<TeamListEntry>();
+                    entry.SetTeam(team);
+                    noNoviceTeams.gameObject.SetActive(false);
+                }
+            }
+        }
+        #endregion
+
+    }
 }

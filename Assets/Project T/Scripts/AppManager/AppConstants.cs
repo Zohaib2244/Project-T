@@ -539,6 +539,23 @@ public class AppConstants : MonoBehaviour
     {
         return GetTeamFromID(teamId).teamRoundDatas.Find(trd => trd.teamRoundDataID == TRDId);
     }
+    public void AddTRD(TeamRoundData trd, string teamId)
+    {
+        Team myTeam = GetTeamFromID(teamId);
+        // Assuming you have a collection to store TeamRoundData, e.g., a dictionary
+        var existingTRD = myTeam.teamRoundDatas.FirstOrDefault(t => t.teamRoundDataID == teamId);
+        if (existingTRD != null)
+        {
+            // Update existing TeamRoundData
+            int index = myTeam.teamRoundDatas.IndexOf(existingTRD);
+            myTeam.teamRoundDatas[index] = trd;
+        }
+        else
+        {
+            myTeam.teamRoundDatas.Add(trd);
+        }
+    }
+    
     #endregion
    
    

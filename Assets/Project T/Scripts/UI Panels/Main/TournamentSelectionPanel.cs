@@ -6,6 +6,7 @@ using Scripts.UI;
 using Scripts.Resources;
 using Scripts.FirebaseConfig;
 using Scripts.ListEntry;
+using TMPro;
 
 namespace Scripts.UIPanels
 {
@@ -14,7 +15,10 @@ public class TournamentSelectionPanel : MonoBehaviour
     [SerializeField] private Button createTournamentBtn;
     [SerializeField] private Button britishParliamentBtn;
     [SerializeField] private Button asianParliamentBtn;
-
+    [SerializeField] private TMP_Text tournamentName_1;
+    [SerializeField] private TMP_Text tournamentName_2;
+    [SerializeField] private TMP_Text tournamentType_1;
+    [SerializeField] private TMP_Text tournamentType_2;
     void OnEnable()
     {
         createTournamentBtn.interactable = false;
@@ -76,12 +80,16 @@ public class TournamentSelectionPanel : MonoBehaviour
                 createTournamentBtn.interactable = true;
                 britishParliamentBtn.interactable = true;
                 asianParliamentBtn.interactable = false;
+                tournamentName_1.text = AppConstants.instance.tournaments[0].tournamentName;
+                tournamentType_1.text = AppConstants.instance.tournaments[0].tournamentType.ToString();
             }
             else if(AppConstants.instance.tournaments.Count == 2)
             {
                 createTournamentBtn.interactable = false;
                 britishParliamentBtn.interactable = true;
                 asianParliamentBtn.interactable = true;
+                tournamentName_1.text = AppConstants.instance.tournaments[0].tournamentName;
+                tournamentType_1.text = AppConstants.instance.tournaments[0].tournamentType.ToString();
             }
             }
     }

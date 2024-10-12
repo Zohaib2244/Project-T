@@ -246,11 +246,11 @@ private string FormatInstitutionName(string name)
     
         DialogueBox.Instance.ShowDialogueBox("Institute List Updated", Color.green);
     }
-    private void UpdateInstituteOnFailed()
+    private async void UpdateInstituteOnFailed()
     {
         Loading.Instance.HideLoadingScreen();
         DialogueBox.Instance.ShowDialogueBox("Failed to update Institute List", Color.red);
-        FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore(UpdateInstituteOnSuccess, UpdateInstituteOnFailed);
+        await FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore(UpdateInstituteOnSuccess, UpdateInstituteOnFailed);
     }
     private void SaveInstituteOnSuccess()
     {

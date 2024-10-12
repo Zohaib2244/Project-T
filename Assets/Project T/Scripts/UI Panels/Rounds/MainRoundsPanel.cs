@@ -102,12 +102,14 @@ namespace Scripts.UIPanels
         #region Panel Configuration
         public void UpdatePanelSwitcherButtonsStates()
         {
+            Debug.Log("UpdatePanelSwitcherButtonsStates");
             if (!selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.DisableAllInteractability();
                 roundFunctionButton.EnableInteractability(0);
                 goPublicButton.interactable = false;
+                Debug.Log("1");
             }
             else if (selectedRound.motionAdded && !selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
             {
@@ -116,6 +118,7 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableInteractability(0);
                 roundFunctionButton.EnableInteractability(1);
                 goPublicButton.interactable = false;
+            Debug.Log("2");
             }
             else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && !selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
             {
@@ -124,6 +127,7 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableInteractability(0);
                 roundFunctionButton.EnableInteractability(1);
                 goPublicButton.interactable = false;
+            Debug.Log("3");
             }
             else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && !selectedRound.drawGenerated)
             {
@@ -133,6 +137,7 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableInteractability(1);
                 roundFunctionButton.EnableInteractability(2);
                 goPublicButton.interactable = false;
+                Debug.Log("4");
             }
             else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && !selectedRound.ballotsAdded && selectedRound.drawGenerated)
             {
@@ -143,12 +148,14 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableInteractability(2);
                 roundFunctionButton.EnableInteractability(3);
                 goPublicButton.interactable = false;
+                Debug.Log("5");
             }
             else if (selectedRound.motionAdded && selectedRound.teamAttendanceAdded && selectedRound.AdjudicatorAttendanceAdded && selectedRound.ballotsAdded && selectedRound.drawGenerated)
             {
                 roundFunctionButton.DeselectAll();
                 roundFunctionButton.EnableAllInteractability();
                 goPublicButton.interactable = true;
+                Debug.Log("6");
             }
         }                                       
 

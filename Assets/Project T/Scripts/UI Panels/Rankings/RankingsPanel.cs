@@ -34,11 +34,11 @@ public class RankingsPanel : MonoBehaviour
 
         Debug.Log("Testing logging the rankings data");
         await AppConstants.instance.GetAllRounds();
-        List<AppConstants.TeamRanking> testList = AppConstants.instance.GetNoviceTeamRankings();
-        foreach (AppConstants.TeamRanking team in testList)
-        {
-            Debug.Log(team);
-        }
+        // List<AppConstants.TeamRanking> testList = AppConstants.instance.GetNoviceTeamRankings();
+        // foreach (AppConstants.TeamRanking team in testList)
+        // {
+        //     Debug.Log(team);
+        // }
     }
 
     // Methods to show the respective panels and hide the others
