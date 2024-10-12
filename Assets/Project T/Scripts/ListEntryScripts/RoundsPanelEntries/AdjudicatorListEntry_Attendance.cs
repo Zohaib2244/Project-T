@@ -41,4 +41,8 @@ public class AdjudicatorListEntry_Attendance : MonoBehaviour
         attendanceImage.sprite = attendanceNotMarkedSprite;
         Rounds_AttendancePanel.Instance.RemoveAdjudicatorAsAvailable(myAdjudicator);
     }
+    public Adjudicator GetAdjudicator()
+    {
+        return myAdjudicator;
+    }
 }

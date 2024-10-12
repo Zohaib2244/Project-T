@@ -42,6 +42,7 @@ public class Rounds_AttendancePanel : MonoBehaviour
     public bool isAdjudicatorAttendance = false;    
     private List<Team> AvailableTeams_tmp;
     private List<Adjudicator> AvailableAdjudicators_tmp;
+    private List<GameObject> adjudicatorEntries = new List<GameObject>();
 
 
 #region Essentials
@@ -59,6 +60,14 @@ public class Rounds_AttendancePanel : MonoBehaviour
         // {
         //     SaveAdjudicatorAttendance();
         // }
+        foreach (Transform child in teamAtdPanelContent)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in adjudicatorAtdPanelContent)
+        {
+            Destroy(child.gameObject);
+        }
         MainRoundsPanel.Instance.SaveRound();
         teamAtdPanel.gameObject.SetActive(false);
         adjudicatorAtdPanel.gameObject.SetActive(false);
@@ -85,9 +94,9 @@ public void OpenTeamAttendancePanel()
     // Set the team panel active and animate it upwards
     teamAtdPanel.gameObject.SetActive(true);
     teamAtdPanel.transform.localPosition = new Vector3(0, -Screen.height, 0); // Start below the screen
-    teamAtdPanel.transform.DOLocalMoveY(teamPanelInVector, 0.5f);
+    teamAtdPanel.transform.DOLocalMoveY(teamPanelInVector, 0.5f).OnComplete(() =>UpdateTeamList());
     // Update the team list
-    UpdateTeamList();
+    
 }
 public void OpenAdjudicatorAttendancePanel()
 {
@@ -103,9 +112,9 @@ public void OpenAdjudicatorAttendancePanel()
     // Set the adjudicator panel active and animate it upwards
     adjudicatorAtdPanel.gameObject.SetActive(true);
     adjudicatorAtdPanel.transform.localPosition = new Vector3(0, -Screen.height, 0); // Start below the screen
-    adjudicatorAtdPanel.transform.DOLocalMoveY(adjudicatorPanelInVector, 0.5f);
+    adjudicatorAtdPanel.transform.DOLocalMoveY(adjudicatorPanelInVector, 0.5f).OnComplete(() => UpdateAdjudicatorList());
     // Update the adjudicator list
-    UpdateAdjudicatorList();
+    // UpdateAdjudicatorList();
 }
 
 
@@ -150,7 +159,8 @@ private void UpdateAdjudicatorList()
     // Get the list of available adjudicators from selectedRound
     var availableAdjudicators = MainRoundsPanel.Instance.selectedRound.availableAdjudicators;
 
-    // Instantiate adjudicator list entries and check for attendance
+
+    // First, add all GameObjects
     foreach (Adjudicator adjudicator in AppConstants.instance.selectedTouranment.adjudicatorsInTourney)
     {
         GameObject adjudicatorEntry = Instantiate(adjudicatorAtdPanelPrefab, adjudicatorAtdPanelContent);
@@ -158,12 +168,15 @@ private void UpdateAdjudicatorList()
         adjudicatorListEntry.Initialize(adjudicator);
         adjudicatorAttendanceButtonSelect.AddOption(adjudicatorEntry.GetComponent<Button>(), adjudicatorListEntry.MarkAttendance, adjudicatorListEntry.UnMarkAttendance);
 
-        // Check if the adjudicator exists in availableAdjudicators and mark attendance if it does
-        if (availableAdjudicators.Any(a => a.adjudicatorID == adjudicator.adjudicatorID))
+        if(availableAdjudicators.Any(a => a.adjudicatorID == adjudicator.adjudicatorID))
         {
-            adjudicatorAttendanceButtonSelect.SelectOption(adjudicatorEntry.GetComponent<Button>());
+            if (adjudicatorEntry.TryGetComponent<Button>(out var button))
+            {
+                adjudicatorAttendanceButtonSelect.SelectOption(button);
+            }
         }
     }
+
 }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Scripts.UIPanels.RoundPanels;
+using System.Linq;
 
 
 public class MotionsEntry : MonoBehaviour
@@ -31,28 +32,41 @@ public class MotionsEntry : MonoBehaviour
     {
         Dictionary<string, string> motion = new Dictionary<string, string>
         {
-            {"motionText", motionText_IF.text},
-            {"motionInfoSlide", motionInfoSlide_IF.text}
+            {motionText_IF.text, motionInfoSlide_IF.text},
         };
         return motion;
     }
-    public void SetMotion(Dictionary<string, object> motion)
-    {
-        motionText = motion.ContainsKey("motionText") ? motion["motionText"].ToString() : "";
-        motionInfoSlide = motion.ContainsKey("motionInfoSlide") ? motion["motionInfoSlide"].ToString() : "";
 
-        motionText_IF.text = motionText;
-        motionInfoSlide_IF.text = motionInfoSlide;
-        // Check if the text in the input field is null or empty
-        if (string.IsNullOrEmpty(motionInfoSlide))
-        {
-            infoSLideToggle.SelectOption2();
-        }
-        else if (!string.IsNullOrEmpty(motionInfoSlide))
-        {
-            infoSLideToggle.SelectOption1();
-        }
+public void SetMotion(Dictionary<string, string> motion)
+{
+    if (motion == null || !motion.Any())
+    {
+        Debug.LogWarning("SetMotion: The provided motion dictionary is null or empty.");
+        motionText = " ";
+        motionInfoSlide = " ";
     }
+    else
+    {
+        var _motion = motion.First();
+        motionText = _motion.Key;
+        motionInfoSlide = _motion.Value;
+    }
+
+    Debug.Log("motionText: " + motionText);
+    Debug.Log("motionInfoSlide: " + motionInfoSlide);
+
+    motionText_IF.text = motionText;
+    motionInfoSlide_IF.text = motionInfoSlide;
+
+    if (string.IsNullOrEmpty(motionInfoSlide))
+    {
+        infoSLideToggle.SelectOption2();
+    }
+    else
+    {
+        infoSLideToggle.SelectOption1();
+    }
+}
     private void InfoSlideOn()
     {
         motionInfoSlide_IF.interactable = true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Scripts.UIPanels;
+using Scripts.FirebaseConfig;
 
 public class Rounds_DrawDisplayPanel : MonoBehaviour
 {
@@ -42,29 +43,24 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
             drawEntry.GetComponent<MatchListEntry>().SetMatch(match, i + 1); // Pass match object and match number (index + 1)
         }
     }
-    public void SaveDraw()
+    public async void SaveDraw()
     {
-        // Retrieve all draw prefabs
-        // var allMatches = GetDrawPrefabs();
+        Loading.Instance.ShowLoadingScreen();
     
-        // Get the selected round
-        var selectedRound = MainRoundsPanel.Instance.selectedRound;
-    
-        if (selectedRound == null)
+        if ( MainRoundsPanel.Instance.selectedRound == null)
         {
             Debug.LogWarning("No selected round found.");
             return;
         }
-    
-        // Save the draw prefabs to the selected round
-        selectedRound.matches.Clear();
-        selectedRound.matches = DrawsPanel.Instance.matches_TMP;
+    MainRoundsPanel.Instance.selectedRound.matches.Clear();
+         MainRoundsPanel.Instance.selectedRound.matches = DrawsPanel.Instance.matches_TMP;
         // MainRoundsPanel.Instance.selectedRound.matches.Clear();
         // MainRoundsPanel.Instance.selectedRound.matches = allMatches;
         MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
         Debug.Log("Draw saved: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
         // Set the draw generated flag to true
         MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
+    //   await FirestoreManager.FireInstance.SaveAllMatchesToFirestore( MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, DrawsPanel.Instance.matches_TMP, OnMatchesSaveSuccess, OnMatchesSaveFail);
     }
     private List<Match> GetDrawPrefabs()
     {
@@ -77,5 +73,25 @@ public class Rounds_DrawDisplayPanel : MonoBehaviour
         }
     
         return drawPrefabs;
+    }
+    
+    private void OnMatchesSaveSuccess(List<Match> matches)
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Draw saved successfully.", Color.green);
+        // Save the draw prefabs to the selected round
+         MainRoundsPanel.Instance.selectedRound.matches.Clear();
+         MainRoundsPanel.Instance.selectedRound.matches = matches;
+        // MainRoundsPanel.Instance.selectedRound.matches.Clear();
+        // MainRoundsPanel.Instance.selectedRound.matches = allMatches;
+        MainRoundsPanel.Instance.selectedRound.drawGenerated = true;
+        Debug.Log("Draw saved: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
+        // Set the draw generated flag to true
+        MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
+    }
+    private void OnMatchesSaveFail()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to save draw.", Color.red);
     }
 }

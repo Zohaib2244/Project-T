@@ -2,6 +2,10 @@ using Scripts.Resources;
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using Scripts.FirebaseConfig;
+using Scripts.UIPanels;
+using System.Linq;
+using System;
 
 public class Ballot_InfoPanel : MonoBehaviour
 {
@@ -168,7 +172,7 @@ private void UpdateTeamSpeakerScores(TeamRoundData trd, TMP_InputField score1, T
             UpdateSpeakerScores();
         }
     }
-    public void SaveBallot()
+    public async void SaveBallot()
     {
         myMatch.ballotEntered = true;
 
@@ -188,7 +192,20 @@ private void UpdateTeamSpeakerScores(TeamRoundData trd, TMP_InputField score1, T
         DebugTeamRoundData(CG_trd, "CG");
         DebugTeamRoundData(CO_trd, "CO");
     
+        // Loading.Instance.ShowLoadingScreen();
         Rounds_BallotsPanel.Instance.CloseBallotInfo();
+        // await FirestoreManager.FireInstance.UpdateMatchAtFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, myMatch);
+        
+    }
+    private void OnUpdateMatchesSuccess(){
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Ballot saved successfully", Color.green);
+Rounds_BallotsPanel.Instance.CloseBallotInfo();
+    
+    }
+    private void OnUpdateMatchesFail(){
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to save ballot", Color.red);
     }
     
 private void SaveTeamRoundDataFromInput(TeamRoundData trd, TMP_InputField score1, TMP_InputField score2)
@@ -418,25 +435,39 @@ void OnCOSpeakerSelected(int index)
             trd.teamScore = totalScore;
         }
     }
-
-    void UpdatePositions()
+void UpdatePositions()
+{
+    List<(TeamRoundData trd, TMP_Text posText)> teams = new List<(TeamRoundData, TMP_Text)>
     {
-        List<(TeamRoundData trd, TMP_Text posText)> teams = new List<(TeamRoundData, TMP_Text)>
-        {
-            (OG_trd, OG_posText),
-            (OO_trd, OO_posText),
-            (CG_trd, CG_posText),
-            (CO_trd, CO_posText)
-        };
+        (OG_trd, OG_posText),
+        (OO_trd, OO_posText),
+        (CG_trd, CG_posText),
+        (CO_trd, CO_posText)
+    };
 
-        teams.Sort((a, b) => b.trd.teamScore.CompareTo(a.trd.teamScore));
+    // Filter out any null TeamRoundData or TMP_Text entries
+    teams = teams.Where(t => t.trd != null && t.posText != null).ToList();
 
-        string[] positions = { "1st", "2nd", "3rd", "4th" };
-        for (int i = 0; i < teams.Count; i++)
+    // Sort the teams by teamScore, handling potential null values
+    teams.Sort((a, b) =>
+    {
+        if (a.trd == null || b.trd == null)
         {
-            teams[i].posText.text = positions[i];
-            teams[i].trd.teamMatchRanking = i + 1;
+            throw new InvalidOperationException("TeamRoundData cannot be null.");
         }
+
+        if (float.IsNaN(a.trd.teamScore) && float.IsNaN(b.trd.teamScore)) return 0;
+        if (float.IsNaN(a.trd.teamScore)) return 1;
+        if (float.IsNaN(b.trd.teamScore)) return -1;
+        return b.trd.teamScore.CompareTo(a.trd.teamScore);
+    });
+
+    string[] positions = { "1st", "2nd", "3rd", "4th" };
+    for (int i = 0; i < teams.Count; i++)
+    {
+        teams[i].posText.text = positions[i];
+        teams[i].trd.teamMatchRanking = i + 1;
     }
+}
 
 }

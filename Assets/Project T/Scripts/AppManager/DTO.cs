@@ -274,24 +274,20 @@ namespace Scripts.FirebaseConfig
 
         [FirestoreProperty]
         public int swings { get; set; }
-
         [FirestoreProperty]
-        public List<Match> matches { get; set; }
-          [FirestoreProperty]
-                public bool motionAdded { get; set; }
-                  [FirestoreProperty]
+        public bool motionAdded { get; set; }
+        [FirestoreProperty]
         public bool teamAttendanceAdded { get; set; }
-          [FirestoreProperty]
-        public bool AdjudicatorAttendanceAdded{ get; set; }
-          [FirestoreProperty]
+        [FirestoreProperty]
+        public bool AdjudicatorAttendanceAdded { get; set; }
+        [FirestoreProperty]
         public bool drawGenerated { get; set; }
-          [FirestoreProperty]
+        [FirestoreProperty]
         public bool ballotsAdded { get; set; }
         [FirestoreProperty]
         public bool isPublic { get; set; }
         [FirestoreProperty]
         public bool isSilent { get; set; }
-
     }
 
     [FirestoreData]
@@ -330,6 +326,8 @@ namespace Scripts.FirebaseConfig
         public float teamScore { get; set; }
         [FirestoreProperty]
         public int teamMatchRanking { get; set; }
+        [FirestoreProperty]
+        public List<SpeakerRoundData_DTO> speakersInRound { get; set; } // Add this property
     }
 
     [FirestoreData]

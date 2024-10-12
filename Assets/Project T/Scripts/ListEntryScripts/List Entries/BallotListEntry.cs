@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Scripts.Resources;
+using Scripts.FirebaseConfig;
 
 public class BallotListEntry : MonoBehaviour
 {

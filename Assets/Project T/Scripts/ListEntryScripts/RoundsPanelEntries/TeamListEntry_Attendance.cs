@@ -26,8 +26,8 @@ public class TeamListEntry_Attendance : MonoBehaviour
     public void Initialize(Team team)
     {
         myTeam = team;
-        myInstitute = AppConstants.instance.GetInstituitionsFromID(team.instituition);
-        teamName.text = team.teamName;
+        myInstitute = AppConstants.instance.GetInstituitionsFromID(myTeam.instituition);
+        teamName.text = myTeam.teamName;
         teamInstitution.text = myInstitute.instituitionAbreviation;
 
         if (AppConstants.instance.selectedTouranment.tournamentType == TournamentType.British)

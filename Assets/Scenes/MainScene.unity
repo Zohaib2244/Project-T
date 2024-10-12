@@ -5945,6 +5945,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1018542669266755448, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
+      propertyPath: autoAssignButtons
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2647715283183025192, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -6043,7 +6047,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3606673059518764057, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3777963545910643011, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
       propertyPath: m_SizeDelta.y
@@ -6067,7 +6071,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4897736799160298055, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5750570644833093216, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
       propertyPath: m_AnchorMax.y
@@ -6112,6 +6116,14 @@ PrefabInstance:
     - target: {fileID: 7878071697577027303, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8384060407216385095, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
+      propertyPath: actions.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1013933561}
+    - target: {fileID: 8384060407216385095, guid: ac09dd60050b01c418a8ae22250290f2, type: 3}
+      propertyPath: actions.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Scripts.UI.MainUIManager, Assembly-CSharp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

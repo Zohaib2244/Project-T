@@ -51,17 +51,16 @@ public class ButtonSelect : MonoBehaviour
                 buttons.Add(button);
             }
         }
+   // Add click listeners to all buttons and map events
+    for (int i = 0; i < buttons.Count; i++)
+    {
+        Button button = buttons[i];
+        button.onClick.AddListener(() => OnButtonClick(button));
 
-        // Add click listeners to all buttons and map events
-        for (int i = 0; i < buttons.Count; i++)
-        {
-            Button button = buttons[i];
-            button.onClick.AddListener(() => OnButtonClick(button));
-
-            UnityEvent selectEvent = i < buttonSelectEvents.Count ? buttonSelectEvents[i] : null;
-            UnityEvent deselectEvent = i < buttonDeselectEvents.Count ? buttonDeselectEvents[i] : null;
-            buttonEventDict[button] = (selectEvent, deselectEvent);
-        }
+        UnityEvent selectEvent = i < buttonSelectEvents.Count ? buttonSelectEvents[i] : null;
+        UnityEvent deselectEvent = i < buttonDeselectEvents.Count ? buttonDeselectEvents[i] : null;
+        buttonEventDict[button] = (selectEvent, deselectEvent);
+    }
 
         DeselectAll();
     }

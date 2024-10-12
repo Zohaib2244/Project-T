@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Scripts.UIPanels;
-using System.Linq;
-
+using Scripts.FirebaseConfig;
 public class Rounds_BallotsPanel : MonoBehaviour
 {
     #region Singleton
@@ -84,10 +83,25 @@ public class Rounds_BallotsPanel : MonoBehaviour
         ballotInfoPanel.gameObject.SetActive(true);
         ballotInfoPanel.GetComponent<Ballot_InfoPanel>().DisplayMatchBallot(match);
     }
-    public void CloseBallotInfo()
+    public async void CloseBallotInfo()
     {
         ballotInfoPanel.gameObject.SetActive(false);
         UpdateBallotsList();
+        // Loading.Instance.ShowLoadingScreen();
+        // await FirestoreManager.FireInstance.GetAllMatchesFromFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId);
+
+       
+    }
+    private void GetAllMatchesSuccess()
+    {
+        Loading.Instance.HideLoadingScreen();
+        UpdateBallotsList();
+    }
+    private void GetAllMatchesFail()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed To Update Ballot Panel", Color.red);
+        CloseBallotInfo();
     }
     // Helper method to retrieve all ballot prefabs
     private List<Match> GetBallotPrefabs()

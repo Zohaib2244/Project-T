@@ -28,15 +28,15 @@ public class TournamentHomePanel : MonoBehaviour
         Loading.Instance.ShowLoadingScreen();
     
         // Run Firestore calls in parallel
-        var institutionsTask = FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
-        var adjudicatorsTask = FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
-        var roundsTask = AppConstants.instance.GetAllRounds();
-        var teamsTask = FirestoreManager.FireInstance.GetAllTeamsFromFirestore();
+    await   FirestoreManager.FireInstance.GetAllInstituitionsFromFirestore();
+      await FirestoreManager.FireInstance.GetAllAdjudicatorsFromFirestore();
+      await AppConstants.instance.GetAllRounds();
+      await FirestoreManager.FireInstance.GetAllTeamsFromFirestore();
     
         // Await all tasks to complete
-        await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
-        tournamentSelection.onSelectOption1 = ShowTournament1Info;
-        tournamentSelection.onSelectOption2 = ShowTournament2Info;
+        // await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
+        // tournamentSelection.onSelectOption1 = ShowTournament1Info;
+        // tournamentSelection.onSelectOption2 = ShowTournament2Info;
         Loading.Instance.HideLoadingScreen();
     }
 

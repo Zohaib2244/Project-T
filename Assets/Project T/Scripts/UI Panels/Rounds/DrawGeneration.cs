@@ -40,6 +40,7 @@ public class DrawGeneration : MonoBehaviour
     }
     public void GenerateDraws()
     {
+        MainRoundsPanel.Instance.selectedRound.availableTeams.Count();
         if (isTeamAutoAllocation)
         {
             matches = GenerateDrawForPrelims(teams_TMP, adjudicators_TMP, tournamentType);

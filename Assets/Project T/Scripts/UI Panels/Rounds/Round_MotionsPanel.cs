@@ -44,7 +44,26 @@ namespace Scripts.UIPanels.RoundPanels
         void OnEnable()
         {
             ConfigureMotionsforRound();
+        DebugMotions();
         }
+        void DebugMotions()
+    {
+        var motions = MainRoundsPanel.Instance.selectedRound.motions;
+
+        if (motions == null)
+        {
+            Debug.LogError("DebugMotions: motions is null.");
+            return;
+        }
+
+        Debug.Log("DebugMotions: Logging motions...");
+
+        // Assuming motions is a Dictionary<string, string>
+        foreach (var kvp in motions)
+        {
+            Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+        }
+    }
         void OnDisable()
         {
             // Clear existing motion prefabs
@@ -79,23 +98,40 @@ namespace Scripts.UIPanels.RoundPanels
                     // Populate the motion prefab with the motion data
                     var motionKey = MainRoundsPanel.Instance.selectedRound.motions.Keys.ElementAt(i);
                     var motionValue = MainRoundsPanel.Instance.selectedRound.motions[motionKey];
-                    motionPrefabInstance.GetComponent<MotionsEntry>().SetMotion(new Dictionary<string, object> { { motionKey, motionValue } });
+                    Debug.Log($"Motion Key: {motionKey}, Motion Value: {motionValue}");
+                    motionPrefabInstance.GetComponent<MotionsEntry>().SetMotion(new Dictionary<string, string> { { motionKey, motionValue } });
                 }
                 else
                 {
                     // Leave the motion prefab empty
-                    motionPrefabInstance.GetComponent<MotionsEntry>().SetMotion(new Dictionary<string, object>());
+                    motionPrefabInstance.GetComponent<MotionsEntry>().SetMotion(new Dictionary<string, string>());
                 }
             }
         }
         public async void SaveMotion(Dictionary<string, string> motion)
         {
+                var motions = motion;
+
+    if (motions == null)
+    {
+        Debug.LogError("DebugMotions: motions is null.");
+        return;
+    }
+
+    Debug.Log("DebugMotions: Logging motions...");
+
+    // Assuming motions is a Dictionary<string, string>
+    foreach (var kvp in motions)
+    {
+        Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+    }
             Loading.Instance.ShowLoadingScreen();
            await FirestoreManager.FireInstance.SaveRoundMotionToFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(),MainRoundsPanel.Instance.selectedRound.roundId, motion, OnMotionSavedSuccess);
         }
         
         private void OnMotionSavedSuccess(Dictionary<string, string> motion)
         {
+                           
             Loading.Instance.HideLoadingScreen();
             DialogueBox.Instance.ShowDialogueBox("Motion Saved Successfully.", Color.green);
            MainRoundsPanel.Instance.selectedRound.motionAdded = true;
@@ -103,6 +139,21 @@ namespace Scripts.UIPanels.RoundPanels
             MainRoundsPanel.Instance.goPublicButton.interactable = true;
             MainRoundsPanel.Instance.UpdatePanelSwitcherButtonsStates();
             MainRoundsPanel.Instance.SaveRound();
+             var motions =  MainRoundsPanel.Instance.selectedRound.motions;
+
+    if (motions == null)
+    {
+        Debug.LogError("DebugMotions: motions is null.");
+        return;
+    }
+
+    Debug.Log("DebugMotions: Logging motions...");
+
+    // Assuming motions is a Dictionary<string, string>
+    foreach (var kvp in motions)
+    {
+        Debug.Log($"Key: {kvp.Key}, Value: {kvp.Value}");
+    }
         }
         private void OnMotionSavedFailure()
         {
