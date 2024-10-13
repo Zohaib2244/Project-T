@@ -56,9 +56,13 @@ public class TournamentInfo
     public List<Adjudicator> adjudicatorsInTourney { get; set; }
     public List<SpeakerCategories> speakerCategories { get; set; }
     public List<Team> teamsInTourney { get; set; }
+    public List<string> openBreakingTeams { get; set; }
+    public List<string> noviceBreakingTeams { get; set; }
     public List<Rounds> preLimsInTourney { get; set; }
     public List<Rounds> noviceBreaksInTourney { get; set; }
     public List<Rounds> openBreaksInTourney { get; set; }
+    public BreakParameters breakParam { get; set; }
+    public bool isBreaksGenerated { get; set;}
 
     public TournamentInfo()
     {
@@ -72,6 +76,8 @@ public class TournamentInfo
         preLimsInTourney = new List<Rounds>();
         noviceBreaksInTourney = new List<Rounds>();
         openBreaksInTourney = new List<Rounds>();
+        isBreaksGenerated = false;
+        breakParam = BreakParameters.TeamPoints;
     }
 }
 public class Instituitions : TournamentInfo
@@ -126,6 +132,7 @@ public class Team : TournamentInfo
     public bool available = false;
     public float totalTeamScore;
     public int teamPoints;
+    public bool isEligibleforBreak;
     public Team()
     {
         teamId = "";
@@ -134,6 +141,9 @@ public class Team : TournamentInfo
         instituition = "";
         speakers = new List<Speaker>();
         teamRoundDatas = new List<TeamRoundData>();
+        totalTeamScore = 0;
+        teamPoints = 0;
+        isEligibleforBreak = false;
     }
 }
 public class Speaker : Team
@@ -380,6 +390,10 @@ public class AppConstants : MonoBehaviour
     {
         return selectedTouranment.instituitionsinTourney.Find(i => i.instituitionID == instituteID);
     }
+    public string GetInstituteAbreviation(string instituteID)
+    {
+        return GetInstituitionsFromID(instituteID).instituitionAbreviation;
+    }
     #endregion
 
     #region Team Functions
@@ -403,6 +417,65 @@ public class AppConstants : MonoBehaviour
     public Team GetTeamFromID(string teamID)
     {
         return selectedTouranment.teamsInTourney.Find(t => t.teamId == teamID);
+    }
+    public List<Team> GetEligibleTeamsForBreaks(SpeakerTypes speakerType)
+    {
+        return selectedTouranment.teamsInTourney.Where(t => t.teamCategory == speakerType && t.isEligibleforBreak).ToList();
+    }
+
+    public void CalculateTeamPoints()
+    {
+        foreach (Team team in selectedTouranment.teamsInTourney)
+        {
+            int totalPoints = 0;
+    
+            foreach (var trd in team.teamRoundDatas)
+            {
+                if(trd.roundType == RoundCategory.PreLim)
+                {
+                    switch (trd.teamMatchRanking)
+                    {
+                        case 1:
+                            totalPoints += 3;
+                            break;
+                        case 2:
+                            totalPoints += 2;
+                            break;
+                        case 3:
+                            totalPoints += 1;
+                            break;
+                        case 4:
+                            totalPoints += 0;
+                            break;
+                        default:
+                            Debug.LogWarning("Invalid position: " + trd.teamMatchRanking);
+                            break;
+                    }
+                }
+            }
+    
+            team.teamPoints = totalPoints;
+        }
+    }
+    public void CalculateTeamScore()
+    {
+        foreach (Team team in selectedTouranment.teamsInTourney)
+        {
+            float totalScore = 0;
+    
+            foreach (var roundData in team.teamRoundDatas)
+            {
+                if (roundData.roundType == RoundCategory.PreLim)
+                {
+                    foreach (var speakerScore in roundData.speakersInRound)
+                    {
+                        totalScore += speakerScore.speakerScore;
+                    }
+                }
+            }
+    
+            team.totalTeamScore = totalScore;
+        }
     }
     #endregion
     #region Adjudicator Functions

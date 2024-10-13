@@ -175,6 +175,7 @@ namespace Scripts.FirebaseConfig
             return (RoundStates)Enum.Parse(typeof(RoundStates), value.ToString());
         }
     }
+
     #endregion
 
     #region Admin Info
@@ -214,7 +215,15 @@ namespace Scripts.FirebaseConfig
         [FirestoreProperty]
         public int noOfPrelims { get; set; }
         [FirestoreProperty]
+        public List<string> openBreakingTeams { get; set; }
+        [FirestoreProperty]
+        public List<string> noviceBreakingTeams { get; set; }
+        [FirestoreProperty]
         public List<SpeakerCategories_DTO> speakerCategories { get; set; }
+        [FirestoreProperty]
+        public bool isBreaksGenerated { get; set; }
+        [FirestoreProperty]
+        public int breakParameters { get; set; }
     }
     [FirestoreData]
     public class Instituitions_DTO
@@ -364,6 +373,8 @@ namespace Scripts.FirebaseConfig
         public float totalTeamScore { get; set; }
         [FirestoreProperty]
         public int teamPoints { get; set; }
+        [FirestoreProperty]
+        public bool isEligibleforBreak { get; set; }
     }
 
     [FirestoreData]
@@ -440,7 +451,11 @@ namespace Scripts.FirebaseConfig
                 tournamentName = tournamentInfo.tournamentName,
                 tournamentShortHand = tournamentInfo.tournamentShortHand,
                 noOfPrelims = tournamentInfo.noOfPrelims,
-                speakerCategories = speakerCategories
+                speakerCategories = speakerCategories,
+                isBreaksGenerated = tournamentInfo.isBreaksGenerated,
+                openBreakingTeams = tournamentInfo.openBreakingTeams,
+                noviceBreakingTeams = tournamentInfo.noviceBreakingTeams,
+                breakParameters = (int)tournamentInfo.breakParam
             };
         }
         public TournamentInfo DTOToTournamentInfo(TournamentInfo_DTO tournamentInfo)
@@ -466,6 +481,10 @@ namespace Scripts.FirebaseConfig
                 tournamentShortHand = tournamentInfo.tournamentShortHand,
                 noOfPrelims = tournamentInfo.noOfPrelims,
                 speakerCategories = speakerCategories,
+                isBreaksGenerated = tournamentInfo.isBreaksGenerated,
+                openBreakingTeams = tournamentInfo.openBreakingTeams,
+                noviceBreakingTeams = tournamentInfo.noviceBreakingTeams,
+                breakParam = (BreakParameters)tournamentInfo.breakParameters
             };
         }
 
@@ -501,7 +520,8 @@ namespace Scripts.FirebaseConfig
                 teamName = team.teamName,
                 teamCategory = team.teamCategory,
                 totalTeamScore = team.totalTeamScore,
-                teamPoints = team.teamPoints
+                teamPoints = team.teamPoints,
+                isEligibleforBreak = team.isEligibleforBreak
             };
         }
         public Team DTOToTeam(Team_DTO team)
@@ -514,7 +534,8 @@ namespace Scripts.FirebaseConfig
                 teamName = team.teamName,
                 teamCategory = team.teamCategory,
                 totalTeamScore = team.totalTeamScore,
-                teamPoints = team.teamPoints
+                teamPoints = team.teamPoints,
+                isEligibleforBreak = team.isEligibleforBreak
             };
         }
 

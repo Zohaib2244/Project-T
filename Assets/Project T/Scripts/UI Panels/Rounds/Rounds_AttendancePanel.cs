@@ -42,8 +42,6 @@ public class Rounds_AttendancePanel : MonoBehaviour
     public bool isAdjudicatorAttendance = false;    
     private List<Team> AvailableTeams_tmp;
     private List<Adjudicator> AvailableAdjudicators_tmp;
-    private List<GameObject> adjudicatorEntries = new List<GameObject>();
-
 
 #region Essentials
     private void OnEnable() 
@@ -236,8 +234,7 @@ private void UpdateAdjudicatorList()
         }
         List<string> uniqueTeamIdsList = uniqueTeamIds.ToList();
         await FirestoreManager.FireInstance.SaveTeamAttendanceToFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, uniqueTeamIdsList,uniqueTeams, OnTeamAttendanceAddedSuccess, OnTeamAttendanceAddedFailure);
-    }
-    
+    }   
     public async void SaveAdjudicatorAttendance()
     {
         // Create a HashSet to track unique adjudicator IDs (as strings)

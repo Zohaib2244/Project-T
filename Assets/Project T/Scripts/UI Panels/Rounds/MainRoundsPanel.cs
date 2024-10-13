@@ -79,12 +79,12 @@ namespace Scripts.UIPanels
         #region Essentails
         void OnEnable()
         {
-            selectedRound = AppConstants.instance.GetCurrentRound();
+            // selectedRound = AppConstants.instance.GetCurrentRound();
             // selectedRound.
             DisableAllPanels();
             ConfigureRoundDropDown();
             UpdateBreaksDropDown();
-            ConfigureScreen();
+            // ConfigureScreen();
             // speakerCategoryToggle.DeActivate();
             // DisableAllPanels();
             preLimDropdown.onChangedValue += ChangePrelimRound;
@@ -219,16 +219,18 @@ namespace Scripts.UIPanels
             ConfigureScreen();
             DisableAllPanels();
         }
-        private void ConfigureRoundDropDown()
+        public void ConfigureRoundDropDown()
         {
             preLimDropdown.DeleteAllOptions();
-            noviceBreakDropdown.DeleteAllOptions();
-            openBreakDropdown.DeleteAllOptions();
+         
         
             // Populate prelims dropdown
             for (int i = 0; i < AppConstants.instance.selectedTouranment.preLimsInTourney.Count; i++)
             {
+            if (AppConstants.instance.selectedTouranment.preLimsInTourney[i].roundState != RoundStates.NotStarted)
+            {
                 preLimDropdown.AddOptions($"Round {i + 1}");
+            }
             }
         
             // Deactivate novice and open dropdowns initially
@@ -238,11 +240,13 @@ namespace Scripts.UIPanels
             // Deactivate novice dropdown if the tournament is open
             if (AppConstants.instance.selectedTouranment.speakerCategories.Count == 1)
             {
-                noviceBreakDropdown.gameObject.SetActive(false);
+            noviceBreakDropdown.gameObject.SetActive(false);
             }
         }
-                private void UpdateBreaksDropDown()
+        public void UpdateBreaksDropDown()
         {
+            noviceBreakDropdown.DeleteAllOptions();
+            openBreakDropdown.DeleteAllOptions();
             var prelims = AppConstants.instance.selectedTouranment.preLimsInTourney;
             var noviceBreaks = AppConstants.instance.selectedTouranment.noviceBreaksInTourney;
             var openBreaks = AppConstants.instance.selectedTouranment.openBreaksInTourney;
@@ -266,7 +270,7 @@ namespace Scripts.UIPanels
                 // Update novice breaks dropdown
                 for (int i = 0; i < noviceBreaks.Count; i++)
                 {
-                    if (i == 0 || noviceBreaks[i - 1].roundState == RoundStates.Completed)
+                    if (i == 0 || noviceBreaks[i - 1].roundState == RoundStates.Completed || noviceBreaks[i - 1].roundState == RoundStates.InProgress)
                     {
                         noviceBreakDropdown.AddOptions(noviceBreaks[i].roundType.ToString());
                     }
@@ -275,7 +279,7 @@ namespace Scripts.UIPanels
                 // Update open breaks dropdown
                 for (int i = 0; i < openBreaks.Count; i++)
                 {
-                    if (i == 0 || openBreaks[i - 1].roundState == RoundStates.Completed)
+                    if (i == 0 || openBreaks[i - 1].roundState == RoundStates.Completed || openBreaks[i - 1].roundState == RoundStates.InProgress)
                     {
                         openBreakDropdown.AddOptions(openBreaks[i].roundType.ToString());
                     }

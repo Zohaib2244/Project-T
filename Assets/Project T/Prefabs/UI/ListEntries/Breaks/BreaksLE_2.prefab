@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6454354528336452863}
   - component: {fileID: 2044088387843637937}
   m_Layer: 5
-  m_Name: Rankingtxt (4)
+  m_Name: teamscore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 1365938949649815102}
   - component: {fileID: 7621222526369090475}
   m_Layer: 5
-  m_Name: Rankingtxt (5)
+  m_Name: teampoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,6 +281,7 @@ GameObject:
   - component: {fileID: 7839195978480886261}
   - component: {fileID: 1206669091068852806}
   - component: {fileID: 8607299165929650128}
+  - component: {fileID: 8582507939642575156}
   m_Layer: 5
   m_Name: BreaksLE_2
   m_TagString: Untagged
@@ -407,6 +408,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
+--- !u!114 &8582507939642575156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3215681355143927834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d35b7c23b3af64449230b0729ed4604, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rankingtxt: {fileID: 2235979231429560750}
+  teamNametxt: {fileID: 6769069445376495544}
+  teamInstitutionAbrvtxt: {fileID: 3759106906243652447}
+  teamScoretxt: {fileID: 2044088387843637937}
+  teamPointstxt: {fileID: 7621222526369090475}
 --- !u!1 &7222623640208285774
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,7 +437,7 @@ GameObject:
   - component: {fileID: 9115695955151139164}
   - component: {fileID: 6769069445376495544}
   m_Layer: 5
-  m_Name: Rankingtxt (3)
+  m_Name: teamname
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -553,7 +571,7 @@ GameObject:
   - component: {fileID: 1485813443218674818}
   - component: {fileID: 3759106906243652447}
   m_Layer: 5
-  m_Name: Rankingtxt (2)
+  m_Name: Institute
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

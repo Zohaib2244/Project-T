@@ -12,7 +12,8 @@ namespace Scripts.Resources
         CRUInstitutionPanel,
         TicketRequestPanel,
         RoundsPanel,
-        RankingsPanel
+        RankingsPanel,
+        BreaksPanel,
     }
     public enum TournamentType
     {
@@ -89,5 +90,10 @@ namespace Scripts.Resources
         DrawOptionsPanel,
         DrawDisplayPanel,
         DrawEditPanel,
+    }
+    public enum BreakParameters
+    {
+        TeamScore,
+        TeamPoints
     }
 }

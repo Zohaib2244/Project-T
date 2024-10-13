@@ -4,7 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Scripts.UIPanels;
 using Scripts.FirebaseConfig;
-using System.Threading.Tasks;
+using Scripts.Resources;
 public class Rounds_BallotsPanel : MonoBehaviour
 {
     #region Singleton
@@ -62,45 +62,100 @@ public class Rounds_BallotsPanel : MonoBehaviour
             drawEntry.GetComponent<BallotListEntry>().SetMatch(match, i + 1); // Pass match object and match number (index + 1)
         }
     }
-    public void SaveBallots()
+    public async void SaveBallots()
     {
-       List<Match> allMatches = GetBallotPrefabs();
-        
-            // Get the selected round
-            var selectedRound = MainRoundsPanel.Instance.selectedRound;
-        
-            if (selectedRound == null)
-            {
-                Debug.LogWarning("No selected round found.");
-                return;
-            }
+        List<Match> allMatches = GetBallotPrefabs();
 
-            selectedRound.matches.Clear();
-            // Save the draw prefabs to the selected round
-            selectedRound.matches = allMatches;
+        // Get the selected round
+        var selectedRound = MainRoundsPanel.Instance.selectedRound;
+
+        if (selectedRound == null)
+        {
+            Debug.LogWarning("No selected round found.");
+            return;
+        }
+
+        selectedRound.matches.Clear();
+        // Save the draw prefabs to the selected round
+        selectedRound.matches = allMatches;
+        selectedRound.roundState = RoundStates.Completed;
+        List<Rounds> roundsList = null;
+        switch (selectedRound.roundCategory)
+        {
+            case RoundCategory.PreLim:
+                roundsList = AppConstants.instance.selectedTouranment.preLimsInTourney;
+                break;
+            case RoundCategory.NoviceBreak:
+                roundsList = AppConstants.instance.selectedTouranment.noviceBreaksInTourney;
+                break;
+            case RoundCategory.OpenBreak:
+                roundsList = AppConstants.instance.selectedTouranment.openBreaksInTourney;
+                break;
+            default:
+                break;
+        }
+        if (roundsList == null)
+        {
+            Debug.LogError("Rounds list is null.");
+            return;
+        }
+        int currentIndex = roundsList.IndexOf(selectedRound);
+        if (currentIndex < roundsList.Count - 1)
+        {
+            Debug.Log("Updating next round to InProgress.");
+            roundsList[currentIndex + 1].roundState = RoundStates.InProgress;
+            MainRoundsPanel.Instance.ConfigureRoundDropDown();    
+        }
+        else
+        {
+            if (roundsList == AppConstants.instance.selectedTouranment.preLimsInTourney)
+            {
+                Debug.Log("Updating next round to Break.");
+                if (AppConstants.instance.selectedTouranment.speakerCategories.Count == 1)
+                    AppConstants.instance.selectedTouranment.openBreaksInTourney[0].roundState = RoundStates.InProgress;
+                else
+                {
+                    AppConstants.instance.selectedTouranment.openBreaksInTourney[0].roundState = RoundStates.InProgress;
+                    AppConstants.instance.selectedTouranment.noviceBreaksInTourney[0].roundState = RoundStates.InProgress;
+                }
+                MainRoundsPanel.Instance.ConfigureRoundDropDown();
+                MainRoundsPanel.Instance.UpdateBreaksDropDown();
+
+            }
+        }
+        AppConstants.instance.CalculateTeamPoints();
+        AppConstants.instance.CalculateTeamScore();
+        Loading.Instance.ShowLoadingScreen();
+        await FirestoreManager.FireInstance.UpdateRoundStateforAllPrelimsAtFirestore();
+        await FirestoreManager.FireInstance.UpdateRoundStateforAllOpenBreaksAtFirestore();
+        await FirestoreManager.FireInstance.UpdateRoundStateforAllNoviceBreaksAtFirestore();
+        await FirestoreManager.FireInstance.UpdateAllTeamsScoreandPointatFirestore();
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Ballots Saved Successfully", Color.green);
+        MainRoundsPanel.Instance.DisableAllPanels();
     }
 
     public void ShowBallotInfo(Match match)
     {
         ballotInfoPanel.gameObject.SetActive(true);
-            // Display the match ballot
+        // Display the match ballot
         ballotInfoPanel.GetComponent<Ballot_InfoPanel>().DisplayMatchBallot(match);
     }
-    
+
     public async void CloseBallotInfo()
     {
-    
+
         // Deactivate the ballotInfoPanel
         ballotInfoPanel.gameObject.SetActive(false);
-    
+
         // Update the ballots list
         // UpdateBallotsList();
-    
+
         // Optionally, load matches from Firestore
         Loading.Instance.ShowLoadingScreen();
         await FirestoreManager.FireInstance.GetAllMatchesFromFirestore(MainRoundsPanel.Instance.selectedRound.roundCategory.ToString(), MainRoundsPanel.Instance.selectedRound.roundId, GetAllMatchesSuccess, GetAllMatchesFail);
     }
-       private void GetAllMatchesSuccess(List<Match> matches)
+    private void GetAllMatchesSuccess(List<Match> matches)
     {
         MainRoundsPanel.Instance.selectedRound.matches = matches;
         UpdateBallotsList();
@@ -126,12 +181,14 @@ public class Rounds_BallotsPanel : MonoBehaviour
             foreach (Transform child in ballotsContainer.transform)
             {
                 // Get the BallotListEntry component and retrieve the match
-            if (child.TryGetComponent<BallotListEntry>(out BallotListEntry ballotEntry))
-                {if (ballotEntry != null)
+                if (child.TryGetComponent<BallotListEntry>(out BallotListEntry ballotEntry))
                 {
-                    Match match = ballotEntry.GetSavedBallot();
-                    matches.Add(match);
-                }}
+                    if (ballotEntry != null)
+                    {
+                        Match match = ballotEntry.GetSavedBallot();
+                        matches.Add(match);
+                    }
+                }
             }
         }
         else
@@ -142,5 +199,5 @@ public class Rounds_BallotsPanel : MonoBehaviour
         return matches;
     }
 
-    
+
 }

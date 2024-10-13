@@ -44,6 +44,10 @@ public class DrawGeneration : MonoBehaviour
         if (isTeamAutoAllocation)
         {
             Debug.Log("Available Teams: " + teams_TMP.Count);   
+            foreach (var team in teams_TMP)
+            {
+                Debug.Log("Team Name: " + team.teamName);
+            }
             matches = GenerateDrawForPrelims(teams_TMP, adjudicators_TMP, tournamentType);
         }
         else
@@ -111,7 +115,7 @@ public class DrawGenerator
     private double beta = 4.0; // Position cost exponent set to 4
     private double alpha = 1.0; // Order of Rényi entropy, default to 1 (Shannon entropy)
     private bool isAdjudicatorAutoAllocation = true;
-    private bool isTeamAutoAllocation = true;
+    // private bool isTeamAutoAllocation = true;
     private Random random = new Random();
 
     public DrawGenerator(int numberOfTeams, double beta = 4.0, double alpha = 1.0)
@@ -195,69 +199,76 @@ public class DrawGenerator
         return n_h * (2 - H_alpha);
     }
 
-    public List<Match> GenerateDraw(List<Team> teams, List<Adjudicator> adjudicators, bool isAdjudicatorAutoAllocation = true, bool isTeamAutoAllocation = true)
+ public List<Match> GenerateDraw(List<Team> teams, List<Adjudicator> adjudicators, bool isAdjudicatorAutoAllocation = true, bool isTeamAutoAllocation = true)
+{
+    // Log initial teams
+    Debug.Log("Initial Teams: " + string.Join(", ", teams.Select(t => t.teamName)));
+
+    List<Team> adjustedTeams = PullUp(teams);
+    
+    // Log teams after PullUp
+    Debug.Log("Teams after PullUp: " + string.Join(", ", adjustedTeams.Select(t => t.teamName)));
+
+    CalculateCosts(adjustedTeams);
+
+    // Log cost matrix
+    Debug.Log("Cost Matrix: ");
+    for (int i = 0; i < adjustedTeams.Count; i++)
     {
-        List<Team> adjustedTeams = PullUp(teams);
-        CalculateCosts(adjustedTeams);
-        int[,] shuffledCostMatrix = ShuffleMatrix(costMatrix);
-        int[] assignment = HungarianAlgorithm.Solve(shuffledCostMatrix);
-        List<Match> matches = MapAssignmentToMatches(assignment, adjustedTeams, adjudicators);
-        return matches;
+        Debug.Log(string.Join(", ", Enumerable.Range(0, numberOfPositions).Select(j => costMatrix[i, j])));
     }
-      private List<Team> PullUp(List<Team> teams)
+
+    int[,] shuffledCostMatrix = ShuffleMatrix(costMatrix);
+
+    // Log shuffled cost matrix
+    Debug.Log("Shuffled Cost Matrix: ");
+    for (int i = 0; i < adjustedTeams.Count; i++)
+    {
+        Debug.Log(string.Join(", ", Enumerable.Range(0, numberOfPositions).Select(j => shuffledCostMatrix[i, j])));
+    }
+
+    int[] assignment = HungarianAlgorithm.Solve(shuffledCostMatrix);
+
+    // Log assignment
+    Debug.Log("Assignment: " + string.Join(", ", assignment));
+
+    List<Match> matches = MapAssignmentToMatches(assignment, adjustedTeams, adjudicators);
+
+
+    return matches;
+}
+
+    private List<Team> PullUp(List<Team> teams)
     {
         // Calculate winning points for each team
         foreach (var team in teams)
         {
             team.totalTeamScore = CalculateWinningPoints(team);
         }
-    
+
         // Group teams by their winning points to form brackets
         var brackets = teams.GroupBy(t => (int)t.totalTeamScore).OrderByDescending(g => g.Key).ToList();
         List<Team> adjustedTeams = new List<Team>();
         Random random = new Random();
-    
+
         // Create a new list to store the modified brackets
         var updatedBrackets = new List<IGrouping<int, Team>>(brackets);
-    
+
         foreach (var bracket in brackets)
         {
-            // Shuffle teams within the bracket
-            var shuffledBracket = bracket.OrderBy(x => random.Next()).ToList();
-    
-            int bracketSize = shuffledBracket.Count();
-            if (bracketSize % 4 != 0)
-            {
-                int pullUpCount = 4 - (bracketSize % 4);
-                var nextBracketGroup = updatedBrackets.FirstOrDefault(b => b.Key < bracket.Key);
-    
-                if (nextBracketGroup != null)
-                {
-                    var nextBracket = nextBracketGroup.ToList();
-                    if (nextBracket.Any())
-                    {
-                        var pullUpTeams = nextBracket.Take(pullUpCount).ToList();
-                        adjustedTeams.AddRange(pullUpTeams);
-                        nextBracket = nextBracket.Skip(pullUpCount).ToList();
-    
-                        // Update the updatedBrackets list with the remaining teams in the next bracket
-                        if (nextBracket.Any())
-                        {
-                            updatedBrackets[updatedBrackets.IndexOf(nextBracketGroup)] = nextBracket.GroupBy(t => (int)t.totalTeamScore).First();
-                        }
-                        else
-                        {
-                            updatedBrackets.Remove(nextBracketGroup);
-                        }
-                    }
-                }
-            }
+            // Log bracket teams
+            Debug.Log("Bracket: " + string.Join(", ", bracket.Select(t => t.teamName)));
+
+            // Shuffle teams within each bracket
+            var shuffledBracket = bracket.OrderBy(t => random.Next()).ToList();
             adjustedTeams.AddRange(shuffledBracket);
         }
-    
+
+        // Log adjusted teams
+        Debug.Log("Adjusted Teams: " + string.Join(", ", adjustedTeams.Select(t => t.teamName)));
+
         return adjustedTeams;
     }
-
     private int CalculateWinningPoints(Team team)
     {
         int winningPoints = 0;
@@ -322,6 +333,7 @@ public class DrawGenerator
     
                 if (teamRoundData == null)
                 {
+                    Debug.Log($"<color=red>TeamRoundData not found for team {team.teamName} in round {MainRoundsPanel.Instance.selectedRound.roundId}</color>");
                     // Create a new TRD if it doesn't exist
                     teamRoundData = new TeamRoundData
                     {
@@ -349,6 +361,7 @@ public class DrawGenerator
                 }
                 else
                 {
+                    Debug.Log($"<color=green>TeamRoundData found for team {team.teamName} in round {MainRoundsPanel.Instance.selectedRound.roundId}</color>");
                     // Update the existing TRD, preserving additional information
                     teamRoundData.matchID = match.matchId;
                     teamRoundData.teamPositionBritish = (TeamPositionsBritish)j;
