@@ -42,6 +42,7 @@ namespace Scripts.UIPanels
         #region  Variables
         public Rounds selectedRound;
         public RoundPanelTypes SelectedRoundPanel;
+        public List<Team> brokenTeamsList = new List<Team>();
         public int swingsCount;
         [SerializeField] private GameObject TopPanel;
         [SerializeField] private Image RoundPanelImage;
@@ -80,7 +81,7 @@ namespace Scripts.UIPanels
         void OnEnable()
         {
             // selectedRound = AppConstants.instance.GetCurrentRound();
-            // selectedRound.
+            selectedRound = null;
             DisableAllPanels();
             ConfigureRoundDropDown();
             UpdateBreaksDropDown();
@@ -90,6 +91,8 @@ namespace Scripts.UIPanels
             preLimDropdown.onChangedValue += ChangePrelimRound;
             noviceBreakDropdown.onChangedValue += ChangeNoviceBreakRound;
             openBreakDropdown.onChangedValue += ChangeOpenBreakRound;
+            roundFunctionButton.DeselectAll();
+            roundFunctionButton.DisableAllInteractability();
             
         }
 
@@ -156,6 +159,12 @@ namespace Scripts.UIPanels
                 roundFunctionButton.EnableAllInteractability();
                 goPublicButton.interactable = true;
                 Debug.Log("6");
+            }
+            else if(selectedRound == null)
+            {
+                Debug.Log("No Round Selected");
+                roundFunctionButton.DeselectAll();
+                roundFunctionButton.DisableAllInteractability();
             }
         }                                       
 
@@ -341,7 +350,7 @@ namespace Scripts.UIPanels
             if (index >= 0 && index < allRounds.Count)
             {
                 var foundRound = allRounds[index];
-                Debug.Log($"Selected round: {selectedRound.roundType}");
+                // Debug.Log($"Selected round: {selectedRound.roundType}");
                 // Add that round to the selected round
                 UpdateSelectedRound(foundRound);
                 noviceBreakDropdown.SetDefaultText();
@@ -372,12 +381,14 @@ namespace Scripts.UIPanels
                 preLimDropdown.SetDefaultText();
                 openBreakDropdown.SetDefaultText();
                 roundTypeText.text = "- NOVICE";
+                brokenTeamsList = AppConstants.instance.GetTeamsFromIDs(AppConstants.instance.selectedTouranment.noviceBreakingTeams);
                 Debug.Log($"Selected round: {selectedRound.roundType}");
             }
             else
             {
                 DialogueBox.Instance.ShowDialogueBox("Round not found!", Color.red);
             }
+
         }
         private void ChangeOpenBreakRound(int index)
         {
@@ -396,6 +407,7 @@ namespace Scripts.UIPanels
                 roundTypeText.text = "- OPEN";
                 preLimDropdown.SetDefaultText();
                 noviceBreakDropdown.SetDefaultText();
+                brokenTeamsList = AppConstants.instance.GetTeamsFromIDs(AppConstants.instance.selectedTouranment.openBreakingTeams);
                 Debug.Log($"Selected round: {selectedRound.roundType}");
             }
             else

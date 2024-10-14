@@ -5,6 +5,7 @@ using DG.Tweening;
 using Scripts.UIPanels;
 using Scripts.FirebaseConfig;
 using Scripts.Resources;
+using Unity.VisualScripting;
 public class Rounds_BallotsPanel : MonoBehaviour
 {
     #region Singleton
@@ -52,7 +53,7 @@ public class Rounds_BallotsPanel : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        Debug.Log("MainRoundsPanel.Instance.selectedRound.matches.Count: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
+        // Debug.Log("MainRoundsPanel.Instance.selectedRound.matches.Count: " + MainRoundsPanel.Instance.selectedRound.matches.Count);
         // Instantiate new entries and set match data
         for (int i = 0; i < MainRoundsPanel.Instance.selectedRound.matches.Count; i++)
         {
@@ -84,12 +85,15 @@ public class Rounds_BallotsPanel : MonoBehaviour
         {
             case RoundCategory.PreLim:
                 roundsList = AppConstants.instance.selectedTouranment.preLimsInTourney;
+                
                 break;
             case RoundCategory.NoviceBreak:
                 roundsList = AppConstants.instance.selectedTouranment.noviceBreaksInTourney;
+                RemoveTeamsAtPositions(selectedRound.matches);
                 break;
             case RoundCategory.OpenBreak:
                 roundsList = AppConstants.instance.selectedTouranment.openBreaksInTourney;
+                RemoveTeamsAtPositions(selectedRound.matches);
                 break;
             default:
                 break;
@@ -130,10 +134,37 @@ public class Rounds_BallotsPanel : MonoBehaviour
         await FirestoreManager.FireInstance.UpdateRoundStateforAllOpenBreaksAtFirestore();
         await FirestoreManager.FireInstance.UpdateRoundStateforAllNoviceBreaksAtFirestore();
         await FirestoreManager.FireInstance.UpdateAllTeamsScoreandPointatFirestore();
+        await FirestoreManager.FireInstance.UpdateTournamentBreakingTeams();
         Loading.Instance.HideLoadingScreen();
         DialogueBox.Instance.ShowDialogueBox("Ballots Saved Successfully", Color.green);
         MainRoundsPanel.Instance.DisableAllPanels();
     }
+    // Helper method to remove teams at specified positions
+private void RemoveTeamsAtPositions(List<Match> matches)
+{
+    TeamRoundData teamRoundData;
+    foreach (Match match in matches)
+    {
+        foreach (var team in match.teams)
+        {
+            teamRoundData = AppConstants.instance.GetTeamsSpeakerRoundDataFromMatch(team.Key,team.Value);
+            if(teamRoundData != null)
+            {
+                if(teamRoundData.teamMatchRanking >2)
+                {
+                    if(teamRoundData.roundType == RoundCategory.OpenBreak)
+                    {
+                        AppConstants.instance.selectedTouranment.openBreakingTeams.Remove(team.Key);
+                    }
+                    else if(teamRoundData.roundType == RoundCategory.NoviceBreak)
+                    {
+                        AppConstants.instance.selectedTouranment.noviceBreakingTeams.Remove(team.Key);
+                    }
+                }
+            }
+        }
+    }
+}
 
     public void ShowBallotInfo(Match match)
     {

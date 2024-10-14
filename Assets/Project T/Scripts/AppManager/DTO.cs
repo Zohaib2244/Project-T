@@ -3,6 +3,7 @@ using Firebase.Firestore;
 using Scripts.Resources;
 using System;
 using System.Linq;
+using UnityEngine;
 
 namespace Scripts.FirebaseConfig
 {
@@ -589,31 +590,53 @@ namespace Scripts.FirebaseConfig
 
         public Rounds DTOToRounds(Rounds_DTO rounds)
         {
+            // Calculate availableTeams before the return statement
+            // Add debug logs to check the values of rounds and rounds.availableTeamsIds
+            if (rounds == null)
+            {
+                Debug.LogError("rounds is null");
+                return null; // Return null or handle the error as appropriate
+            }
+
+            if (rounds.availableTeamsIds == null)
+            {
+                Debug.LogError("rounds.availableTeamsIds is null");
+                return null; // Return null or handle the error as appropriate
+            }
+            Debug.Log($"Team in tournament COunt: {AppConstants.instance.selectedTouranment.teamsInTourney.Count}");
+
+            // Calculate availableTeams before the return statement
+            var availableTeams = AppConstants.instance.selectedTouranment?.teamsInTourney?
+                .Where(team => rounds.availableTeamsIds.Contains(team.teamId))
+                .ToList() ?? new List<Team>();
+
+            // Debug log to check the result
+            Debug.Log($"Available teams count: {availableTeams.Count}");
+
+            // Debug log to check the result
+            Debug.Log($"Available teams count: {availableTeams.Count}");
+
             return new Rounds
             {
-                roundId = rounds.roundId,
-                roundType = rounds.roundType,
-                roundCategory = (RoundCategory)rounds.roundCategory,
-                motions = rounds.motions,
-                availableTeams = AppConstants.instance.selectedTouranment.teamsInTourney
-                    .Where(team => rounds.availableTeamsIds.Contains(team.teamId))
-                    .ToList(),
-
-                availableAdjudicators = AppConstants.instance.selectedTouranment.adjudicatorsInTourney
-                    .Where(adjudicator => rounds.availableAdjudicatorsIds.Contains(adjudicator.adjudicatorID))
-                    .ToList(),
-                roundState = rounds.roundState,
+                roundId = rounds?.roundId,
+                roundType = rounds?.roundType ?? default,
+                roundCategory = (RoundCategory)(rounds?.roundCategory ?? 0),
+                motions = rounds?.motions ?? new Dictionary<string, string>(),
+                availableTeams = availableTeams, // Assign the calculated availableTeams here
+                availableAdjudicators = AppConstants.instance.selectedTouranment?.adjudicatorsInTourney?
+                    .Where(adjudicator => rounds?.availableAdjudicatorsIds?.Contains(adjudicator.adjudicatorID) ?? false)
+                    .ToList() ?? new List<Adjudicator>(),
+                roundState = rounds?.roundState ?? default,
                 swings = new List<TeamRoundData>(),
-                motionAdded = rounds.motionAdded,
-                teamAttendanceAdded = rounds.teamAttendanceAdded,
-                AdjudicatorAttendanceAdded = rounds.AdjudicatorAttendanceAdded,
-                drawGenerated = rounds.drawGenerated,
-                ballotsAdded = rounds.ballotsAdded,
-                isPublic = rounds.isPublic,
-                isSilent = rounds.isSilent
-                            };
+                motionAdded = rounds?.motionAdded ?? false,
+                teamAttendanceAdded = rounds?.teamAttendanceAdded ?? false,
+                AdjudicatorAttendanceAdded = rounds?.AdjudicatorAttendanceAdded ?? false,
+                drawGenerated = rounds?.drawGenerated ?? false,
+                ballotsAdded = rounds?.ballotsAdded ?? false,
+                isPublic = rounds?.isPublic ?? false,
+                isSilent = rounds?.isSilent ?? false
+            };
         }
-
         // Match DTO Converter
         public Match_DTO MatchToDTO(Match match)
         {

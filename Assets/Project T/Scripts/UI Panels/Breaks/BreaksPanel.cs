@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Scripts.Resources;
 using System.Linq;
+using Scripts.FirebaseConfig;
 
 public class BreaksPanel : MonoBehaviour
 {
@@ -95,18 +96,22 @@ public class BreaksPanel : MonoBehaviour
     }
     public void CalculateBreaks()
     {
+        Debug.Log("Calculating Breaks");
+
         breakingOpenTeams = CalculateOpenBreaks();
         breakingNoviceTeams = CalculateNoviceBreaks();
+        
+        ShowBreaksDisplayPanel();
     }
     List<Team> CalculateOpenBreaks()
     {
         if (breakParameters == BreakParameters.TeamPoints)
         {
-            Eligible_openTeams_TMP.Sort((team1, team2) => team1.teamPoints.CompareTo(team2.teamPoints));
+            Eligible_openTeams_TMP.Sort((team1, team2) => team2.teamPoints.CompareTo(team1.teamPoints));
         }
         else if (breakParameters == BreakParameters.TeamScore)
         {
-            Eligible_openTeams_TMP.Sort((team1, team2) => team1.totalTeamScore.CompareTo(team2.totalTeamScore));
+            Eligible_openTeams_TMP.Sort((team1, team2) => team2.totalTeamScore.CompareTo(team1.totalTeamScore));
         }
 
         // Iterate through each SpeakerCategory in the tournament
@@ -119,22 +124,22 @@ public class BreaksPanel : MonoBehaviour
                     switch (speakerCategory.breakType)
                     {
                         case BreakTypes.QF:
-                            if (Eligible_openTeams_TMP.Count < 16)
+                            if (Eligible_openTeams_TMP.Count > 16)
                                 return Eligible_openTeams_TMP.Take(16).ToList();
                             else
-                                DialogueBox.Instance.ShowDialogueBox("Not enough teams to break to Quarter Finals", Color.red);
+                                DialogueBox.Instance.ShowDialogueBox("Not enough Open teams to break to Quarter Finals", Color.red);
                             break;
                         case BreakTypes.SF:
-                            if (Eligible_openTeams_TMP.Count < 8)
+                            if (Eligible_openTeams_TMP.Count > 8)
                                 return Eligible_openTeams_TMP.Take(8).ToList();
                             else
-                                DialogueBox.Instance.ShowDialogueBox("Not enough teams to break to Semi Finals", Color.red);
+                                DialogueBox.Instance.ShowDialogueBox("Not enough Open teams to break to Semi Finals", Color.red);
                             break;
                         case BreakTypes.F:
-                            if (Eligible_openTeams_TMP.Count < 4)
+                            if (Eligible_openTeams_TMP.Count > 4)
                                 return Eligible_openTeams_TMP.Take(4).ToList();
                             else
-                                DialogueBox.Instance.ShowDialogueBox("Not enough teams to break to Finals", Color.red);
+                                DialogueBox.Instance.ShowDialogueBox("Not enough Open teams to break to Finals", Color.red);
                             break;
                         default:
                             return new List<Team>();
@@ -148,11 +153,11 @@ public class BreaksPanel : MonoBehaviour
     {
         if (breakParameters == BreakParameters.TeamPoints)
         {
-            Eligible_noviceTeams_TMP.Sort((team1, team2) => team1.teamPoints.CompareTo(team2.teamPoints));
+            Eligible_noviceTeams_TMP.Sort((team1, team2) => team2.teamPoints.CompareTo(team1.teamPoints));
         }
         else if (breakParameters == BreakParameters.TeamScore)
         {
-            Eligible_noviceTeams_TMP.Sort((team1, team2) => team1.totalTeamScore.CompareTo(team2.totalTeamScore));
+            Eligible_noviceTeams_TMP.Sort((team1, team2) => team2.totalTeamScore.CompareTo(team1.totalTeamScore));
         }
 
         // Iterate through each SpeakerCategory in the tournament
@@ -166,22 +171,22 @@ public class BreaksPanel : MonoBehaviour
                     switch (speakerCategory.breakType)
                     {
                         case BreakTypes.QF:
-                            if (Eligible_noviceTeams_TMP.Count < 16)
+                            if (Eligible_noviceTeams_TMP.Count > 16)
                                 return Eligible_noviceTeams_TMP.Take(16).ToList();
                             else
-                                DialogueBox.Instance.ShowDialogueBox("Not enough teams to break to Quarter Finals", Color.red);
+                                DialogueBox.Instance.ShowDialogueBox("Not enough Novice teams to break to Quarter Finals", Color.red);
                             break;
                         case BreakTypes.SF:
-                            if (Eligible_noviceTeams_TMP.Count < 8)
+                            if (Eligible_noviceTeams_TMP.Count > 8)
                                 return Eligible_noviceTeams_TMP.Take(8).ToList();
                             else
-                                DialogueBox.Instance.ShowDialogueBox("Not enough teams to break to Semi Finals", Color.red);
+                                DialogueBox.Instance.ShowDialogueBox("Not enough Novice teams to break to Semi Finals", Color.red);
                             break;
                         case BreakTypes.F:
-                            if (Eligible_noviceTeams_TMP.Count < 4)
+                            if (Eligible_noviceTeams_TMP.Count > 4)
                                 return Eligible_noviceTeams_TMP.Take(4).ToList();
                             else
-                                DialogueBox.Instance.ShowDialogueBox("Not enough teams to break to Finals", Color.red);
+                                DialogueBox.Instance.ShowDialogueBox("Not enough Novice teams to break to Finals", Color.red);
                             break;
                         default:
                             return new List<Team>();
@@ -191,8 +196,9 @@ public class BreaksPanel : MonoBehaviour
         }
         return new List<Team>();
     }
-    public void SaveBreaks()
+    public async void SaveBreaks()
     {
+        Loading.Instance.ShowLoadingScreen();
         AppConstants.instance.selectedTouranment.isBreaksGenerated = true;
         if (AppConstants.instance.selectedTouranment.speakerCategories.Count == 1)
             AppConstants.instance.selectedTouranment.openBreakingTeams = breakingOpenTeams.Select(x => x.teamId).ToList();
@@ -201,5 +207,17 @@ public class BreaksPanel : MonoBehaviour
             AppConstants.instance.selectedTouranment.openBreakingTeams = breakingOpenTeams.Select(x => x.teamId).ToList();
             AppConstants.instance.selectedTouranment.noviceBreakingTeams = breakingNoviceTeams.Select(x => x.teamId).ToList();
         }
+        await FirestoreManager.FireInstance.UpdateTournamentBreakingTeams(OnBreaksUpdatedSuccess, OnBreaksUpdatedFailure);
+    }
+
+    void OnBreaksUpdatedSuccess()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Breaks Saved Successfully", Color.green);
+    }
+    void OnBreaksUpdatedFailure()
+    {
+        Loading.Instance.HideLoadingScreen();
+        DialogueBox.Instance.ShowDialogueBox("Failed to save breaks", Color.red);
     }
 }

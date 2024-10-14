@@ -420,9 +420,17 @@ public class AppConstants : MonoBehaviour
     }
     public List<Team> GetEligibleTeamsForBreaks(SpeakerTypes speakerType)
     {
-        return selectedTouranment.teamsInTourney.Where(t => t.teamCategory == speakerType && t.isEligibleforBreak).ToList();
+        return selectedTouranment.teamsInTourney.Where(t => t.teamCategory == speakerType).ToList();
     }
-
+    public List<Team> GetTeamsFromIDs(List<string> teamIDs)
+    {
+        List<Team> teams = new List<Team>();
+        foreach (string teamID in teamIDs)
+        {
+            teams.Add(GetTeamFromID(teamID));
+        }
+        return teams;
+    }
     public void CalculateTeamPoints()
     {
         foreach (Team team in selectedTouranment.teamsInTourney)
@@ -477,6 +485,31 @@ public class AppConstants : MonoBehaviour
             team.totalTeamScore = totalScore;
         }
     }
+public TeamRoundData GetTeamsSpeakerRoundDataFromMatch(string matchID, string teamID)
+{
+    // Find the match with the given matchID in the selected round
+    Match match = selectedRound.matches.Find(m => m.matchId == matchID);
+    
+    // Check if the match is found
+    if (match == null)
+    {
+        Debug.LogError($"Match with ID {matchID} not found.");
+        return null;
+    }
+
+    // Check if the team exists in the match
+    if (!match.teams.ContainsKey(teamID))
+    {
+        Debug.LogError($"Team with ID {teamID} not found in match {matchID}.");
+        return null;
+    }
+
+    // Get the TeamRoundData for the team
+    TeamRoundData trd = GetTRDFromID(teamID, match.teams[teamID]);
+
+    // Return the TeamRoundData
+    return trd;
+}
     #endregion
     #region Adjudicator Functions
     public string GenerateAdjudicatorID(string adjName, string adjInstitute)

@@ -111,47 +111,69 @@ public class Breaks_EditPanel : MonoBehaviour
 
     private void UpdateOpenTeamList()
     {
+        // Clear existing children in the panel
         foreach (Transform child in openBreaksListPanelContent)
         {
             Destroy(child.gameObject);
         }
-
+    
+        // Remove all buttons from the selection list
         openBreaksListPanelButtonSelect.RemoveAllButtons();
-        var eligibleTems = AppConstants.instance.GetEligibleTeamsForBreaks(SpeakerTypes.Open);
-        Debug.Log("Available Teams: " + eligibleTems.Count);
-        foreach (Team team in AppConstants.instance.selectedTouranment.teamsInTourney)
+    
+        // Get eligible teams for breaks in the Open category
+        var eligibleTeams = AppConstants.instance.GetEligibleTeamsForBreaks(SpeakerTypes.Open);
+        Debug.Log("Available Teams: " + eligibleTeams.Count);
+    
+        // Filter teams that belong to the Open category
+        var openCategoryTeams = AppConstants.instance.selectedTouranment.teamsInTourney
+            .Where(team => team.teamCategory == SpeakerTypes.Open)
+            .ToList();
+    
+        // Display only the teams that belong to the Open category
+        foreach (Team team in openCategoryTeams)
         {
             GameObject teamObj = Instantiate(openBreaksListPanelPrefab, openBreaksListPanelContent);
             Team_EligibilityLE teamEligibilityLE = teamObj.GetComponent<Team_EligibilityLE>();
             teamEligibilityLE.Initialize(team);
             openBreaksListPanelButtonSelect.AddOption(teamObj.GetComponent<Button>(), teamEligibilityLE.MarkEligibility, teamEligibilityLE.UnMarkEligibility);
-        
-            if(eligibleTems.Any(x => x.teamId == team.teamId))
+    
+            if (eligibleTeams.Any(x => x.teamId == team.teamId))
             {
-                teamEligibilityLE.MarkEligibility();
+                openBreaksListPanelButtonSelect.SelectOption(teamObj.GetComponent<Button>());
             }
         }
     }
-    private void UpdateNoviceTeamList()
+      private void UpdateNoviceTeamList()
     {
+        // Clear existing children in the panel
         foreach (Transform child in noviceBreaksListPanelContent)
         {
             Destroy(child.gameObject);
         }
-
+    
+        // Remove all buttons from the selection list
         noviceBreaksListPanelButtonSelect.RemoveAllButtons();
-        var eligibleTems = AppConstants.instance.GetEligibleTeamsForBreaks(SpeakerTypes.Novice);
-        Debug.Log("Available Teams: " + eligibleTems.Count);
-        foreach (Team team in AppConstants.instance.selectedTouranment.teamsInTourney)
+    
+        // Get eligible teams for breaks in the Novice category
+        var eligibleTeams = AppConstants.instance.GetEligibleTeamsForBreaks(SpeakerTypes.Novice);
+        Debug.Log("Available Teams: " + eligibleTeams.Count);
+    
+        // Filter teams that belong to the Novice category
+        var noviceCategoryTeams = AppConstants.instance.selectedTouranment.teamsInTourney
+            .Where(team => team.teamCategory == SpeakerTypes.Novice)
+            .ToList();
+    
+        // Display only the teams that belong to the Novice category
+        foreach (Team team in noviceCategoryTeams)
         {
             GameObject teamObj = Instantiate(noviceBreaksListPanelPrefab, noviceBreaksListPanelContent);
             Team_EligibilityLE teamEligibilityLE = teamObj.GetComponent<Team_EligibilityLE>();
             teamEligibilityLE.Initialize(team);
             noviceBreaksListPanelButtonSelect.AddOption(teamObj.GetComponent<Button>(), teamEligibilityLE.MarkEligibility, teamEligibilityLE.UnMarkEligibility);
-
-            if(eligibleTems.Any(x => x.teamId == team.teamId))
+    
+            if (eligibleTeams.Any(x => x.teamId == team.teamId))
             {
-                teamEligibilityLE.MarkEligibility();
+               noviceBreaksListPanelButtonSelect.SelectOption(teamObj.GetComponent<Button>());
             }
         }
     }
@@ -159,38 +181,42 @@ public class Breaks_EditPanel : MonoBehaviour
     #region Eligibility Functions
     public void AddOpenTeamAsEligible(Team team)
     {
+        Debug.Log("<color=lightblue>Adding Open Team as Eligible</color>");
         if (!breaksPanel.Eligible_openTeams_TMP.Any(x => x.teamId == team.teamId))
         {
             team.isEligibleforBreak = true;
             breaksPanel.Eligible_openTeams_TMP.Add(team);
-            selectedOpenTeams.text = "/" + breaksPanel.Eligible_openTeams_TMP.Count.ToString();
+            selectedOpenTeams.text = breaksPanel.Eligible_openTeams_TMP.Count.ToString();
         }
     }
     public void RemoveOpenTeamAsEligible(Team team)
     {
+        Debug.Log("<color=lightblue>Removing Open Team as Eligible</color>");
         if (breaksPanel.Eligible_openTeams_TMP.Any(x => x.teamId == team.teamId))
         {
             team.isEligibleforBreak = false;
             breaksPanel.Eligible_openTeams_TMP.Remove(team);
-            selectedOpenTeams.text = "/" + breaksPanel.Eligible_openTeams_TMP.Count.ToString();
+            selectedOpenTeams.text = breaksPanel.Eligible_openTeams_TMP.Count.ToString();
         }
     }
     public void AddNoviceTeamAsEligible(Team team)
     {
+        Debug.Log("<color=lightblue>Adding Novice Team as Eligible</color>");
         if (!breaksPanel.Eligible_noviceTeams_TMP.Any(x => x.teamId == team.teamId))
         {
             team.isEligibleforBreak = true;
            breaksPanel. Eligible_noviceTeams_TMP.Add(team);
-            selectedNoviceTeams.text = "/" + breaksPanel.Eligible_noviceTeams_TMP.Count.ToString();
+            selectedNoviceTeams.text = breaksPanel.Eligible_noviceTeams_TMP.Count.ToString();
         }
     }
     public void RemoveNoviceTeamAsEligible(Team team)
     {
+        Debug.Log("<color=lightblue>Removing Novice Team as Eligible</color>");
         if (breaksPanel.Eligible_noviceTeams_TMP.Any(x => x.teamId == team.teamId))
         {
             team.isEligibleforBreak = false;
             breaksPanel.Eligible_noviceTeams_TMP.Remove(team);
-            selectedNoviceTeams.text = "/" + breaksPanel.Eligible_noviceTeams_TMP.Count.ToString();
+            selectedNoviceTeams.text = breaksPanel.Eligible_noviceTeams_TMP.Count.ToString();
         }
     }
     #endregion
