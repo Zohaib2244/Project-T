@@ -182,8 +182,6 @@ private void UpdateAdjudicatorList()
     }
 
 }
-
-
 private void UpdateBreakingTeamsList()
 {
     // Clear existing team entries
@@ -193,6 +191,7 @@ private void UpdateBreakingTeamsList()
     }
     teamAttendanceButtonSelect.RemoveAllButtons();
     // Get the list of available teams from selectedRound
+    Debug.Log("Available Breaking Teams Count: " + MainRoundsPanel.Instance.brokenTeamsList.Count);
     foreach (Team team in MainRoundsPanel.Instance.brokenTeamsList)
     {
         GameObject teamEntry = Instantiate(teamAtdPanelPrefab, teamAtdPanelContent);

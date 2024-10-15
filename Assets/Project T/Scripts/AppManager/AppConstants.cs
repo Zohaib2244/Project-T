@@ -422,6 +422,10 @@ public class AppConstants : MonoBehaviour
     {
         return selectedTouranment.teamsInTourney.Where(t => t.teamCategory == speakerType).ToList();
     }
+    public TeamRoundData GetTeamRoundData(string teamId, string teamrounddataid)
+    {
+        return GetTeamFromID(teamId).teamRoundDatas.Find(trd => trd.teamRoundDataID == teamrounddataid);
+    }
     public List<Team> GetTeamsFromIDs(List<string> teamIDs)
     {
         List<Team> teams = new List<Team>();

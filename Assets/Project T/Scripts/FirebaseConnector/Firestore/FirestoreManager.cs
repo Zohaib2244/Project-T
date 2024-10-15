@@ -63,7 +63,21 @@ namespace Scripts.FirebaseConfig
         }
         protected CollectionReference GetRoundCollectionReference(string roundType)
         {
-            return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection(roundType);
+            if (roundType == RoundCategory.PreLim.ToString())
+            {
+                Debug.Log("PreLim");
+                return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection("PreLim");
+            }
+            else if (roundType == RoundCategory.OpenBreak.ToString())
+            {
+                Debug.Log("OpenBreak");
+                return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection("OpenBreak");
+            }
+            else
+            {
+                Debug.Log("NoviceBreak");
+                return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection("NoviceBreak");
+            }
         }
         protected CollectionReference GetMatchCollectionReference(string roundType, string roundId)
         {
@@ -261,7 +275,8 @@ public async Task UpdateTournamentBreakingTeams(UnityAction onSuccess = null, Un
             {
                 { "noviceBreakingTeams", selectedTournament.noviceBreakingTeams },
                 { "openBreakingTeams", selectedTournament.openBreakingTeams },
-                 { "breakParameters", Convert.ToInt32(selectedTournament.breakParam) }
+                 { "breakParameters", Convert.ToInt32(selectedTournament.breakParam) },
+                {"isBreaksGenerated", selectedTournament.isBreaksGenerated}
             };
 
             // Get the document reference for the selected tournament

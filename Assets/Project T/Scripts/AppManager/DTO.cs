@@ -597,26 +597,17 @@ namespace Scripts.FirebaseConfig
                 Debug.LogError("rounds is null");
                 return null; // Return null or handle the error as appropriate
             }
-
-            if (rounds.availableTeamsIds == null)
+            List<Team> availableTeams = new List<Team>();
+            if (rounds.availableTeamsIds != null)
             {
-                Debug.LogError("rounds.availableTeamsIds is null");
-                return null; // Return null or handle the error as appropriate
-            }
-            Debug.Log($"Team in tournament COunt: {AppConstants.instance.selectedTouranment.teamsInTourney.Count}");
-
-            // Calculate availableTeams before the return statement
-            var availableTeams = AppConstants.instance.selectedTouranment?.teamsInTourney?
+                Debug.Log("rounds.availableTeamsIds is not null");
+                availableTeams = AppConstants.instance.selectedTouranment?.teamsInTourney?
                 .Where(team => rounds.availableTeamsIds.Contains(team.teamId))
                 .ToList() ?? new List<Team>();
 
-            // Debug log to check the result
-            Debug.Log($"Available teams count: {availableTeams.Count}");
-
-            // Debug log to check the result
-            Debug.Log($"Available teams count: {availableTeams.Count}");
-
-            return new Rounds
+                // return null; // Return null or handle the error as appropriate
+            }
+                return new Rounds
             {
                 roundId = rounds?.roundId,
                 roundType = rounds?.roundType ?? default,

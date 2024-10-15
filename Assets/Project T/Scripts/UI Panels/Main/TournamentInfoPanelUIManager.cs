@@ -358,10 +358,10 @@ namespace Scripts.UIPanels
             RoundTypes[] breakTypes = { RoundTypes.QF, RoundTypes.SF, RoundTypes.F };
 
             // Initialize novice breaks
-            AdjustRounds(tournamentConfiguration.noviceBreaksInTourney, noviceBreaks, breakTypes, "NoviceBreak");
+            AdjustRounds(tournamentConfiguration.noviceBreaksInTourney, noviceBreaks, breakTypes, "NoviceBreak", RoundCategory.NoviceBreak);
 
             // Initialize open breaks
-            AdjustRounds(tournamentConfiguration.openBreaksInTourney, openBreaks, breakTypes, "OpenBreak");
+            AdjustRounds(tournamentConfiguration.openBreaksInTourney, openBreaks, breakTypes, "OpenBreak", RoundCategory.OpenBreak);
         }
 
         private void AdjustRounds(List<Rounds> roundsList, int requiredCount, RoundTypes roundType, string roundIdPrefix)
@@ -379,6 +379,7 @@ namespace Scripts.UIPanels
                 {
                     roundId = $"R_{roundIdPrefix}{roundsList.Count + 1}",
                     roundType = roundType,
+                    roundCategory = RoundCategory.PreLim,
                     availableTeams = new List<Team>(),
                     availableAdjudicators = new List<Adjudicator>(),
                     roundState = RoundStates.NotStarted,
@@ -388,7 +389,7 @@ namespace Scripts.UIPanels
             }
         }
 
-        private void AdjustRounds(List<Rounds> roundsList, int requiredCount, RoundTypes[] breakTypes, string roundIdPrefix)
+        private void AdjustRounds(List<Rounds> roundsList, int requiredCount, RoundTypes[] breakTypes, string roundIdPrefix, RoundCategory roundCategory)
         {
             // Remove excess rounds if the list is longer than required
             while (roundsList.Count > requiredCount)
@@ -420,6 +421,7 @@ namespace Scripts.UIPanels
                     availableTeams = new List<Team>(),
                     availableAdjudicators = new List<Adjudicator>(),
                     roundState = RoundStates.NotStarted,
+                    roundCategory = roundCategory,
                     swings = new List<TeamRoundData>(),
                     matches = new List<Match>()
                 });
