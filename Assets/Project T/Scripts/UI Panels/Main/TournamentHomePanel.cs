@@ -42,6 +42,7 @@ namespace Scripts.UIPanels
             // await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
             // tournamentSelection.onSelectOption1 = ShowTournament1Info;
             // tournamentSelection.onSelectOption2 = ShowTournament2Info;
+            CheckBreaksPanel();
             Loading.Instance.HideLoadingScreen();
         }
 

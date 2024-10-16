@@ -4,6 +4,7 @@ using Scripts.UIPanels;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using Scripts.Resources;
 using Scripts.FirebaseConfig;
 public class Rounds_AttendancePanel : MonoBehaviour
 {
@@ -92,7 +93,12 @@ public void OpenTeamAttendancePanel()
     // Set the team panel active and animate it upwards
     teamAtdPanel.gameObject.SetActive(true);
     teamAtdPanel.transform.localPosition = new Vector3(0, -Screen.height, 0); // Start below the screen
-    teamAtdPanel.transform.DOLocalMoveY(teamPanelInVector, 0.5f).OnComplete(() =>UpdateTeamList());
+    teamAtdPanel.transform.DOLocalMoveY(teamPanelInVector, 0.5f).OnComplete(() =>{
+        if (MainRoundsPanel.Instance.selectedRound.roundCategory != RoundCategory.PreLim)
+            UpdateBreakingTeamsList();
+        else
+            UpdateTeamList();
+    });
     // Update the team list
     
 }
@@ -176,7 +182,30 @@ private void UpdateAdjudicatorList()
     }
 
 }
-
+private void UpdateBreakingTeamsList()
+{
+    // Clear existing team entries
+    foreach (Transform child in teamAtdPanelContent)
+    {
+        Destroy(child.gameObject);
+    }
+    teamAttendanceButtonSelect.RemoveAllButtons();
+    // Get the list of available teams from selectedRound
+    Debug.Log("Available Breaking Teams Count: " + MainRoundsPanel.Instance.brokenTeamsList.Count);
+    foreach (Team team in MainRoundsPanel.Instance.brokenTeamsList)
+    {
+        GameObject teamEntry = Instantiate(teamAtdPanelPrefab, teamAtdPanelContent);
+        TeamListEntry_Attendance teamListEntry = teamEntry.GetComponent<TeamListEntry_Attendance>();
+        teamListEntry.Initialize(team);
+        teamAttendanceButtonSelect.AddOption(teamEntry.GetComponent<Button>(), teamListEntry.MarkAttendance, teamListEntry.UnMarkAttendance);
+        
+        // Check if the team exists in availableTeams and mark attendance if it does
+        if (MainRoundsPanel.Instance.selectedRound.availableTeams.Any(t => t.teamId == team.teamId))
+        {
+            teamAttendanceButtonSelect.SelectOption(teamEntry.GetComponent<Button>());
+        }
+    }
+}
 
 #endregion
 

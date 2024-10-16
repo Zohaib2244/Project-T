@@ -257,7 +257,14 @@ public class DragDropManager : MonoBehaviour {
 
 		DDM.SetupDefaultPanel(DDM.AllObjects.Count - 1, 'd');
 	}
-
+	public static void AddPanel (PanelSettings pnl)
+	{
+		DDM.AllPanels.Add(pnl);
+	}
+	public static void RemovePanel(PanelSettings pnl)
+	{
+		DDM.AllPanels.Remove(pnl);
+	}
 	public static void RemoveObject(ObjectSettings obj)
 	{
 		DDM.AllObjects.Remove (obj);
@@ -299,6 +306,7 @@ public class DragDropManager : MonoBehaviour {
 		StartCoroutine(SmoothMove(state, Target, TargetPos, Speed));
     }
 
+	
 	bool Approximately (float valueA, float valueB)
 	{
 		return Mathf.Abs (valueA - valueB) < 0.04f;
@@ -335,6 +343,7 @@ public class DragDropManager : MonoBehaviour {
 		}
 	}
 
+	
 	// Event Starter
 	public void CallEvent (UnityEvent _event)
     {

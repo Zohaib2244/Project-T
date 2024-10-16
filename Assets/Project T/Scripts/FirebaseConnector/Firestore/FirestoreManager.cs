@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using Scripts.Resources;
+using Unity.VisualScripting;
 
 namespace Scripts.FirebaseConfig
 {
@@ -62,7 +63,21 @@ namespace Scripts.FirebaseConfig
         }
         protected CollectionReference GetRoundCollectionReference(string roundType)
         {
-            return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection(roundType);
+            if (roundType == RoundCategory.PreLim.ToString())
+            {
+                Debug.Log("PreLim");
+                return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection("PreLim");
+            }
+            else if (roundType == RoundCategory.OpenBreak.ToString())
+            {
+                Debug.Log("OpenBreak");
+                return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection("OpenBreak");
+            }
+            else
+            {
+                Debug.Log("NoviceBreak");
+                return GetTournamentDocumentReference(AppConstants.instance.selectedTouranment.tournamentId).Collection("NoviceBreak");
+            }
         }
         protected CollectionReference GetMatchCollectionReference(string roundType, string roundId)
         {
@@ -240,6 +255,52 @@ namespace Scripts.FirebaseConfig
             onFailure?.Invoke();
         }
     }
+public async Task UpdateTournamentBreakingTeams(UnityAction onSuccess = null, UnityAction onFailure = null)
+{
+    if (FirebaseConnector.Instance.isFirebaseReady)
+    {
+        try
+        {
+            // Get the reference to the selected tournament
+            var selectedTournament = AppConstants.instance.selectedTouranment;
+            if (selectedTournament == null)
+            {
+                Debug.LogError("Selected tournament is null.");
+                onFailure?.Invoke();
+                return;
+            }
+
+            // Create a dictionary to hold the updated fields
+            var updates = new Dictionary<string, object>
+            {
+                { "noviceBreakingTeams", selectedTournament.noviceBreakingTeams },
+                { "openBreakingTeams", selectedTournament.openBreakingTeams },
+                 { "breakParameters", Convert.ToInt32(selectedTournament.breakParam) },
+                {"isBreaksGenerated", selectedTournament.isBreaksGenerated}
+            };
+
+            // Get the document reference for the selected tournament
+            var tournamentDocRef = GetTournamentDocumentReference(selectedTournament.tournamentId);
+
+            // Update the tournament document in Firestore
+            await tournamentDocRef.UpdateAsync(updates);
+
+            Debug.Log("Tournament breaking teams updated successfully.");
+            onSuccess?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("UpdateTournamentBreakingTeams encountered an error: " + ex);
+            onFailure?.Invoke();
+        }
+    }
+    else
+    {
+        Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+        onFailure?.Invoke();
+    }
+}
+
         #endregion
 
         #region Institution Functions
@@ -402,7 +463,7 @@ namespace Scripts.FirebaseConfig
                 onFailure?.Invoke();
             }
         }
-        public async Task GetAllTeamsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
+                  public async Task GetAllTeamsFromFirestore(UnityAction onSuccess = null, UnityAction onFailure = null)
             {
                 if (FirebaseConnector.Instance.isFirebaseReady)
                 {
@@ -410,22 +471,24 @@ namespace Scripts.FirebaseConfig
                     {
                         QuerySnapshot teamSnapshot = await GetTeamCollectionReference().GetSnapshotAsync();
                         Debug.Log($"<color=blue>Retrieved {teamSnapshot.Count} team documents from Firestore.</color>");
-            
+                        
                         // Clear existing teams
                         AppConstants.instance.selectedTouranment.teamsInTourney.Clear();
-            
+                        
                         // Create a list of tasks to process each team document in parallel
                         var tasks = new List<Task>();
-            
+                        var processedTeamIds = new HashSet<string>();
+                        
                         foreach (var teamDoc in teamSnapshot.Documents)
                         {
                             tasks.Add(Task.Run(async () =>
                             {
                                 try
                                 {
+                                    Debug.Log($"Processing team document {teamDoc.Id}");
                                     Team_DTO team_dto = teamDoc.ConvertTo<Team_DTO>();
                                     Team team = DTOConverter.Instance.DTOToTeam(team_dto);
-            
+                    
                                     // Fetch speakers for the team
                                     QuerySnapshot speakersSnapshot = await GetSpeakerCollectionReference(team_dto.teamId).GetSnapshotAsync();
                                     foreach (var speakerDoc in speakersSnapshot.Documents)
@@ -434,7 +497,7 @@ namespace Scripts.FirebaseConfig
                                         Speaker speaker = DTOConverter.Instance.DTOToSpeaker(speaker_dto);
                                         team.speakers.Add(speaker);
                                     }
-            
+                    
                                     // Fetch team round data for the team
                                     QuerySnapshot teamRoundDataSnapshot = await GetTeamRoundDataCollectionReference(team_dto.teamId).GetSnapshotAsync();
                                     Debug.Log($"<color=blue>Retrieved {teamRoundDataSnapshot.Count} team round data documents for team ID {team_dto.teamId} from Firestore.</color>");
@@ -445,13 +508,25 @@ namespace Scripts.FirebaseConfig
                                             Debug.Log($"<color=lightblue> SRD in DTO : + " + teamRoundDataDTO.speakersInRound.Count + "</color>");
                                         else
                                             Debug.Log($"<color=lightblue> SRD in DTO : + " + "NULL" + "</color>");
-
+                
                                         TeamRoundData teamRoundData = DTOConverter.Instance.DTOToTeamRoundData(teamRoundDataDTO);
                                         team.teamRoundDatas.Add(teamRoundData);
                                         Debug.Log($"<color=green>Added TeamRoundData object with ID {teamRoundDataDTO.teamRoundDataID} to team with ID {team_dto.teamId}.</color>");
                                     }
-
-                                    AppConstants.instance.selectedTouranment.teamsInTourney.Add(team);
+                
+                                    lock (processedTeamIds)
+                                    {
+                                        if (!processedTeamIds.Contains(team_dto.teamId))
+                                        {
+                                            AppConstants.instance.selectedTouranment.teamsInTourney.Add(team);
+                                            processedTeamIds.Add(team_dto.teamId);
+                                            Debug.Log($"<color=green>Added team with ID {team_dto.teamId} to teamsInTourney.</color>");
+                                        }
+                                        else
+                                        {
+                                            Debug.LogWarning($"<color=yellow>Duplicate team ID detected: {team_dto.teamId}. Skipping addition.</color>");
+                                        }
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
@@ -459,11 +534,11 @@ namespace Scripts.FirebaseConfig
                                 }
                             }));
                         }
-            
+                        
                         // Wait for all tasks to complete
                         await Task.WhenAll(tasks);
-            
-                        Debug.Log("<color=green>Teams updated successfully.</color>");
+                        
+                        Debug.Log($"<color=green>Teams updated successfully. Total teams added: {AppConstants.instance.selectedTouranment.teamsInTourney.Count}</color>");
                         onSuccess?.Invoke();
                     }
                     catch (Exception ex)
@@ -477,8 +552,7 @@ namespace Scripts.FirebaseConfig
                     Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
                     onFailure?.Invoke();
                 }
-            }
-        public async void UpdateTeamInFireStore(Team team, UnityAction onSuccess = null, UnityAction onFailure = null)
+            }        public async void UpdateTeamInFireStore(Team team, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             if (FirebaseConnector.Instance.isFirebaseReady)
             {
@@ -823,88 +897,78 @@ namespace Scripts.FirebaseConfig
             //     onFailure?.Invoke();
             // }
         }
-        public async Task<List<Rounds>> GetAllRoundsFromFirestore(string roundType)
+           public async Task<List<Rounds>> GetAllRoundsFromFirestore(string roundType)
+        {
+            List<Rounds> roundsList = new List<Rounds>();
+        
+            if (FirebaseConnector.Instance.isFirebaseReady)
+            {
+                try
                 {
-                    List<Rounds> roundsList = new List<Rounds>();
-                
-                    if (FirebaseConnector.Instance.isFirebaseReady)
+                    QuerySnapshot snapshot = await GetRoundCollectionReference(roundType).GetSnapshotAsync();
+                    Debug.Log($"<color=blue>Retrieved {snapshot.Count} round documents from Firestore.</color>");
+        
+                    foreach (var document in snapshot.Documents)
                     {
                         try
                         {
-                            QuerySnapshot snapshot = await GetRoundCollectionReference(roundType).GetSnapshotAsync();
-                            Debug.Log($"<color=blue>Retrieved {snapshot.Count} round documents from Firestore.</color>");
-                
-                            // Create a list of tasks to process each round document in parallel
-                            var tasks = new List<Task<Rounds>>();
-                
-                            foreach (var document in snapshot.Documents)
+                            Rounds_DTO round_dto = document.ConvertTo<Rounds_DTO>();
+                            Debug.Log($"<color=blue>Round ID {round_dto.roundId} retrieved from Firestore. TeamAvailable: {round_dto.availableTeamsIds}</color>");
+                            Rounds round = DTOConverter.Instance.DTOToRounds(round_dto);
+        
+                            // Log the available teams in the round DTO
+                            if (round_dto.availableTeamsIds != null)
                             {
-                                tasks.Add(Task.Run(async () =>
-                                {
-                                    try
-                                    {
-                                        Rounds_DTO round_dto = document.ConvertTo<Rounds_DTO>();
-                                        Rounds round = DTOConverter.Instance.DTOToRounds(round_dto);
-                
-                                        // Log the available teams in the round DTO
-                                        if (round_dto.availableTeamsIds != null)
-                                        {
-                                            Debug.Log($"<color=red>Round ID {round_dto.roundId} has {round_dto.availableTeamsIds.Count} available teams.</color>");
-                                        }
-                                        else
-                                        {
-                                            Debug.LogWarning($"<color=red>Round ID {round_dto.roundId} has no available teams.</color>");
-                                        }
-                
-                                        // Retrieve matches for the round sequentially
-                                        QuerySnapshot matchesSnapshot = await GetMatchCollectionReference(roundType, round_dto.roundId).GetSnapshotAsync();
-                                        foreach (var matchDoc in matchesSnapshot.Documents)
-                                        {
-                                            try
-                                            {
-                                                Match_DTO match_dto = matchDoc.ConvertTo<Match_DTO>();
-                                                Match match = DTOConverter.Instance.DTOToMatch(match_dto);
-                                                round.matches.Add(match);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Debug.LogError($"Error processing match document {matchDoc.Id}: {ex}");
-                                            }
-                                        }
-                
-                                        // Log the number of available teams in the round object
-                                        Debug.Log($"<color=blue>Round ID {round.roundId} has {round.availableTeams.Count} available teams after conversion.</color>");
-                                        return round;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Debug.LogError($"Error processing round document {document.Id}: {ex}");
-                                        return null;
-                                    }
-                                }));
+                                Debug.Log($"<color=red>Round ID {round_dto.roundId} has {round_dto.availableTeamsIds.Count} available teams.</color>");
                             }
-                
-                            // Wait for all tasks to complete and add the results to the roundsList
-                            var results = await Task.WhenAll(tasks);
-                            roundsList.AddRange(results.Where(r => r != null));
-                
-                            // Sort the roundsList based on the last digit of roundId
-                            roundsList = roundsList.OrderBy(r => int.Parse(r.roundId.Last().ToString())).ToList();
-                
-                            Debug.Log("<color=green>Rounds updated successfully.</color>");
+                            else
+                            {
+                                Debug.LogWarning($"<color=red>Round ID {round_dto.roundId} has no available teams.</color>");
+                            }
+        
+                            // Retrieve matches for the round sequentially
+                            QuerySnapshot matchesSnapshot = await GetMatchCollectionReference(roundType, round_dto.roundId).GetSnapshotAsync();
+                            foreach (var matchDoc in matchesSnapshot.Documents)
+                            {
+                                try
+                                {
+                                    Match_DTO match_dto = matchDoc.ConvertTo<Match_DTO>();
+                                    Match match = DTOConverter.Instance.DTOToMatch(match_dto);
+                                    round.matches.Add(match);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.LogError($"Error processing match document {matchDoc.Id}: {ex}");
+                                }
+                            }
+        
+                            // Log the number of available teams in the round object
+                            Debug.Log($"<color=blue>Round ID {round.roundId} has {round.availableTeams.Count} available teams after conversion.</color>");
+                            roundsList.Add(round);
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogError("GetAllRoundsFromFirestore encountered an error: " + ex);
+                            Debug.LogError($"Error processing round document {document.Id}: {ex}");
                         }
                     }
-                    else
-                    {
-                        Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
-                    }
-                
-                    return roundsList;
+        
+                    // Sort the roundsList based on the last digit of roundId
+                    roundsList = roundsList.OrderBy(r => int.Parse(r.roundId.Last().ToString())).ToList();
+        
+                    Debug.Log("<color=green>Rounds updated successfully.</color>");
                 }
+                catch (Exception ex)
+                {
+                    Debug.LogError("GetAllRoundsFromFirestore encountered an error: " + ex);
+                }
+            }
+            else
+            {
+                Debug.LogError("Firebase is not ready. Please wait for Firebase to initialize.");
+            }
+        
+            return roundsList;
+        }
         public async Task UpdateRoundAsync(string roundType, Rounds round, UnityAction onSuccess = null, UnityAction onFailure = null)
         {
             try
@@ -1259,10 +1323,10 @@ namespace Scripts.FirebaseConfig
                 foreach (var round in prelimRounds)
                 {
                 // Update the state of each round
-                DocumentReference roundRef = GetRoundDocumentReference("prelims", round.roundId);
+                DocumentReference roundRef = GetRoundDocumentReference(RoundCategory.PreLim.ToString(), round.roundId);
                 await roundRef.UpdateAsync(new Dictionary<string, object>
                 {
-                    { "state", round.roundState }
+                    { "roundState", round.roundState }
                 });
 
                 Debug.Log($"<color=green>Round {round.roundId} state updated successfully.</color>");
@@ -1296,10 +1360,10 @@ namespace Scripts.FirebaseConfig
                 foreach (var round in noviceBreakRounds)
                 {
                 // Update the state of each round
-                DocumentReference roundRef = GetRoundDocumentReference("noviceBreaks", round.roundId);
+                DocumentReference roundRef = GetRoundDocumentReference(RoundCategory.NoviceBreak.ToString(), round.roundId);
                 await roundRef.UpdateAsync(new Dictionary<string, object>
                 {
-                    { "state", round.roundState }
+                    { "roundState", round.roundState }
                 });
 
                 Debug.Log($"<color=green>Round {round.roundId} state updated successfully.</color>");
@@ -1333,10 +1397,10 @@ namespace Scripts.FirebaseConfig
                 foreach (var round in openBreakRounds)
                 {
                 // Update the state of each round
-                DocumentReference roundRef = GetRoundDocumentReference("openBreaks", round.roundId);
+                DocumentReference roundRef = GetRoundDocumentReference(RoundCategory.OpenBreak.ToString(), round.roundId);
                 await roundRef.UpdateAsync(new Dictionary<string, object>
                 {
-                    { "state", round.roundState }
+                    { "roundState", round.roundState }
                 });
 
                 Debug.Log($"<color=green>Round {round.roundId} state updated successfully.</color>");
@@ -1356,7 +1420,7 @@ namespace Scripts.FirebaseConfig
             onFailure?.Invoke();
             }
         }
-      
+
         private async Task GetTeamRoundData(string teamId, string trdId)
             {
                 try

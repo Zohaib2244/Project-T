@@ -34,6 +34,11 @@ public class DrawGeneration : MonoBehaviour
 
     void OnEnable()
     {
+        Debug.Log("Draw Generation Panel Enabled");
+        if(MainRoundsPanel.Instance.selectedRound.availableTeams != null)
+        Debug.Log("Available Teams: " + MainRoundsPanel.Instance.selectedRound.availableTeams.Count);
+        else
+            Debug.Log("Available Teams: NULL");
         tournamentType = AppConstants.instance.selectedTouranment.tournamentType;
         teams_TMP = MainRoundsPanel.Instance.selectedRound.availableTeams;
         adjudicators_TMP = MainRoundsPanel.Instance.selectedRound.availableAdjudicators;
