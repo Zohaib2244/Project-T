@@ -62,7 +62,7 @@ public class TournamentInfo
     public List<Rounds> noviceBreaksInTourney { get; set; }
     public List<Rounds> openBreaksInTourney { get; set; }
     public BreakParameters breakParam { get; set; }
-    public bool isBreaksGenerated { get; set;}
+    public bool isBreaksGenerated { get; set; }
 
     public TournamentInfo()
     {
@@ -180,13 +180,13 @@ public class Rounds : TournamentInfo
     public RoundStates roundState;
     public List<TeamRoundData> swings;
     public List<Match> matches;
-        public bool motionAdded = false;
-        public bool teamAttendanceAdded = false;
-        public bool AdjudicatorAttendanceAdded = false;
-        public bool drawGenerated = false;
-        public bool ballotsAdded = false;
-        public bool isSilent = false;
-        public bool isPublic = false;
+    public bool motionAdded = false;
+    public bool teamAttendanceAdded = false;
+    public bool AdjudicatorAttendanceAdded = false;
+    public bool drawGenerated = false;
+    public bool ballotsAdded = false;
+    public bool isSilent = false;
+    public bool isPublic = false;
 
     // FOR DRAWS : be like the number of matches ibn this round, based upon the draw and the data in matches will be set by the generate draw function
     public Rounds()
@@ -428,10 +428,10 @@ public class AppConstants : MonoBehaviour
         foreach (Team team in selectedTouranment.teamsInTourney)
         {
             int totalPoints = 0;
-    
+
             foreach (var trd in team.teamRoundDatas)
             {
-                if(trd.roundType == RoundCategory.PreLim)
+                if (trd.roundType == RoundCategory.PreLim)
                 {
                     switch (trd.teamMatchRanking)
                     {
@@ -453,7 +453,7 @@ public class AppConstants : MonoBehaviour
                     }
                 }
             }
-    
+
             team.teamPoints = totalPoints;
         }
     }
@@ -462,7 +462,7 @@ public class AppConstants : MonoBehaviour
         foreach (Team team in selectedTouranment.teamsInTourney)
         {
             float totalScore = 0;
-    
+
             foreach (var roundData in team.teamRoundDatas)
             {
                 if (roundData.roundType == RoundCategory.PreLim)
@@ -473,7 +473,7 @@ public class AppConstants : MonoBehaviour
                     }
                 }
             }
-    
+
             team.totalTeamScore = totalScore;
         }
     }
@@ -563,34 +563,34 @@ public class AppConstants : MonoBehaviour
         Debug.Log("Open Breaks in Tournament: " + selectedTouranment.openBreaksInTourney.Count);
     }
     public void PrintRankings()
-{
-    List<Rounds> allRounds = new List<Rounds>();
-    allRounds.AddRange(selectedTouranment.preLimsInTourney);
-    allRounds.AddRange(selectedTouranment.noviceBreaksInTourney);
-    allRounds.AddRange(selectedTouranment.openBreaksInTourney);
-
-    foreach (Rounds round in allRounds)
     {
-        Debug.Log($"Round ID: {round.roundId}, Round Type: {round.roundType}");
+        List<Rounds> allRounds = new List<Rounds>();
+        allRounds.AddRange(selectedTouranment.preLimsInTourney);
+        allRounds.AddRange(selectedTouranment.noviceBreaksInTourney);
+        allRounds.AddRange(selectedTouranment.openBreaksInTourney);
 
-        var teamRankings = round.availableTeams
-            .Select(team => new
-            {
-                Team = team,
-                TotalSpeakerPoints = team.teamRoundDatas.Sum(trd => trd.speakersInRound.Sum(srd => srd.speakerScore)),
-                TeamPoints = team.teamRoundDatas.Sum(trd => trd.teamScore)
-            })
-            .OrderByDescending(tr => tr.TeamPoints)
-            .ThenByDescending(tr => tr.TotalSpeakerPoints)
-            .ToList();
-
-        for (int i = 0; i < teamRankings.Count; i++)
+        foreach (Rounds round in allRounds)
         {
-            var ranking = teamRankings[i];
-            Debug.Log($"Rank: {i + 1}, Team Name: {ranking.Team.teamName}, Institution: {ranking.Team.instituition}, Total Speaker Points: {ranking.TotalSpeakerPoints}, Team Points: {ranking.TeamPoints}");
+            Debug.Log($"Round ID: {round.roundId}, Round Type: {round.roundType}");
+
+            var teamRankings = round.availableTeams
+                .Select(team => new
+                {
+                    Team = team,
+                    TotalSpeakerPoints = team.teamRoundDatas.Sum(trd => trd.speakersInRound.Sum(srd => srd.speakerScore)),
+                    TeamPoints = team.teamRoundDatas.Sum(trd => trd.teamScore)
+                })
+                .OrderByDescending(tr => tr.TeamPoints)
+                .ThenByDescending(tr => tr.TotalSpeakerPoints)
+                .ToList();
+
+            for (int i = 0; i < teamRankings.Count; i++)
+            {
+                var ranking = teamRankings[i];
+                Debug.Log($"Rank: {i + 1}, Team Name: {ranking.Team.teamName}, Institution: {ranking.Team.instituition}, Total Speaker Points: {ranking.TotalSpeakerPoints}, Team Points: {ranking.TeamPoints}");
+            }
         }
     }
-}
     public string GenerateMatchID(string roundID, int matchCount)
     {
         string selectedTournamentID = selectedTouranment.tournamentId.ToString();
@@ -628,10 +628,216 @@ public class AppConstants : MonoBehaviour
             myTeam.teamRoundDatas.Add(trd);
         }
     }
-    
+
     #endregion
-   
-   
-   
+
+    #region Ranking Functions
+
+    public class AdjudicatorInfo
+    {
+        public string Name { get; set; }
+        public string Institution { get; set; }
+        public AdjudicatorTypes Type { get; set; }
+    }
+
+    public class SpeakerInfo
+    {
+        public string Name { get; set; }
+        public SpeakerTypes Category { get; set; }
+        public string Team { get; set; }
+        public string Institution { get; set; }
+    }
+
+    public class SpeakerRanking
+    {
+        public int Ranking { get; set; }
+        public string SpeakerName { get; set; }
+        public string TeamName { get; set; }
+        public List<float> RoundScores { get; set; }
+        public List<string> RoundPositions { get; set; } // New property
+        public float TotalScore { get; set; }
+    }
+
+    public class TeamRanking
+    {
+        public int Ranking { get; set; }
+        public string TeamName { get; set; }
+        public string Institution { get; set; }
+        public List<string> Positions { get; set; }
+        public int Points { get; set; }
+        public float Scores { get; set; }
+    }
+
+    public List<AdjudicatorInfo> GetAllAdjudicatorsInfo()
+    {
+        List<AdjudicatorInfo> adjudicatorsInfo = new List<AdjudicatorInfo>();
+
+        if (selectedTouranment != null && selectedTouranment.adjudicatorsInTourney != null)
+        {
+            foreach (var adjudicator in selectedTouranment.adjudicatorsInTourney)
+            {
+                var institutionAbbreviation = GetInstituitionsFromID(adjudicator.instituitionID)?.instituitionAbreviation ?? "Unknown";
+                adjudicatorsInfo.Add(new AdjudicatorInfo
+                {
+                    Name = adjudicator.adjudicatorName,
+                    Institution = institutionAbbreviation,
+                    Type = adjudicator.adjudicatorType
+                });
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No adjudicators found in the selected tournament");
+        }
+
+        return adjudicatorsInfo;
+    }
+
+    public List<SpeakerInfo> GetAllSpeakersInfo()
+    {
+        List<SpeakerInfo> speakersInfo = new List<SpeakerInfo>();
+
+        if (selectedTouranment != null && selectedTouranment.teamsInTourney != null)
+        {
+            foreach (var team in selectedTouranment.teamsInTourney)
+            {
+                var institutionAbbreviation = GetInstituitionsFromID(team.instituition)?.instituitionAbreviation ?? "Unknown";
+
+                foreach (var speaker in team.speakers)
+                {
+                    speakersInfo.Add(new SpeakerInfo
+                    {
+                        Name = speaker.speakerName,
+                        Category = speaker.teamCategory,
+                        Team = team.teamName,
+                        Institution = institutionAbbreviation
+                    });
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No teams found in the selected tournament");
+        }
+
+        return speakersInfo;
+    }
+
+    public List<SpeakerRanking> GetSpeakerRankings(SpeakerTypes type)
+    {
+        if (selectedTouranment != null && selectedTouranment.teamsInTourney != null)
+        {
+            var speakerData = new Dictionary<string, (List<float> Scores, List<string> Positions)>();
+
+            // Collect scores and positions from rounds
+            foreach (var round in selectedTouranment.preLimsInTourney)
+            {
+                foreach (var teamRoundData in round.availableTeams.SelectMany(team => team.teamRoundDatas))
+                {
+                    foreach (var speakerRoundData in teamRoundData.speakersInRound)
+                    {
+                        if (!speakerData.ContainsKey(speakerRoundData.speakerId))
+                        {
+                            speakerData[speakerRoundData.speakerId] = (new List<float>(), new List<string>());
+                        }
+                        speakerData[speakerRoundData.speakerId].Scores.Add(speakerRoundData.speakerScore);
+                        speakerData[speakerRoundData.speakerId].Positions.Add(teamRoundData.teamPositionBritish.ToString());
+                    }
+                }
+            }
+
+            // Calculate total scores and create ranking entries
+            var rankings = new List<SpeakerRanking>();
+            foreach (var team in selectedTouranment.teamsInTourney)
+            {
+                if (team.teamCategory == type)
+                {
+                    foreach (var speaker in team.speakers)
+                    {
+                        if (speakerData.ContainsKey(speaker.speakerId))
+                        {
+                            var roundScores = speakerData[speaker.speakerId].Scores;
+                            var totalScore = roundScores.Sum();
+                            rankings.Add(new SpeakerRanking
+                            {
+                                SpeakerName = speaker.speakerName,
+                                TeamName = team.teamName,
+                                RoundScores = roundScores,
+                                RoundPositions = speakerData[speaker.speakerId].Positions,
+                                TotalScore = totalScore
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Sort rankings by total score
+            rankings = rankings.OrderByDescending(r => r.TotalScore).ToList();
+
+            // Assign rankings
+            for (int i = 0; i < rankings.Count; i++)
+            {
+                rankings[i].Ranking = i + 1;
+            }
+
+            return rankings;
+        }
+        else
+        {
+            return new List<SpeakerRanking>();
+        }
+    }
+
+    public List<TeamRanking> GetTeamRankings(SpeakerTypes type)
+    {
+        if (selectedTouranment != null && selectedTouranment.teamsInTourney != null)
+        {
+            var teamData = new List<TeamRanking>();
+
+            // Collect scores and positions from rounds
+            foreach (var team in selectedTouranment.teamsInTourney)
+            {
+                if (team.teamCategory == type)
+                {
+                    var positions = new List<string>();
+
+                    foreach (var teamRoundData in team.teamRoundDatas)
+                    {
+                        positions.Add(teamRoundData.teamPositionBritish.ToString());
+                    }
+
+                    teamData.Add(new TeamRanking
+                    {
+                        TeamName = team.teamName,
+                        Institution = GetInstituitionsFromID(team.instituition)?.instituitionAbreviation ?? "Unknown",
+                        Positions = positions,
+                        Points = team.teamPoints,
+                        Scores = team.totalTeamScore
+                    });
+                }
+            }
+
+            // Sort rankings by total points and then by total score
+            teamData = teamData.OrderByDescending(tr => tr.Points)
+                               .ThenByDescending(tr => tr.Scores)
+                               .ToList();
+
+            // Assign rankings
+            for (int i = 0; i < teamData.Count; i++)
+            {
+                teamData[i].Ranking = i + 1;
+            }
+
+            return teamData;
+        }
+        else
+        {
+            return new List<TeamRanking>();
+        }
+    }
+
+
+    #endregion
+
     #endregion
 }

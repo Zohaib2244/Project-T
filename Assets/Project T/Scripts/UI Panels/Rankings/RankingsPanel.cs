@@ -20,7 +20,7 @@ public class RankingsPanel : MonoBehaviour
     public Button speakersSelectButton;
 
     // Start is called before the first frame update
-    async void Start()
+    void Start()
     {
         // Set Teams Panel as the default
         teamsPanel.SetActive(true);
@@ -31,14 +31,6 @@ public class RankingsPanel : MonoBehaviour
         teamsButton.onClick.AddListener(ShowTeamsPanel);
         speakersButton.onClick.AddListener(ShowSpeakersPanel);
         participantsButton.onClick.AddListener(ShowBreaksPanel);
-
-        Debug.Log("Testing logging the rankings data");
-        await AppConstants.instance.GetAllRounds();
-        // List<AppConstants.TeamRanking> testList = AppConstants.instance.GetNoviceTeamRankings();
-        // foreach (AppConstants.TeamRanking team in testList)
-        // {
-        //     Debug.Log(team);
-        // }
     }
 
     // Methods to show the respective panels and hide the others

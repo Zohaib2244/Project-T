@@ -22,7 +22,7 @@ public class SpeakersPanelEntry : MonoBehaviour
     public TMP_Text teamText;
     public TMP_Text instituteText;
 
-    public void SetAdjudicatorData(string name, string type, string team, string institute)
+    public void SetSpeakersData(string name, string type, string team, string institute)
     {
         if (nameText != null)
             nameText.text = name;

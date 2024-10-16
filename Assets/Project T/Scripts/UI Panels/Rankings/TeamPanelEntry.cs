@@ -2,9 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class TeamPanelEntry : MonoBehaviour
 {
+    public TMP_Text rankingText;
+    public TMP_Text teamNameText;
+    public TMP_Text institutionText;
+    public TMP_Text teamPointsText;
+    public TMP_Text teamScoresText;
+    public GridLayoutGroup positionsGridLayout;
+    public TMP_Text positionTextPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,17 +26,7 @@ public class TeamPanelEntry : MonoBehaviour
         
     }
 
-    public TMP_Text rankingText;
-    public TMP_Text teamNameText;
-    public TMP_Text institutionText;
-    public TMP_Text round1PositionText;
-    public TMP_Text round2PositionText;
-    public TMP_Text round3PositionText;
-    public TMP_Text round4PositionText;
-    public TMP_Text teamPointsText;
-    public TMP_Text teamScoresText;
-
-    public void SetRankingData(int ranking, string teamName, string institution, int totalSpeakerPoints, int round1Position, int round2Position, int round3Position, int round4Position, int teamPoints, string teamScores)
+    public void SetRankingData(int ranking, string teamName, string institution, List<string> positions, int teamPoints, float teamScores)
     {
         if (rankingText != null)
             rankingText.text = ranking.ToString();
@@ -38,22 +37,23 @@ public class TeamPanelEntry : MonoBehaviour
         if (institutionText != null)
             institutionText.text = institution;
 
-        if (round1PositionText != null)
-            round1PositionText.text = round1Position.ToString();
-
-        if (round2PositionText != null)
-            round2PositionText.text = round2Position.ToString();
-
-        if (round3PositionText != null)
-            round3PositionText.text = round3Position.ToString();
-
-        if (round4PositionText != null)
-            round4PositionText.text = round4Position.ToString();
-
         if (teamPointsText != null)
             teamPointsText.text = teamPoints.ToString("F2"); // Format as needed
 
         if (teamScoresText != null)
-            teamScoresText.text = teamScores;
+            teamScoresText.text = teamScores.ToString("F2"); // Format as needed
+
+        // Clear existing children in the GridLayoutGroup
+        foreach (Transform child in positionsGridLayout.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Populate the GridLayoutGroup with positions
+        foreach (string position in positions)
+        {
+            TMP_Text positionTextInstance = Instantiate(positionTextPrefab, positionsGridLayout.transform);
+            positionTextInstance.text = position.ToString();
+        }
     }
 }

@@ -2,9 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class SpeakerPanelEntry : MonoBehaviour
 {
+    public TMP_Text rankingText;
+    public TMP_Text speakerNameText;
+    public TMP_Text teamNameText;
+    public TMP_Text totalScoreText;
+    public GameObject roundScorePrefab; // Prefab for round score text elements
+    public Transform roundScoresContainer; // Container with GridLayoutGroup
+
     // Start is called before the first frame update
     void Start()
     {
@@ -17,16 +25,7 @@ public class SpeakerPanelEntry : MonoBehaviour
         
     }
 
-    public TMP_Text rankingText;
-    public TMP_Text speakerNameText;
-    public TMP_Text teamNameText;
-    public TMP_Text round1ScoreText;
-    public TMP_Text round2ScoreText;
-    public TMP_Text round3ScoreText;
-    public TMP_Text round4ScoreText;
-    public TMP_Text totalScoreText;
-
-    public void SetRankingData(int ranking, string speakerName, string teamName, int round1Score, int round2Score, int round3Score, int round4Score, int totalScore)
+    public void SetRankingData(int ranking, string speakerName, string teamName, List<float> roundScores, float totalScore)
     {
         if (rankingText != null)
             rankingText.text = ranking.ToString();
@@ -37,17 +36,22 @@ public class SpeakerPanelEntry : MonoBehaviour
         if (teamNameText != null)
             teamNameText.text = teamName;
 
-        if (round1ScoreText != null)
-            round1ScoreText.text = round1Score.ToString();
+        // Clear previous round scores
+        foreach (Transform child in roundScoresContainer)
+        {
+            Destroy(child.gameObject);
+        }
 
-        if (round2ScoreText != null)
-            round2ScoreText.text = round2Score.ToString();
-
-        if (round3ScoreText != null)
-            round3ScoreText.text = round3Score.ToString();
-
-        if (round4ScoreText != null)
-            round4ScoreText.text = round4Score.ToString();
+        // Populate round scores
+        for (int i = 0; i < roundScores.Count; i++)
+        {
+            GameObject roundScoreObj = Instantiate(roundScorePrefab, roundScoresContainer);
+            TMP_Text roundScoreText = roundScoreObj.GetComponent<TMP_Text>();
+            if (roundScoreText != null)
+            {
+                roundScoreText.text = $"Round {i + 1}: {roundScores[i]}";
+            }
+        }
 
         if (totalScoreText != null)
             totalScoreText.text = totalScore.ToString();
