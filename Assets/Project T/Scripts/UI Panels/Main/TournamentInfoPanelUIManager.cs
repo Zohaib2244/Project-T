@@ -30,7 +30,6 @@ namespace Scripts.UIPanels
         [SerializeField] private Button increasePrelimCountBtn;
         [SerializeField] private Button decreasePrelimCountBtn;
         public bool generateID = false;
-        
         #endregion
         void OnEnable()
         {

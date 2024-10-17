@@ -280,7 +280,6 @@ GameObject:
   - component: {fileID: 6334842420497874255}
   - component: {fileID: 7839195978480886261}
   - component: {fileID: 1206669091068852806}
-  - component: {fileID: 8607299165929650128}
   - component: {fileID: 8582507939642575156}
   m_Layer: 5
   m_Name: BreaksLE_2
@@ -395,19 +394,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8607299165929650128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3215681355143927834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
 --- !u!114 &8582507939642575156
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,19 +1,36 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public class DrawEditListEntry : MonoBehaviour
 {
-    Match myMatch;
-    AdvancedDropdown OGDropdown;
-    AdvancedDropdown OODropdown;
-    AdvancedDropdown CGDropdown;
-    AdvancedDropdown CODropdown;
+    public BritishMatch_TMP myMatch;
+    public AdvancedDropdown OGDropdown;
+    public AdvancedDropdown OODropdown;
+    public AdvancedDropdown CGDropdown;
+    public AdvancedDropdown CODropdown;
 
-    AdvancedDropdown Adj1Dropdown;
-    AdvancedDropdown Adj2Dropdown;
-    AdvancedDropdown Adj3Dropdown;
+    public AdvancedDropdown Adj1Dropdown;
+    public AdvancedDropdown Adj2Dropdown;
+    public AdvancedDropdown Adj3Dropdown;
+    
 
-    public void SetMatch(Match match)
+    public void SetMatch(BritishMatch_TMP match)
     {
         myMatch = match;
+    }
+
+    void PopulateDropDown()
+    {
+        List<string> teamNames = new List<string>();
+        foreach (var team in myMatch.teamsInMatch)
+        {
+            teamNames.Add(team.TeamName);
+        }
+
+        OGDropdown.SetOptions(teamNames);
+        OODropdown.SetOptions(teamNames);
+        CGDropdown.SetOptions(teamNames);
+        CODropdown.SetOptions(teamNames);
     }
 }

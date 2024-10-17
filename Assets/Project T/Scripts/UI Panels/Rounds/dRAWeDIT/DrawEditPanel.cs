@@ -3,7 +3,53 @@ using System.Collections.Generic;
 using Scripts.Resources;
 using Scripts.UIPanels;
 using UnityEngine;
+using UnityEngine.Events;
+using System;
 
+[Serializable]
+public class Team_TMP
+{
+    string TeamID;
+    string TeamName;
+    TeamPositionsBritish TeamPosition;
+
+    public Team_TMP(string teamID, string teamRoundDataID)
+    {
+        Team team = AppConstants.instance.GetTeamFromID(teamID);
+        TeamRoundData teamRoundData = AppConstants.instance.GetTeamRoundData(teamID,teamRoundDataID);
+    
+        TeamID = team.teamId;
+        TeamName = team.teamName;
+        TeamPosition = teamRoundData.teamPositionBritish;
+    }
+}
+public class BritishMatch_TMP
+{
+    List<Team_TMP> teamsInMatch = new List<Team_TMP>();
+        
+
+    public BritishMatch_TMP(Match match)
+    {
+        foreach (var team in match.teams)
+        {
+            Team_TMP team_TMP = new Team_TMP(team.Key, team.Value);
+            teamsInMatch.Add(team_TMP);
+        }
+    }
+}
+public class Draw
+{
+    public List<BritishMatch_TMP> matches = new List<BritishMatch_TMP>();
+
+    public Draw(List<Match> matches)
+    {
+        foreach (var match in matches)
+        {
+            BritishMatch_TMP britishMatch_TMP = new BritishMatch_TMP(match);
+            this.matches.Add(britishMatch_TMP);
+        }
+    }
+}
 public class DrawEditPanel : MonoBehaviour
 {
     #region Singleton
@@ -33,123 +79,29 @@ public class DrawEditPanel : MonoBehaviour
     [SerializeField] private Transform matchesListContent;
     [SerializeField] private GameObject matchEntryPrefab;
 
-    [SerializeField] public List<string> unassignedTeamIds = new List<string>();
-    [SerializeField] private List<string> assignedTeamIds = new List<string>();
-
-    [SerializeField] private List<string> unassignedAdjudicatorIds = new List<string>();
-    [SerializeField] private List<string> assignedAdjudicatorIds = new List<string>();
-
-void OnEnable()
-{
-    AssignTeams();
-    AssignAdjudicators();
-}
-void OnDisable()
-{
-    assignedTeamIds.Clear();
-    unassignedTeamIds.Clear();
-    assignedAdjudicatorIds.Clear();
-    unassignedAdjudicatorIds.Clear();
-}
-    void UpdateMatchesList()
-    {
-        // Clear the list
-        foreach (Transform child in matchesListContent)
-        {
-            Destroy(child.gameObject);
-        }
-    
-        // Loop through the matches in mainroundspanel.selectedround.matches
+[SerializeField] private List<string> allAvailableTeams = new List<string>();
+    [SerializeField] private List<string> allAvailableJudges = new List<string>();
+    [SerializeField] private Draw draw;
+    private void OnEnable() {
+        draw = new Draw(DrawsPanel.Instance.matches_TMP);
         foreach (var match in DrawsPanel.Instance.matches_TMP)
         {
-            // Instantiate matchEntryPrefab for each match
-            GameObject matchEntry = Instantiate(matchEntryPrefab, matchesListContent);
+            foreach (var team in match.teams)
+            {
+                if (!allAvailableTeams.Contains(team.Key))
+                {
+                    allAvailableTeams.Add(team.Key);
+                }
+            }
+            foreach (var judge in match.adjudicators)
+            {
+                if (!allAvailableJudges.Contains(judge.adjudicatorID))
+                {
+                    allAvailableJudges.Add(judge.adjudicatorID);
+                }
+            }
+        }
+    }
+
     
-            // Access the DrawEditListEntry script on the instantiated prefab
-            DrawEditListEntry drawEditListEntry = matchEntry.GetComponent<DrawEditListEntry>();
-            drawEditListEntry.SetMatch(match);
-        }
-    }
-
-    public void AddTeamToMatch(string teamId, string matchId, TeamPositionsBritish teamPosition)
-    {
-        // Get the match from the matches_TMP list
-        var match = DrawsPanel.Instance.matches_TMP.Find(m => m.matchId == matchId);
-        if (match == null)
-        {
-            Debug.LogError("AddTeamToMatch: Match not found.");
-            return;
-        }
-
-        // Get the team from the teamsInTourney list
-        var team = AppConstants.instance.selectedTouranment.teamsInTourney.Find(t => t.teamId == teamId);
-        if (team == null)
-        {
-            Debug.LogError("AddTeamToMatch: Team not found.");
-            return;
-        }
-
-        // Check if the team is already assigned to a match
-        if (assignedTeamIds.Contains(teamId))
-        {
-            Debug.LogWarning("AddTeamToMatch: Team is already assigned to a match.");
-            return;
-        }
-
-        // Assign Team To A Match
-        match.teams.Add(teamId, teamPosition);
-        assignedTeamIds.Add(teamId);
-        unassignedTeamIds.Remove(teamId);
-    }
-
-    void AssignTeams()
-    {
-        foreach (var team in MainRoundsPanel.Instance.selectedRound.availableTeams)
-        {
-            if (!CheckIfTeamIsAssigned(team.teamId, MainRoundsPanel.Instance.selectedRound.matches))
-            {
-                unassignedTeamIds.Add(team.teamId);
-            }
-            else
-            {
-                assignedTeamIds.Add(team.teamId);
-            }
-        }
-    }
-    void AssignAdjudicators()
-    {
-        foreach (var adj in MainRoundsPanel.Instance.selectedRound.availableAdjudicators)
-        {
-            if (!CheckIfAdjudicatorIsAssigned(adj, MainRoundsPanel.Instance.selectedRound.matches))
-            {
-                unassignedAdjudicatorIds.Add(adj.adjudicatorID);
-            }
-            else
-            {
-                assignedAdjudicatorIds.Add(adj.adjudicatorID);
-            }
-        }
-    }
-    public bool CheckIfTeamIsAssigned(string teamId, List<Match> matches)
-    {
-        foreach (var match in matches)
-        {
-            if (match.teams.ContainsKey(teamId))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-    public bool CheckIfAdjudicatorIsAssigned(Adjudicator adj, List<Match> matches)
-    {
-        foreach (var match in matches)
-        {
-            if (match.adjudicators.Contains(adj))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 }
