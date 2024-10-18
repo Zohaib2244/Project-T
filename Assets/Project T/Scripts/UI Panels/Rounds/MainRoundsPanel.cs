@@ -375,7 +375,6 @@ namespace Scripts.UIPanels
             if (index >= 0 && index < allRounds.Count)
             {
             var foundRound = allRounds[index];
-            Debug.Log($"Selected round: {selectedRound.roundType}");
             // Add that round to the selected round
             UpdateSelectedRound(foundRound);
             selectedRound = foundRound;

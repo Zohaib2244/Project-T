@@ -331,7 +331,24 @@ public class Ballot_InfoPanel : MonoBehaviour
         }
     }
     #endregion
-
+    #region Toggle Configuration
+    public void UpdateOGIronman(bool value)
+    {
+        OG_ironman = value;
+    }
+    public void UpdateOOIronman(bool value)
+    {
+        OO_ironman = value;
+    }
+    public void UpdateCGIronman(bool value)
+    {
+        CG_ironman = value;
+    }
+    public void UpdateCOIronman(bool value)
+    {
+        CO_ironman = value;
+    }
+    #endregion
     #region Dropdown Configuration
     void PopulateDropdowns()
     {

@@ -14,6 +14,7 @@ namespace Scripts.Resources
         RoundsPanel,
         RankingsPanel,
         BreaksPanel,
+        EmailPanel,
     }
     public enum TournamentType
     {

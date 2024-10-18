@@ -157,6 +157,10 @@ namespace Scripts.UIPanels
             MainUIManager.Instance.SwitchPanel(Panels.TournamentInfoPanel);
             TournamentInfoPanelUIManager.Instance.ShowTournamentInfo();
         }
+        public void OpenEmailPanel()
+        {
+            MainUIManager.Instance.SwitchPanel(Panels.EmailPanel);
+        }
         public void CheckBreaksPanel()
         {
             var selectedTournament = AppConstants.instance.selectedTouranment;

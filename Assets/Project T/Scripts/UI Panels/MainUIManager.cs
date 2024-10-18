@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Scripts.Resources;
+using DG.Tweening;
 
 
 namespace Scripts.UI
@@ -43,6 +44,26 @@ namespace Scripts.UI
 
         public void SwitchPanel(Panels panel)
         {
+            if(panel == Panels.EmailPanel)
+            {
+                foreach(PanelItem item in panels)
+                {
+                    if(item.panel == panel)
+                    {
+                        item.gameObject.SetActive(true);
+                        Vector3 pos = item.gameObject.transform.position;
+                        item.gameObject.transform.position = new Vector3(item.gameObject.transform.position.x, -Screen.height, item.gameObject.transform.position.z);
+                        item.gameObject.transform.DOMoveY(pos.y, 0.5f);
+                        activePanel = panel;
+                    }
+                    else
+                    {
+                        item.gameObject.SetActive(false);
+                    }
+                }
+                return;
+            }
+
             foreach (PanelItem item in panels)
             {
                 if (item.panel == panel)

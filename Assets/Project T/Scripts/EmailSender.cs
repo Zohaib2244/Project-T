@@ -7,12 +7,45 @@ public class EmailSender : MonoBehaviour
 {
     public string smtpServer = "smtp.gmail.com"; // SMTP server for Gmail
     public int smtpPort = 587; // Port number for Gmail SMTP
-    public string smtpUser = "zohaibangry@gmail.com"; // Your Gmail address
-    public string smtpPassword = "HAHAlollma0"; // Your Gmail password
-    public string fromEmail = "zohaibangry@gmail.com"; // Your Gmail address (same as smtpUser)
+    public string smtpUser = "zohaibangry123@gmail.com"; // Your Gmail address
+    public string smtpPassword = "dffokqvwflpeujrq"; // Your Gmail password
+    public string fromEmail = "zohaibangry1234@gmail.com"; // Your Gmail address (same as smtpUser)
     public string subject = "Welcome To NDO 2024, Please see the necessary links for our Tabs";
-    public string body = "";
+    public string body = "this is an autoemail agoogoo for a gaga";
     public string link = "smthhelloworld.com";
+public void SendEmail()
+{
+    try
+    {
+        Debug.Log("Starting to configure SMTP client...");
+
+        SmtpClient client = new SmtpClient(smtpServer, smtpPort)
+        {
+            Credentials = new NetworkCredential(smtpUser, smtpPassword),
+            EnableSsl = true
+        };
+
+        Debug.Log("SMTP client configured successfully.");
+
+        MailMessage mailMessage = new MailMessage
+        {
+            From = new MailAddress(fromEmail),
+            Subject = subject,
+            Body = body
+        };
+        mailMessage.To.Add("zohaibangry420@gmail.com");
+
+        Debug.Log("Mail message created successfully.");
+
+        client.Send(mailMessage);
+
+        Debug.Log("Email sent successfully.");
+    }
+    catch (System.Exception ex)
+    {
+        Debug.LogError($"Failed to send email: {ex.Message}");
+    }
+}
 
     public void SendEmailsToAllSpeakers()
     {
