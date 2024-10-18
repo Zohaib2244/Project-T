@@ -489,27 +489,27 @@ public class AppConstants : MonoBehaviour
             team.totalTeamScore = totalScore;
         }
     }
-public TeamRoundData GetTeamsSpeakerRoundDataFromMatch(string matchID, string teamID)
-{
-    // Find the match with the given matchID in the selected round
-    Match match = selectedRound.matches.Find(m => m.matchId == matchID);
-    
-    // Check if the match is found
-    if (match == null)
+    public TeamRoundData GetTeamsSpeakerRoundDataFromMatch(string matchID, string teamID)
     {
-        Debug.LogError($"Match with ID {matchID} not found.");
-        return null;
-    }
+        // Find the match with the given matchID in the selected round
+        Match match = selectedRound.matches.Find(m => m.matchId == matchID);
 
-    // Check if the team exists in the match
-    if (!match.teams.ContainsKey(teamID))
-    {
-        Debug.LogError($"Team with ID {teamID} not found in match {matchID}.");
-        return null;
-    }
+        // Check if the match is found
+        if (match == null)
+        {
+            Debug.LogError($"Match with ID {matchID} not found.");
+            return null;
+        }
 
-    // Get the TeamRoundData for the team
-    TeamRoundData trd = GetTRDFromID(teamID, match.teams[teamID]);
+        // Check if the team exists in the match
+        if (!match.teams.ContainsKey(teamID))
+        {
+            Debug.LogError($"Team with ID {teamID} not found in match {matchID}.");
+            return null;
+        }
+
+        // Get the TeamRoundData for the team
+        TeamRoundData trd = GetTRDFromID(teamID, match.teams[teamID]);
 
     // Return the TeamRoundData
     return trd;
@@ -684,6 +684,8 @@ public List<Speaker> GetAllSpeakers()
         public string Name { get; set; }
         public string Institution { get; set; }
         public AdjudicatorTypes Type { get; set; }
+        public string Contact { get; set; }
+        public string Email { get; set; }
     }
 
     public class SpeakerInfo
@@ -692,6 +694,8 @@ public List<Speaker> GetAllSpeakers()
         public SpeakerTypes Category { get; set; }
         public string Team { get; set; }
         public string Institution { get; set; }
+        public string Contact { get; set; }
+        public string Email { get; set; }
     }
 
     public class SpeakerRanking
@@ -727,7 +731,9 @@ public List<Speaker> GetAllSpeakers()
                 {
                     Name = adjudicator.adjudicatorName,
                     Institution = institutionAbbreviation,
-                    Type = adjudicator.adjudicatorType
+                    Type = adjudicator.adjudicatorType,
+                    Contact = adjudicator.adjudicatorPhone,
+                    Email = adjudicator.adjudicatorEmail
                 });
             }
         }
@@ -754,9 +760,11 @@ public List<Speaker> GetAllSpeakers()
                     speakersInfo.Add(new SpeakerInfo
                     {
                         Name = speaker.speakerName,
-                        Category = speaker.teamCategory,
+                        Category = team.teamCategory,
                         Team = team.teamName,
-                        Institution = institutionAbbreviation
+                        Institution = institutionAbbreviation,
+                        Contact = speaker.speakerContact,
+                        Email = speaker.speakerEmail
                     });
                 }
             }
@@ -776,18 +784,21 @@ public List<Speaker> GetAllSpeakers()
             var speakerData = new Dictionary<string, (List<float> Scores, List<string> Positions)>();
 
             // Collect scores and positions from rounds
-            foreach (var round in selectedTouranment.preLimsInTourney)
+            foreach (var team in selectedTouranment.teamsInTourney)
             {
-                foreach (var teamRoundData in round.availableTeams.SelectMany(team => team.teamRoundDatas))
+                foreach (var teamRoundData in team.teamRoundDatas)
                 {
-                    foreach (var speakerRoundData in teamRoundData.speakersInRound)
+                    if (teamRoundData.roundType == RoundCategory.PreLim)
                     {
-                        if (!speakerData.ContainsKey(speakerRoundData.speakerId))
+                        foreach (var speakerRoundData in teamRoundData.speakersInRound)
                         {
-                            speakerData[speakerRoundData.speakerId] = (new List<float>(), new List<string>());
+                            if (!speakerData.ContainsKey(speakerRoundData.speakerId))
+                            {
+                                speakerData[speakerRoundData.speakerId] = (new List<float>(), new List<string>());
+                            }
+                            speakerData[speakerRoundData.speakerId].Scores.Add(speakerRoundData.speakerScore);
+                            speakerData[speakerRoundData.speakerId].Positions.Add(teamRoundData.teamPositionBritish.ToString());
                         }
-                        speakerData[speakerRoundData.speakerId].Scores.Add(speakerRoundData.speakerScore);
-                        speakerData[speakerRoundData.speakerId].Positions.Add(teamRoundData.teamPositionBritish.ToString());
                     }
                 }
             }
@@ -849,7 +860,14 @@ public List<Speaker> GetAllSpeakers()
 
                     foreach (var teamRoundData in team.teamRoundDatas)
                     {
-                        positions.Add(teamRoundData.teamPositionBritish.ToString());
+                        if (teamRoundData.roundType == RoundCategory.PreLim)
+                        {
+                            // Determine the team's position in the round
+                            int position = teamRoundData.teamMatchRanking;
+                            string roundNumber = teamRoundData.roundID.Last().ToString();
+                            string roundPosition = $"R{roundNumber}: {GetOrdinal(position)}";
+                            positions.Add(roundPosition);
+                        }
                     }
 
                     teamData.Add(new TeamRanking
@@ -879,6 +897,31 @@ public List<Speaker> GetAllSpeakers()
         else
         {
             return new List<TeamRanking>();
+        }
+    }
+
+    private string GetOrdinal(int number)
+    {
+        if (number <= 0) return number.ToString();
+
+        switch (number % 100)
+        {
+            case 11:
+            case 12:
+            case 13:
+                return number + "th";
+        }
+
+        switch (number % 10)
+        {
+            case 1:
+                return number + "st";
+            case 2:
+                return number + "nd";
+            case 3:
+                return number + "rd";
+            default:
+                return number + "th";
         }
     }
 

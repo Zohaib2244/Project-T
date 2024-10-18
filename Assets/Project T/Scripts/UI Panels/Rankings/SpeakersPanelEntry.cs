@@ -21,8 +21,10 @@ public class SpeakersPanelEntry : MonoBehaviour
     public TMP_Text categoryText;
     public TMP_Text teamText;
     public TMP_Text instituteText;
+    public TMP_Text contactText;
+    public TMP_Text emailText;
 
-    public void SetSpeakersData(string name, string type, string team, string institute)
+    public void SetSpeakersData(string name, string type, string team, string institute, string contact, string email)
     {
         if (nameText != null)
             nameText.text = name;
@@ -35,6 +37,12 @@ public class SpeakersPanelEntry : MonoBehaviour
 
         if (instituteText != null)
             instituteText.text = institute;
+
+        if (contactText != null)
+            contactText.text = contact;
+        
+        if (emailText != null)
+            emailText.text = email;
     }
 }
 

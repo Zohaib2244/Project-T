@@ -11,7 +11,7 @@ public class TeamPanelEntry : MonoBehaviour
     public TMP_Text institutionText;
     public TMP_Text teamPointsText;
     public TMP_Text teamScoresText;
-    public GridLayoutGroup positionsGridLayout;
+    public HorizontalLayoutGroup positionsGridLayout;
     public TMP_Text positionTextPrefab;
 
     // Start is called before the first frame update
@@ -38,10 +38,10 @@ public class TeamPanelEntry : MonoBehaviour
             institutionText.text = institution;
 
         if (teamPointsText != null)
-            teamPointsText.text = teamPoints.ToString("F2"); // Format as needed
+            teamPointsText.text = teamPoints.ToString();
 
         if (teamScoresText != null)
-            teamScoresText.text = teamScores.ToString("F2"); // Format as needed
+            teamScoresText.text = ((int)teamScores).ToString(); // Convert float to int
 
         // Clear existing children in the GridLayoutGroup
         foreach (Transform child in positionsGridLayout.transform)

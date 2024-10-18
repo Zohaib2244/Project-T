@@ -42,7 +42,7 @@ public class SpeakersScript : MonoBehaviour
 
             // Set the data
             SpeakersPanelEntry panelEntry = speakerEntry.GetComponent<SpeakersPanelEntry>();
-            panelEntry.SetSpeakersData(speaker.Name, speaker.Category.ToString(), speaker.Team, speaker.Institution);
+            panelEntry.SetSpeakersData(speaker.Name, speaker.Category.ToString(), speaker.Team, speaker.Institution, speaker.Contact, speaker.Email);
         });
 
         // Deactivate loading panel
