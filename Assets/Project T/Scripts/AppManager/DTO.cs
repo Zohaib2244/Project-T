@@ -461,6 +461,7 @@ namespace Scripts.FirebaseConfig
         }
         public TournamentInfo DTOToTournamentInfo(TournamentInfo_DTO tournamentInfo)
         {
+
             var speakerCategories = new List<SpeakerCategories>();
             foreach (var speakerCategory in tournamentInfo.speakerCategories)
             {
@@ -473,7 +474,6 @@ namespace Scripts.FirebaseConfig
                     breakType = breakType
                 });
             }
-
             return new TournamentInfo
             {
                 tournamentId = tournamentInfo.tournamentId,

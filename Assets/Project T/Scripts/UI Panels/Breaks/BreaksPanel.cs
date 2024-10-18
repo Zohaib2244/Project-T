@@ -5,6 +5,7 @@ using DG.Tweening;
 using Scripts.Resources;
 using System.Linq;
 using Scripts.FirebaseConfig;
+using Unity.VisualScripting;
 
 public class BreaksPanel : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class BreaksPanel : MonoBehaviour
     void OnEnable()
     {
         breakParameters = AppConstants.instance.selectedTouranment.breakParam;
+        UpdateBreaks();
         teamCategoryToggle.DeActivate();
         GetAllEligibleOpenTeams();
         GetAllEligibleNoviceTeams();
@@ -196,6 +198,30 @@ public class BreaksPanel : MonoBehaviour
         }
         return new List<Team>();
     }
+
+    private void UpdateBreaks()
+    {
+        if(AppConstants.instance.selectedTouranment.isBreaksGenerated)
+        {
+            foreach(string team in AppConstants.instance.selectedTouranment.openBreakingTeams)
+            {
+                Team team1 = AppConstants.instance.GetTeamFromID(team);
+                breakingOpenTeams.Add(team1);
+            }
+
+            if(AppConstants.instance.selectedTouranment.speakerCategories.Count == 2)
+            {
+                foreach (string team in AppConstants.instance.selectedTouranment.noviceBreakingTeams)
+                {
+                    Team team1 = AppConstants.instance.GetTeamFromID(team);
+                    breakingNoviceTeams.Add(team1);
+                }
+            }
+            breakParameters = AppConstants.instance.selectedTouranment.breakParam;
+        }
+    }
+
+
     public async void SaveBreaks()
     {
         Loading.Instance.ShowLoadingScreen();

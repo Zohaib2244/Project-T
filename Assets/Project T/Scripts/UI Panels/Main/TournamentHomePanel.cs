@@ -25,10 +25,14 @@ namespace Scripts.UIPanels
         #region Public Variables
         #endregion
 
-        private async void OnEnable()
+        private void OnEnable()
         {
             ConfigureTournament();
             UpdateAdminInfo();
+            GetTournamentDataFromFirestore();
+        }
+        private async void GetTournamentDataFromFirestore()
+        {
             Loading.Instance.ShowLoadingScreen();
 
             // Run Firestore calls in parallel
@@ -40,25 +44,24 @@ namespace Scripts.UIPanels
 
             // Await all tasks to complete
             // await Task.WhenAll(institutionsTask, adjudicatorsTask, roundsTask, teamsTask);
-            // tournamentSelection.onSelectOption1 = ShowTournament1Info;
-            // tournamentSelection.onSelectOption2 = ShowTournament2Info;
+            tournamentSelection.onSelectOption1 = ShowTournament1Info;
+            tournamentSelection.onSelectOption2 = ShowTournament2Info;
             CheckBreaksPanel();
             Loading.Instance.HideLoadingScreen();
         }
-
         public void ShowTournament1Info()
         {
             AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments[0];
             _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
             Debug.Log("Tournament 1 selected");
-            // ConfigureTournament();
+            GetTournamentDataFromFirestore();
         }
         public void ShowTournament2Info()
         {
             AppConstants.instance.selectedTouranment = AppConstants.instance.tournaments[1];
             _tournamentName.text = AppConstants.instance.selectedTouranment.tournamentName;
             Debug.Log("Tournament 2 selected");
-            // ConfigureTournament();
+           GetTournamentDataFromFirestore();
         }
 
 
@@ -72,7 +75,7 @@ namespace Scripts.UIPanels
             }
             else
             {
-                tournament2Shorthand.text = AppConstants.instance.selectedTouranment.tournamentShortHand;
+                // tournament2Shorthand.text = AppConstants.instance.selectedTouranment.tournamentShortHand;
                 tournamentSelection.SelectOption2();
             }
         }
@@ -148,6 +151,11 @@ namespace Scripts.UIPanels
         public void OpenBreaksPanel()
         {
             MainUIManager.Instance.SwitchPanel(Panels.BreaksPanel);
+        }
+        public void OpenTournamentInfoPanel()
+        {
+            MainUIManager.Instance.SwitchPanel(Panels.TournamentInfoPanel);
+            TournamentInfoPanelUIManager.Instance.ShowTournamentInfo();
         }
         public void CheckBreaksPanel()
         {

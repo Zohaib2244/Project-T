@@ -96,4 +96,10 @@ namespace Scripts.Resources
         TeamScore,
         TeamPoints
     }
+    public enum EmailTypes
+    {
+        Speaker,
+        Adjudicator,
+        Feedback,
+    }
 }

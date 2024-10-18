@@ -21,7 +21,7 @@ public class Team_EligibilityLE : MonoBehaviour
     {
         myTeam = team;
         teamName.text = myTeam.teamName;
-        teamInstitution.text = myTeam.instituition;
+        teamInstitution.text = AppConstants.instance.GetInstituteAbreviation(myTeam.instituition).ToString();
     }
 
     public void MarkEligibility()
