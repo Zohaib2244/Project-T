@@ -12,6 +12,23 @@ namespace Scripts.UIPanels
 {
     public class TournamentInfoPanelUIManager : MonoBehaviour
     {
+        #region Singleton
+        public static TournamentInfoPanelUIManager Instance;
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(this);
+            }
+        }
+        #endregion
+
+
+
         #region Variables
         private TournamentInfo tournamentConfiguration = new TournamentInfo();
         [SerializeField] private Transform panel1;
@@ -29,6 +46,7 @@ namespace Scripts.UIPanels
         [SerializeField] private Button saveTournamentBtn;
         [SerializeField] private Button increasePrelimCountBtn;
         [SerializeField] private Button decreasePrelimCountBtn;
+        [SerializeField] private Button backBtn;
         public bool generateID = false;
         #endregion
         void OnEnable()
@@ -39,6 +57,7 @@ namespace Scripts.UIPanels
             tournamentTypeToggle.onSelectOption2 += SelectBritish;
             openBreakDropDown.onChangedValue += OnOpenBreakSelected;
             noviceBreakDropDown.onChangedValue += OnNoviceBreakSelected;
+            backBtn.interactable = false;
         }
         void OnDisable()
         {
@@ -88,20 +107,21 @@ namespace Scripts.UIPanels
         {
             tournamentConfiguration.tournamentType = TournamentType.Asian;
         }
-        public void ShowTournamentInfo(TournamentInfo tournamentInfo)
+        public void ShowTournamentInfo()
         {
             DeActivatePanel();
             // First delay of 0.02 seconds
             DOVirtual.DelayedCall(0.02f, () =>
             {
                 ActivatePanel();
-
+                backBtn.interactable = true;    
                 // Second delay of 0.02 seconds
                 DOVirtual.DelayedCall(0.02f, () =>
                 {
                     generateID = false;
-                    tournamentConfiguration = tournamentInfo;
+                    tournamentConfiguration = AppConstants.instance.selectedTouranment;
                     tournamentName.text = tournamentConfiguration.tournamentName;
+                    tournamentShortHand.text = tournamentConfiguration.tournamentShortHand;
                     if (tournamentConfiguration.tournamentType == TournamentType.Asian)
                         tournamentTypeToggle.SelectOption1();
                     else
@@ -305,6 +325,10 @@ namespace Scripts.UIPanels
                 tournamentConfiguration.preLimsInTourney[0].roundState = RoundStates.InProgress;
 
                 await AppConstants.instance.AddTournament(tournamentConfiguration);
+            }
+            else{
+                Debug.Log("Updating ID");
+                await AppConstants.instance.UpdateTournamentInfo(tournamentConfiguration);
             }
 
 

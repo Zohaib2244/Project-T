@@ -511,9 +511,18 @@ public class AppConstants : MonoBehaviour
         // Get the TeamRoundData for the team
         TeamRoundData trd = GetTRDFromID(teamID, match.teams[teamID]);
 
-        // Return the TeamRoundData
-        return trd;
+    // Return the TeamRoundData
+    return trd;
+}
+public List<Speaker> GetAllSpeakers()
+{
+    List<Speaker> speakers = new List<Speaker>();
+    foreach (Team team in selectedTouranment.teamsInTourney)
+    {
+        speakers.AddRange(team.speakers);
     }
+    return speakers;
+}
     #endregion
     #region Adjudicator Functions
     public string GenerateAdjudicatorID(string adjName, string adjInstitute)

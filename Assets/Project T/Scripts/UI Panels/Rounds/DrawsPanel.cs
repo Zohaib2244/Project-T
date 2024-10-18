@@ -1,4 +1,4 @@
-using System.Collections;
+using DG.Tweening;
 using System.Collections.Generic;
 using Scripts.UIPanels;
 using UnityEngine;
@@ -60,11 +60,22 @@ public class DrawsPanel : MonoBehaviour
             if (drawPanel.drawPanelType == panel)
             {
                 drawPanel.drawPanel.gameObject.SetActive(true);
+                drawPanel.drawPanel.localScale = Vector3.zero; // Start from scale zero
+                drawPanel.drawPanel.DOScale(Vector3.one, 0.5f); // Animate to scale one over 0.5 seconds
             }
             else
             {
-                drawPanel.drawPanel.gameObject.SetActive(false);
+                drawPanel.drawPanel.DOScale(Vector3.zero, 0.5f).OnComplete(() => drawPanel.drawPanel.gameObject.SetActive(false)); // Animate to scale zero over 0.5 seconds and then deactivate
             }
         }
+    }
+    public void OpenEditDrawPanel()
+    {
+        SwitchDrawPanel(DrawPanelTypes.DrawEditPanel);
+    }
+
+    public void CloseEditDrawPanel()
+    {
+        SwitchDrawPanel(DrawPanelTypes.DrawDisplayPanel);
     }
 }
