@@ -42,7 +42,7 @@ public class AdjudicatorsScript : MonoBehaviour
 
             // Set the data
             AdjudicatorPanelEntry panelEntry = adjudicatorEntry.GetComponent<AdjudicatorPanelEntry>();
-            panelEntry.SetAdjudicatorData(adjudicator.Name, adjudicator.Institution, adjudicator.Type.ToString());
+            panelEntry.SetAdjudicatorData(adjudicator.Name, adjudicator.Institution, adjudicator.Type.ToString(), adjudicator.Contact, adjudicator.Email);
         });
 
         // Deactivate loading panel

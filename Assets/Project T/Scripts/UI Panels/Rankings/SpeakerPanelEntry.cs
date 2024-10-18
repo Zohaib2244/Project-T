@@ -49,7 +49,7 @@ public class SpeakerPanelEntry : MonoBehaviour
             TMP_Text roundScoreText = roundScoreObj.GetComponent<TMP_Text>();
             if (roundScoreText != null)
             {
-                roundScoreText.text = $"Round {i + 1}: {roundScores[i]}";
+                roundScoreText.text = $"R{i + 1}: {roundScores[i]}";
             }
         }
 
