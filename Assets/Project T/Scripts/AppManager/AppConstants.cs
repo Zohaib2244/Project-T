@@ -751,7 +751,7 @@ public class AppConstants : MonoBehaviour
                     speakersInfo.Add(new SpeakerInfo
                     {
                         Name = speaker.speakerName,
-                        Category = speaker.teamCategory,
+                        Category = team.teamCategory,
                         Team = team.teamName,
                         Institution = institutionAbbreviation,
                         Contact = speaker.speakerContact,
