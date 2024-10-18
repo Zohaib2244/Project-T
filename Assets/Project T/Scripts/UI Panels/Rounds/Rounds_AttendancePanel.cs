@@ -206,7 +206,6 @@ private void UpdateBreakingTeamsList()
         }
     }
 }
-
 #endregion
 
 #region Attendance Functions

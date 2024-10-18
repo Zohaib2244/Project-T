@@ -392,8 +392,7 @@ public class DrawGenerator
     
         return matches;
     }
-    
-    private Adjudicator[] AssignAdjudicators(List<Adjudicator> adjudicators, int totalMatches, int matchIndex)
+        private Adjudicator[] AssignAdjudicators(List<Adjudicator> adjudicators, int totalMatches, int matchIndex)
     {
         if (isAdjudicatorAutoAllocation)
         {
@@ -403,7 +402,7 @@ public class DrawGenerator
             List<Adjudicator> capAdjudicators = adjudicators.Where(a => a.adjudicatorType == AdjudicatorTypes.CAP).ToList();
             List<Adjudicator> normieAdjudicators = adjudicators.Where(a => a.adjudicatorType == AdjudicatorTypes.Normie).ToList();
     
-            // Assign CAP adjudicators to the first matches
+            // First Pass - Assign one adjudicator per match
             if (matchIndex < capAdjudicators.Count)
             {
                 assignedAdjudicators.Add(capAdjudicators[matchIndex]);
@@ -413,12 +412,18 @@ public class DrawGenerator
                 assignedAdjudicators.Add(normieAdjudicators[matchIndex - capAdjudicators.Count]);
             }
     
-            // Assign remaining Normie adjudicators randomly
-            if (matchIndex == totalMatches - 1 && normieAdjudicators.Count > 0)
+            // Second Pass - Assign remaining adjudicators
+            if (matchIndex >= totalMatches)
             {
-                Random random = new Random();
-                int randomIndex = random.Next(normieAdjudicators.Count);
-                assignedAdjudicators.Add(normieAdjudicators[randomIndex]);
+                int remainingIndex = matchIndex - totalMatches;
+                if (remainingIndex < capAdjudicators.Count)
+                {
+                    assignedAdjudicators.Add(capAdjudicators[remainingIndex]);
+                }
+                else if (remainingIndex < capAdjudicators.Count + normieAdjudicators.Count)
+                {
+                    assignedAdjudicators.Add(normieAdjudicators[remainingIndex - capAdjudicators.Count]);
+                }
             }
     
             return assignedAdjudicators.ToArray();

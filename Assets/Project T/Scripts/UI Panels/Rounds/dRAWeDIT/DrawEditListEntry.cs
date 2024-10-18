@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 
 public class DrawEditListEntry : MonoBehaviour
@@ -10,12 +11,18 @@ public class DrawEditListEntry : MonoBehaviour
     public BritishMatch_TMP myMatch;
     private List<Button> _teamBTNS = new List<Button>();
     private List<Button> _adjBTNS = new List<Button>();
-   
+
     public List<TeamBtn> teamBtns = new List<TeamBtn>();
 
     public List<AdjBtn> adjBtns = new List<AdjBtn>();
 
-    private bool isReplaceable = false;
+    void OnEnable()
+    {
+        DrawEditPanel.Instance.DeselectAllTeams.AddListener(DeselectExtraTeams);
+        DrawEditPanel.Instance.ReplaceTeamsEvent.AddListener(DeselectExtraTeams);
+        DrawEditPanel.Instance.ReplaceTeamsEvent.AddListener(AddTextToButton);
+    }
+
     public void SetMatch(BritishMatch_TMP match)
     {
         myMatch = match;
@@ -25,6 +32,7 @@ public class DrawEditListEntry : MonoBehaviour
             teamBtn.btn.onClick.AddListener(() => OnTeamBtnClick(teamBtn));
             teamBtns.Add(teamBtn);
         }
+        DrawEditPanel.Instance.teamBtns.AddRange(teamBtns);
 
         for (int i = 0; i < myMatch.adjudicatorsInMatch.Count; i++)
         {
@@ -38,44 +46,68 @@ public class DrawEditListEntry : MonoBehaviour
     {
         for (int i = 0; i < myMatch.teamsInMatch.Count; i++)
         {
-            _teamBTNS[i].GetComponentInChildren<Text>().text = myMatch.teamsInMatch[i].TeamName;
+            _teamBTNS[i].GetComponentInChildren<TMP_Text>().text = myMatch.teamsInMatch[i].TeamName;
         }
 
         for (int i = 0; i < myMatch.adjudicatorsInMatch.Count; i++)
         {
-            _adjBTNS[i].GetComponentInChildren<Text>().text = myMatch.adjudicatorsInMatch[i].adjudicatorName;
+            _adjBTNS[i].GetComponentInChildren<TMP_Text>().text = myMatch.adjudicatorsInMatch[i].adjudicatorName;
         }
     }
 
     public void OnAdjBtnClick(AdjBtn adjBtn)
     {
-        
+
     }
 
+    
 
 
+    private void DeselectExtraTeams()
+    {
+        foreach (var teamBtn in teamBtns)
+        {
+            if(teamBtn.team != DrawEditPanel.Instance.replacementTeam1 && teamBtn.team != DrawEditPanel.Instance.replacementTeam2)
+            {
+                DeselectTeam(teamBtn);
+            }
+        }
+    }
+    #region Team Functions
     private void OnTeamBtnClick(TeamBtn teamBtn)
     {
-        isReplaceable = !isReplaceable;
-        if (isReplaceable)
+        if (teamBtn.isSelected)
         {
-            DeselctedAnimation();
-            isReplaceable = false;
-            DrawEditPanel.Instance.RemoveReplaceableTeam(teamBtn);
+            DeselectTeam(teamBtn);
+            DrawEditPanel.Instance.DeselectAllTeams?.Invoke();
+            return;
         }
-        else
+        // DrawEditPanel.Instance.DeselectAllTeams?.Invoke();
+        teamBtn.isSelected = true;
+        SelectedAnimation(teamBtn.btn.transform);
+        DrawEditPanel.Instance.AddReplaceableTeam(teamBtn); // Pass the Team_TMP object associated with the button
+
+    }
+    private void DeselectTeam(TeamBtn teamBtn)
+    {
+        if (teamBtn.isSelected)
         {
-            SelectedAnimation();
-            isReplaceable = true;
-            DrawEditPanel.Instance.AddReplaceableTeam(teamBtn); // Pass the Team_TMP object associated with the button
+            DrawEditPanel.Instance.RemoveReplaceableTeam(teamBtn);
+            teamBtn.isSelected = false;
+            DeselctedAnimation(teamBtn.btn.transform);
         }
     }
-    private void SelectedAnimation()
+    #endregion
+
+
+
+
+    private void SelectedAnimation(Transform transform)
     {
         transform.DOScale(Vector3.one * 0.9f, 0.2f);
     }
 
-    private void DeselctedAnimation()
+    private void DeselctedAnimation(Transform transform)
     {
         transform.DOScale(Vector3.one, 0.2f);
     }

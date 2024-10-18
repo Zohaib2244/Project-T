@@ -62,6 +62,7 @@ public class Rounds_BallotsPanel : MonoBehaviour
             var drawEntry = Instantiate(ballotEntryPrefab, ballotsContent);
             drawEntry.GetComponent<BallotListEntry>().SetMatch(match, i + 1); // Pass match object and match number (index + 1)
         }
+        Loading.Instance.HideLoadingScreen();
     }
     public async void SaveBallots()
     {

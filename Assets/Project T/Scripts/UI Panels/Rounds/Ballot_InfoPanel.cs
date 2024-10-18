@@ -6,6 +6,7 @@ using Scripts.FirebaseConfig;
 using Scripts.UIPanels;
 using System.Linq;
 using System;
+using UnityEngine.UI;
 
 public class Ballot_InfoPanel : MonoBehaviour
 {
@@ -35,6 +36,7 @@ public class Ballot_InfoPanel : MonoBehaviour
     [SerializeField] private TMP_InputField OG_speakerScore_1;
     [SerializeField] private TMP_InputField OG_speakerScore_2;
     [SerializeField] private TMP_Text OG_totalScore;
+    [SerializeField] private bool OG_ironman;
     //OO Variables----------------------------------------------------  
     [Header("OO Variables")]
     [SerializeField] private TMP_Text OO_posText;
@@ -44,6 +46,7 @@ public class Ballot_InfoPanel : MonoBehaviour
     [SerializeField] private TMP_InputField OO_speakerScore_1;
     [SerializeField] private TMP_InputField OO_speakerScore_2;
     [SerializeField] private TMP_Text OO_totalScore;
+    [SerializeField] private bool OO_ironman;
     //CG Variables----------------------------------------------------
     [Header("CG Variables")]
     [SerializeField] private TMP_Text CG_posText;
@@ -53,6 +56,7 @@ public class Ballot_InfoPanel : MonoBehaviour
     [SerializeField] private TMP_InputField CG_speakerScore_1;
     [SerializeField] private TMP_InputField CG_speakerScore_2;
     [SerializeField] private TMP_Text CG_totalScore;
+    [SerializeField] private bool CG_ironman;
     //CO Variables----------------------------------------------------
     [Header("CO Variables")]
     [SerializeField] private TMP_Text CO_posText;
@@ -62,8 +66,10 @@ public class Ballot_InfoPanel : MonoBehaviour
     [SerializeField] private TMP_InputField CO_speakerScore_1;
     [SerializeField] private TMP_InputField CO_speakerScore_2;
     [SerializeField] private TMP_Text CO_totalScore;
+    [SerializeField] private bool CO_ironman;
 
 
+    [SerializeField] private Button saveBtn;
     private Match myMatch;
     private TeamRoundData OG_trd;
     private TeamRoundData OO_trd;
@@ -184,7 +190,17 @@ public class Ballot_InfoPanel : MonoBehaviour
         CO_totalScore.text = "0";
 
     }
-
+    private void CheckSaveButtonInteractability()
+    {
+        if (OG_speakerScore_1.text == "" || OG_speakerScore_2.text == "" || OO_speakerScore_1.text == "" || OO_speakerScore_2.text == "" || CG_speakerScore_1.text == "" || CG_speakerScore_2.text == "" || CO_speakerScore_1.text == "" || CO_speakerScore_2.text == "")
+        {
+            saveBtn.interactable = false;
+        }
+        else
+        {
+            saveBtn.interactable = true;
+        }
+    }
    #endregion
 
     #region TRD Configuration
@@ -393,7 +409,13 @@ public class Ballot_InfoPanel : MonoBehaviour
                 OG_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
                 OG_speakerNameText_2.text = otherSpeaker.speakerName;
             }
+            else if(OG_ironman)
+            {
+                OG_trd.speakersInRound[1].speakerId = selectedSpeaker.speakerId;
+                OG_speakerNameText_2.text = selectedSpeaker.speakerName;
+            }
         }
+
     }
     void OnOOSpeakerSelected(int index)
     {
@@ -409,6 +431,11 @@ public class Ballot_InfoPanel : MonoBehaviour
             {
                 OO_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
                 OO_speakerNameText_2.text = otherSpeaker.speakerName;
+            }
+            else if(OO_ironman)
+            {
+                OO_trd.speakersInRound[1].speakerId = selectedSpeaker.speakerId;
+                OO_speakerNameText_2.text = selectedSpeaker.speakerName;
             }
         }
     }
@@ -428,6 +455,12 @@ public class Ballot_InfoPanel : MonoBehaviour
                 CG_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
                 CG_speakerNameText_2.text = otherSpeaker.speakerName;
             }
+            else if
+            (CG_ironman)
+            {
+                CG_trd.speakersInRound[1].speakerId = selectedSpeaker.speakerId;
+                CG_speakerNameText_2.text = selectedSpeaker.speakerName;
+            }
         }
     }
     void OnCOSpeakerSelected(int index)
@@ -445,6 +478,11 @@ public class Ballot_InfoPanel : MonoBehaviour
                 CO_trd.speakersInRound[1].speakerId = otherSpeaker.speakerId;
                 CO_speakerNameText_2.text = otherSpeaker.speakerName;
             }
+            else if(CO_ironman)
+            {
+                CO_trd.speakersInRound[1].speakerId = selectedSpeaker.speakerId;
+                CO_speakerNameText_2.text = selectedSpeaker.speakerName;
+            }
         }
     }
     #endregion
@@ -458,6 +496,7 @@ public class Ballot_InfoPanel : MonoBehaviour
         UpdateTotalScore(CO_trd, CO_speakerScore_1, CO_speakerScore_2, CO_totalScore);
 
         UpdatePositions();
+        CheckSaveButtonInteractability();
     }
 
     void UpdateTotalScore(TeamRoundData trd, TMP_InputField score1, TMP_InputField score2, TMP_Text totalScoreText)
@@ -519,7 +558,6 @@ public class Ballot_InfoPanel : MonoBehaviour
     #region CallBacks
     private void OnUpdateMatchesSuccess()
     {
-        Loading.Instance.HideLoadingScreen();
         DialogueBox.Instance.ShowDialogueBox("Ballot saved successfully", Color.green);
         Rounds_BallotsPanel.Instance.CloseBallotInfo();
     }

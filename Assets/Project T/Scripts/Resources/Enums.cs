@@ -73,9 +73,9 @@ namespace Scripts.Resources
     }
     public enum RoundStates
     {
-        NotStarted,
-        InProgress,
-        Completed
+        NotStarted, //0
+        InProgress, //1
+        Completed //2
     }
     public enum RoundPanelTypes
     {
