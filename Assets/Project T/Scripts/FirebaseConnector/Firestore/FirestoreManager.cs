@@ -1009,8 +1009,8 @@ public async Task UpdateTournamentBreakingTeams(UnityAction onSuccess = null, Un
         #region Round SI Functions
         public async Task SaveRoundMotionToFirestore(string roundType, string roundId, Dictionary<string, string> motion, UnityAction< Dictionary<string, string>> onSuccess = null, UnityAction onFailure = null)
         {
-            try
-            {
+            // try
+            // {
                 // Get the document reference for the specified round
                 DocumentReference roundRef = GetRoundDocumentReference(roundType, roundId);
         
@@ -1026,12 +1026,12 @@ public async Task UpdateTournamentBreakingTeams(UnityAction onSuccess = null, Un
         
                 Debug.Log($"<color=green>Motion for round {roundId} saved successfully.</color>");
                 onSuccess?.Invoke(motion);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"<color=red>Error saving motion for round {roundId}: {ex.Message}</color>");
-                onFailure?.Invoke();
-            }
+            // }
+            // catch (Exception ex)
+            // {
+            //     Debug.LogError($"<color=red>Error saving motion for round {roundId}: {ex.Message}</color>");
+            //     onFailure?.Invoke();
+            // }
         }
         public async Task SaveTeamAttendanceToFirestore(string roundType, string roundId, List<string> teamAttendance,List<Team> teamsList, UnityAction<List<Team>> onSuccess = null, UnityAction onFailure = null)
         {

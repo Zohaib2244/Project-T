@@ -13,17 +13,6 @@ public class SpeakerPanelEntry : MonoBehaviour
     public GameObject roundScorePrefab; // Prefab for round score text elements
     public Transform roundScoresContainer; // Container with GridLayoutGroup
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void SetRankingData(int ranking, string speakerName, string teamName, List<float> roundScores, float totalScore)
     {
@@ -50,6 +39,8 @@ public class SpeakerPanelEntry : MonoBehaviour
             if (roundScoreText != null)
             {
                 roundScoreText.text = $"R{i + 1}: {roundScores[i]}";
+                roundScoreText.enableAutoSizing = true; // Enable auto size
+                roundScoreText.alignment = TextAlignmentOptions.Center; // Center align text
             }
         }
 

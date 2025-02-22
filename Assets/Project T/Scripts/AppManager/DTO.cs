@@ -413,7 +413,7 @@ namespace Scripts.FirebaseConfig
             }
         }
 
-        //Institution DTO Converter -------------------------------------------------------------------------------------------------
+        //*Institution DTO Converter -------------------------------------------------------------------------------------------------
         public Instituitions_DTO InstituitionsToDTO(Instituitions instituitions)
         {
             return new Instituitions_DTO
@@ -433,7 +433,7 @@ namespace Scripts.FirebaseConfig
                 instituitionAbreviation = instituitions.instituitionAbreviation,
             };
         }
-        //TournamentInfo DTO Converter -------------------------------------------------------------------------------------------------
+        //*TournamentInfo DTO Converter -------------------------------------------------------------------------------------------------
         public TournamentInfo_DTO TournamentInfoToDTO(TournamentInfo tournamentInfo)
         {
             List<SpeakerCategories_DTO> speakerCategories = new List<SpeakerCategories_DTO>();

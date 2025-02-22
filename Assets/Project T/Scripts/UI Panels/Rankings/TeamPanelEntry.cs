@@ -54,6 +54,8 @@ public class TeamPanelEntry : MonoBehaviour
         {
             TMP_Text positionTextInstance = Instantiate(positionTextPrefab, positionsGridLayout.transform);
             positionTextInstance.text = position.ToString();
+            positionTextInstance.enableAutoSizing = true; // Enable auto size
+            positionTextInstance.alignment = TextAlignmentOptions.Center; // Center align text
         }
     }
 }

@@ -73,12 +73,6 @@ public class TeamScript : MonoBehaviour
         }
     }
 
-    // Update is called once per frame (if needed)
-    void Update()
-    {
-
-    }
-
     // Optional: Refresh rankings when the panel becomes active (if necessary)
     private void OnEnable()
     {

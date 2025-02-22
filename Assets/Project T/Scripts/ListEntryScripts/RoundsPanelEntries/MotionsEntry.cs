@@ -37,36 +37,36 @@ public class MotionsEntry : MonoBehaviour
         return motion;
     }
 
-public void SetMotion(Dictionary<string, string> motion)
-{
-    if (motion == null || !motion.Any())
+    public void SetMotion(Dictionary<string, string> motion)
     {
-        Debug.LogWarning("SetMotion: The provided motion dictionary is null or empty.");
-        motionText = " ";
-        motionInfoSlide = " ";
-    }
-    else
-    {
-        var _motion = motion.First();
-        motionText = _motion.Key;
-        motionInfoSlide = _motion.Value;
-    }
+        if (motion == null || !motion.Any())
+        {
+            Debug.LogWarning("SetMotion: The provided motion dictionary is null or empty.");
+            motionText = " ";
+            motionInfoSlide = " ";
+        }
+        else
+        {
+            var _motion = motion.First();
+            motionText = _motion.Key;
+            motionInfoSlide = _motion.Value;
+        }
 
-    Debug.Log("motionText: " + motionText);
-    Debug.Log("motionInfoSlide: " + motionInfoSlide);
+        Debug.Log("motionText: " + motionText);
+        Debug.Log("motionInfoSlide: " + motionInfoSlide);
 
-    motionText_IF.text = motionText;
-    motionInfoSlide_IF.text = motionInfoSlide;
+        motionText_IF.text = motionText;
+        motionInfoSlide_IF.text = motionInfoSlide;
 
-    if (string.IsNullOrEmpty(motionInfoSlide))
-    {
-        infoSLideToggle.SelectOption2();
+        if (string.IsNullOrEmpty(motionInfoSlide))
+        {
+            infoSLideToggle.SelectOption2();
+        }
+        else
+        {
+            infoSLideToggle.SelectOption1();
+        }
     }
-    else
-    {
-        infoSLideToggle.SelectOption1();
-    }
-}
     private void InfoSlideOn()
     {
         motionInfoSlide_IF.interactable = true;

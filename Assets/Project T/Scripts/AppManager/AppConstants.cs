@@ -606,6 +606,9 @@ public List<Speaker> GetAllSpeakers()
         selectedTouranment.openBreaksInTourney = await FirestoreManager.FireInstance.GetAllRoundsFromFirestore(RoundCategory.OpenBreak.ToString());
         Debug.Log("Prelims in Tournament: " + selectedTouranment.preLimsInTourney.Count);
         Debug.Log("Novice Breaks in Tournament: " + selectedTouranment.noviceBreaksInTourney.Count);
+        foreach (Rounds round in selectedTouranment.noviceBreaksInTourney)
+        {
+            Debug.Log($"Round Novice Break, Round Category: {round.roundCategory}");}
         Debug.Log("Open Breaks in Tournament: " + selectedTouranment.openBreaksInTourney.Count);
     }
     public void PrintRankings()
