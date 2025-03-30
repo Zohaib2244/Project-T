@@ -1,2 +1,2 @@
-# Project T
- This is a custom tab app made by a bunch of humans
+# Tab X
+A windows based application to calculate tabulations for British and Asian Parliamentar Debate Competitions. 
